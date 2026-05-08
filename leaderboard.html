@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leaderboard — Concordia Eats</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/shared.css" />
+  <style>
+    /* ── Page ── */
+    .page { padding-top: 72px; }
+
+    /* ── Aceternity UI — Lamp Section Header ── */
+    @keyframes lamp-width { from { width: 0; } to { width: 30%; } }
+    @keyframes lamp-glow  { from { opacity: 0; transform: translateX(-50%) scaleX(0.4); }
+                             to   { opacity: 1; transform: translateX(-50%) scaleX(1); } }
+
+    /* ── Hero ── */
+    .lb-hero {
+      position: relative; overflow: hidden;
+      padding: 80px 0 68px; text-align: center;
+    }
+    .lb-hero-glow { display: none; } /* replaced by lamp */
+
+    /* Lamp line */
+    .lamp-wrap {
+      position: relative; display: flex; justify-content: center;
+      align-items: flex-end; margin-bottom: 0;
+      height: 160px; pointer-events: none;
+    }
+    .lamp-line {
+      position: relative; height: 1px;
+      background: linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(200,151,90,0.0) 5%,
+        rgba(200,151,90,0.95) 35%,
+        rgba(255,230,140,1) 50%,
+        rgba(200,151,90,0.95) 65%,
+        rgba(200,151,90,0.0) 95%,
+        transparent 100%
+      );
+      width: 0%;
+      animation: lamp-width 1.1s cubic-bezier(0.4,0,0.2,1) 0.25s forwards;
+      max-width: 720px; flex-shrink: 0;
+    }
+    /* downward bloom */
+    .lamp-line::after {
+      content: '';
+      position: absolute; bottom: 0; left: 50%;
+      transform: translateX(-50%) scaleX(0.4);
+      width: 680px; height: 320px;
+      background: radial-gradient(
+        ellipse 55% 100% at 50% 0%,
+        rgba(200,151,90,0.28) 0%,
+        rgba(200,151,90,0.10) 35%,
+        rgba(200,151,90,0.03) 60%,
+        transparent 80%
+      );
+      animation: lamp-glow 1.2s cubic-bezier(0.4,0,0.2,1) 0.3s forwards;
+      opacity: 0;
+    }
+    /* upward halo */
+    .lamp-line::before {
+      content: '';
+      position: absolute; top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 300px; height: 1px;
+      box-shadow: 0 0 18px 4px rgba(200,151,90,0.55),
+                  0 0 40px 8px rgba(200,151,90,0.22),
+                  0 0 80px 16px rgba(200,151,90,0.09);
+    }
+    .lb-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--accent-dim); border: 1px solid rgba(200,151,90,0.25);
+      border-radius: 100px; padding: 5px 16px;
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 20px; position: relative;
+    }
+    .live-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--green); box-shadow: 0 0 8px var(--green);
+      animation: blink 1.8s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+    .lb-hero h1 {
+      font-size: clamp(2.4rem, 5vw, 3.8rem); font-weight: 800;
+      letter-spacing: -0.04em; position: relative;
+      line-height: 1.05; margin-bottom: 14px;
+    }
+    .lb-hero h1 .accent { color: var(--accent); }
+    .lb-hero-sub { font-size: 1rem; color: var(--text-muted); position: relative; }
+
+    /* Stat chips row */
+    .lb-stats {
+      display: flex; gap: 14px; justify-content: center;
+      flex-wrap: wrap; margin-top: 36px; position: relative;
+    }
+    .lb-stat-chip {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-card); padding: 16px 24px;
+      min-width: 130px; text-align: center; transition: var(--transition);
+    }
+    .lb-stat-chip:hover { border-color: var(--border-accent); transform: translateY(-2px); }
+    .lb-stat-num {
+      font-family: 'Syne', sans-serif; font-size: 1.7rem; font-weight: 800;
+      letter-spacing: -0.04em; color: var(--accent); line-height: 1;
+    }
+    .lb-stat-label { font-size: 0.73rem; color: var(--text-muted); margin-top: 5px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+
+    /* ── Podium ── */
+    .podium-section { padding: 56px 0 0; }
+
+    .podium {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px; align-items: end; margin-top: 28px;
+    }
+    .podium-slot:nth-child(1) { order: 2; }
+    .podium-slot:nth-child(2) { order: 1; }
+    .podium-slot:nth-child(3) { order: 3; }
+    .podium-slot { display: flex; flex-direction: column; align-items: center; }
+
+    /* card */
+    .podium-card {
+      width: 100%; border-radius: 16px 16px 0 0;
+      padding: 28px 20px 22px; text-align: center;
+      position: relative; overflow: hidden;
+      cursor: pointer; transition: transform 0.28s ease, box-shadow 0.28s ease;
+      background: var(--surface); border: 1px solid var(--border);
+      border-bottom: none;
+    }
+    /* top accent line */
+    .podium-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    }
+    /* corner glow */
+    .podium-card::after {
+      content: ''; position: absolute; bottom: -40px; right: -40px;
+      width: 120px; height: 120px; border-radius: 50%;
+      opacity: 0; transition: opacity 0.35s;
+    }
+    .podium-slot:nth-child(1) .podium-card::before { background: #FFD700; }
+    .podium-slot:nth-child(2) .podium-card::before { background: #C0C0C0; }
+    .podium-slot:nth-child(3) .podium-card::before { background: #CD7F32; }
+
+    .podium-slot:nth-child(1) .podium-card {
+      border-color: rgba(255,215,0,0.2);
+      box-shadow: 0 0 48px rgba(255,215,0,0.06), inset 0 0 48px rgba(255,215,0,0.025);
+    }
+    .podium-slot:nth-child(1) .podium-card::after { background: radial-gradient(circle, rgba(255,215,0,0.1), transparent 70%); }
+    .podium-slot:nth-child(2) .podium-card::after { background: radial-gradient(circle, rgba(192,192,192,0.06), transparent 70%); }
+    .podium-slot:nth-child(3) .podium-card::after { background: radial-gradient(circle, rgba(205,127,50,0.06), transparent 70%); }
+
+    .podium-card:hover { transform: translateY(-6px); }
+    .podium-slot:nth-child(1) .podium-card:hover { box-shadow: 0 24px 56px rgba(255,215,0,0.14); }
+    .podium-slot:nth-child(2) .podium-card:hover { box-shadow: 0 20px 44px rgba(192,192,192,0.08); }
+    .podium-slot:nth-child(3) .podium-card:hover { box-shadow: 0 20px 44px rgba(205,127,50,0.08); }
+    .podium-card:hover::after { opacity: 1; }
+
+    /* spinning conic border on #1 (UIVerse) */
+    .podium-slot:nth-child(1) .podium-card-wrap {
+      width: 100%; position: relative;
+      border-radius: 16px 16px 0 0; overflow: hidden;
+    }
+    .podium-conic {
+      position: absolute; inset: -2px;
+      border-radius: 16px 16px 0 0;
+      background: conic-gradient(from 0deg, transparent 100deg, rgba(255,215,0,0.7) 180deg, transparent 260deg);
+      animation: pod-spin 3s linear infinite;
+      z-index: 0;
+    }
+    @keyframes pod-spin { to { transform: rotate(1turn); } }
+    .podium-card-inner {
+      position: relative; z-index: 1;
+      background: var(--surface);
+      border-radius: 16px 16px 0 0; padding: 28px 20px 22px; text-align: center;
+      border: 1px solid rgba(255,215,0,0.18); border-bottom: none;
+    }
+
+    .podium-crown { font-size: 1.6rem; line-height: 1; margin-bottom: 4px; }
+    .podium-emoji { font-size: 2rem; margin-bottom: 10px; line-height: 1; }
+    .podium-name { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+    .podium-loc { font-size: 0.73rem; color: var(--text-muted); margin-bottom: 16px; }
+    .podium-rating { font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 800; letter-spacing: -0.05em; line-height: 1; }
+    .podium-slot:nth-child(1) .podium-rating { color: #FFD700; }
+    .podium-slot:nth-child(2) .podium-rating { color: #C0C0C0; }
+    .podium-slot:nth-child(3) .podium-rating { color: #CD7F32; }
+    .podium-stars-row { display: flex; gap: 2px; justify-content: center; margin: 7px 0 5px; }
+    .podium-count { font-size: 0.73rem; color: var(--text-muted); }
+
+    /* base platform */
+    .podium-base {
+      width: 100%; text-align: center;
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem;
+      letter-spacing: 0.04em; display: flex; align-items: center; justify-content: center;
+      border-radius: 0 0 10px 10px;
+    }
+    .podium-slot:nth-child(1) .podium-base { background: linear-gradient(135deg, #FFD700, #f0c000); color: #1a1200; height: 64px; font-size: 1.1rem; }
+    .podium-slot:nth-child(2) .podium-base { background: linear-gradient(135deg, #C0C0C0, #a8a8a8); color: #111; height: 46px; }
+    .podium-slot:nth-child(3) .podium-base { background: linear-gradient(135deg, #CD7F32, #b8692a); color: #1a0800; height: 32px; font-size: 0.9rem; }
+
+    /* ── Rankings ── */
+    .rankings-section { padding: 52px 0 96px; }
+
+    .rankings-table {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-card); overflow: hidden; margin-top: 22px;
+    }
+
+    .rankings-row {
+      display: grid; grid-template-columns: 64px 1fr 1fr auto;
+      align-items: center; gap: 20px; padding: 22px 28px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background 0.2s ease, border-color 0.2s ease;
+      position: relative;
+    }
+    .rankings-row:last-child { border-bottom: none; }
+    .rankings-row:hover { background: rgba(200,151,90,0.03); }
+
+    /* left accent on hover */
+    .rankings-row::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; background: var(--accent); transform: scaleY(0);
+      transform-origin: center; transition: transform 0.22s ease;
+      border-radius: 0 2px 2px 0;
+    }
+    .rankings-row:hover::before { transform: scaleY(1); }
+
+    .rank-num {
+      font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800;
+      letter-spacing: -0.05em; text-align: center; opacity: 0.18;
+    }
+    .rank-num.r1 { color: #FFD700; opacity: 1; font-size: 2rem; }
+    .rank-num.r2 { color: #C0C0C0; opacity: 1; }
+    .rank-num.r3 { color: #CD7F32; opacity: 1; }
+
+    .rank-cafe { display: flex; align-items: center; gap: 16px; }
+    .rank-emoji { font-size: 1.8rem; line-height: 1; }
+    .rank-cafe-name { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 3px; }
+    .rank-cafe-loc { font-size: 0.77rem; color: var(--text-muted); }
+
+    /* score bar column */
+    .rank-bar-col { display: flex; flex-direction: column; gap: 5px; }
+    .rank-bar-wrap { height: 6px; background: rgba(255,255,255,0.07); border-radius: 100px; overflow: hidden; }
+    .rank-bar-fill {
+      height: 100%; border-radius: 100px; width: 0%;
+      transition: width 1s cubic-bezier(0.4,0,0.2,1);
+    }
+    .r1 .rank-bar-fill,
+    .rankings-row:nth-child(1) .rank-bar-fill { background: linear-gradient(90deg, #FFD700, #f5d44a); }
+    .r2 .rank-bar-fill,
+    .rankings-row:nth-child(2) .rank-bar-fill { background: linear-gradient(90deg, #C0C0C0, #d8d8d8); }
+    .r3 .rank-bar-fill,
+    .rankings-row:nth-child(3) .rank-bar-fill { background: linear-gradient(90deg, #CD7F32, #e09645); }
+    .rank-bar-info { display: flex; align-items: center; justify-content: space-between; }
+    .rank-bar-reviews { font-size: 0.73rem; color: var(--text-muted); }
+    .rank-bar-pct { font-size: 0.73rem; font-weight: 600; color: var(--text-muted); }
+
+    .rank-right { text-align: right; }
+    .rank-avg-num {
+      font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800;
+      letter-spacing: -0.04em; line-height: 1;
+    }
+    .rank-avg-num.r1 { color: #FFD700; }
+    .rank-avg-num.r2 { color: #C0C0C0; }
+    .rank-avg-num.r3 { color: #CD7F32; }
+    .rank-stars-row { display: flex; gap: 2px; justify-content: flex-end; margin-top: 5px; }
+
+    /* ── CTA ── */
+    .cta-strip {
+      background: var(--accent-dim); border: 1px solid rgba(200,151,90,0.22);
+      border-radius: var(--radius-card); padding: 26px 32px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      flex-wrap: wrap; margin-top: 28px;
+    }
+    .cta-text h3 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+    .cta-text p  { font-size: 0.875rem; color: var(--text-muted); }
+
+    /* ── Skeleton ── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+      background-size: 200% 100%; animation: shimmer 1.4s ease infinite; border-radius: 8px;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .podium-loading { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; align-items: end; margin-top: 28px; }
+    .skel-pod { border-radius: var(--radius-card); }
+    .skel-pod.tall  { height: 230px; }
+    .skel-pod.mid   { height: 190px; }
+    .skel-pod.short { height: 160px; }
+
+    /* ── Empty ── */
+    .empty-state { text-align: center; padding: 64px 24px; color: var(--text-muted); font-size: 0.95rem; }
+    .empty-icon  { font-size: 2.5rem; margin-bottom: 12px; }
+
+    @media (max-width: 700px) {
+      .podium { grid-template-columns: 1fr; }
+      .podium-slot { order: unset !important; }
+      .podium-slot:nth-child(1) { order: 1 !important; }
+      .podium-base { display: none; }
+      .rankings-row { grid-template-columns: 48px 1fr auto; }
+      .rank-bar-col { display: none; }
+      .lb-stats { gap: 10px; }
+      .lb-stat-chip { padding: 13px 18px; min-width: 100px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar" id="mainNav">
+    <div class="container" style="max-width:1160px">
+      <a href="index.html" class="logo">Concordia <span class="accent">Eats</span></a>
+      <ul class="nav-links hide-mobile">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html#cafes">Cafes</a></li>
+        <li><a href="leaderboard.html" style="color:var(--text-primary)">Leaderboard</a></li>
+      </ul>
+      <div class="nav-right" id="navRight"></div>
+    </div>
+  </nav>
+
+  <div class="page">
+
+    <!-- Hero -->
+    <div class="lb-hero">
+      <!-- Aceternity UI Lamp -->
+      <div class="lamp-wrap">
+        <div class="lamp-line"></div>
+      </div>
+
+      <div class="container" style="position:relative;z-index:1;margin-top:-80px">
+        <div class="lb-badge" id="lbBadge">
+          <span class="live-dot"></span>
+          Live Rankings
+        </div>
+        <h1 id="lbTitle">Concordia <span class="accent">Leaderboard</span></h1>
+        <p class="lb-hero-sub" id="lbSub">Ranked by verified student ratings — updated in real-time.</p>
+
+        <div class="lb-stats" id="lbStats">
+          <div class="lb-stat-chip">
+            <div class="lb-stat-num" id="statReviews">—</div>
+            <div class="lb-stat-label">Total Reviews</div>
+          </div>
+          <div class="lb-stat-chip">
+            <div class="lb-stat-num" id="statCafes">3</div>
+            <div class="lb-stat-label">Cafes Rated</div>
+          </div>
+          <div class="lb-stat-chip">
+            <div class="lb-stat-num" id="statTop">—</div>
+            <div class="lb-stat-label">Top Score</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Podium -->
+    <div class="podium-section">
+      <div class="container">
+        <span class="label">Top Cafes This Week</span>
+        <div id="podiumContainer">
+          <div class="podium-loading">
+            <div class="skeleton skel-pod mid"></div>
+            <div class="skeleton skel-pod tall"></div>
+            <div class="skeleton skel-pod short"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Full Rankings -->
+    <div class="rankings-section">
+      <div class="container">
+        <span class="label">Full Rankings</span>
+        <div id="rankingsContainer">
+          <div class="rankings-table">
+            <div class="rankings-row" style="cursor:default">
+              <div class="skeleton" style="height:22px;width:32px;margin:0 auto"></div>
+              <div class="skeleton" style="height:22px;width:180px"></div>
+              <div class="skeleton" style="height:22px;width:120px"></div>
+              <div class="skeleton" style="height:22px;width:50px"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cta-strip" id="ctaStrip" style="display:none">
+          <div class="cta-text">
+            <h3>Help shape the leaderboard</h3>
+            <p>Log in with your NUST email and leave honest reviews to move the rankings.</p>
+          </div>
+          <a href="login.html" class="btn-primary">Rate a Cafe →</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/cafes.js"></script>
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    // ── Navbar scroll shadow ──
+    window.addEventListener('scroll', () => {
+      document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 10);
+    });
+
+    // ── Auth ──
+    const user = Auth.getUser();
+    if (user) {
+      document.getElementById('navRight').innerHTML = `
+        <div class="user-chip">
+          <div class="user-avatar">${user.name.charAt(0).toUpperCase()}</div>
+          <div>
+            <div class="user-name">${user.name.split(' ')[0]}</div>
+          </div>
+        </div>
+        <a href="dashboard.html" class="btn-ghost btn-sm">Dashboard</a>`;
+    } else {
+      document.getElementById('navRight').innerHTML = `
+        <a href="login.html" class="btn-primary">Login with NUST</a>`;
+    }
+
+    // ── Helpers ──
+    function renderStars(avg, size = 13) {
+      const full = Math.round(avg);
+      return [1,2,3,4,5].map(n => {
+        const c = n <= full ? '#C8975A' : 'rgba(200,151,90,0.18)';
+        return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="${c}"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
+      }).join('');
+    }
+
+    function animateCounter(el, target, decimals = 0) {
+      const obj = { val: 0 };
+      gsap.to(obj, {
+        val: target, duration: 1.4, ease: 'power2.out',
+        onUpdate() { el.textContent = obj.val.toFixed(decimals); }
+      });
+    }
+
+    // ── GSAP Hero entrance ──
+    function heroEntrance(totalReviews, topScore) {
+      gsap.timeline()
+        .from('#lbBadge',  { opacity: 0, y: 16, duration: 0.6, ease: 'power3.out' })
+        .from('#lbTitle',  { opacity: 0, y: 28, duration: 0.75, ease: 'power3.out' }, '-=0.3')
+        .from('#lbSub',    { opacity: 0, y: 18, duration: 0.6,  ease: 'power3.out' }, '-=0.4')
+        .from('#lbStats .lb-stat-chip', { opacity: 0, y: 22, stagger: 0.1, duration: 0.55, ease: 'back.out(1.4)' }, '-=0.3')
+        .add(() => {
+          animateCounter(document.getElementById('statReviews'), totalReviews);
+          if (topScore) animateCounter(document.getElementById('statTop'), topScore, 1);
+          else document.getElementById('statTop').textContent = '—';
+        }, '-=0.2');
+    }
+
+    // ── Render podium ──
+    function renderPodium(ranked) {
+      if (!ranked.length) {
+        document.getElementById('podiumContainer').innerHTML = `
+          <div class="empty-state"><div class="empty-icon">🏆</div>No ratings yet — be the first to review!</div>`;
+        return;
+      }
+
+      const medals  = ['👑', '🥈', '🥉'];
+      const crowns  = ['#1', '#2', '#3'];
+      const slots   = ranked.slice(0, 3);
+
+      const html = slots.map((c, i) => {
+        const card = i === 0
+          ? `<div class="podium-card-wrap">
+               <div class="podium-conic"></div>
+               <div class="podium-card-inner">
+                 <div class="podium-crown">${medals[i]}</div>
+                 <div class="podium-emoji">${c.emoji}</div>
+                 <div class="podium-name">${c.name}</div>
+                 <div class="podium-loc">${c.location}</div>
+                 <div class="podium-rating">${c.avg}</div>
+                 <div class="podium-stars-row">${renderStars(parseFloat(c.avg), 15)}</div>
+                 <div class="podium-count">${c.count} review${c.count !== 1 ? 's' : ''}</div>
+               </div>
+             </div>`
+          : `<div class="podium-card">
+               <div class="podium-crown">${medals[i]}</div>
+               <div class="podium-emoji">${c.emoji}</div>
+               <div class="podium-name">${c.name}</div>
+               <div class="podium-loc">${c.location}</div>
+               <div class="podium-rating">${c.avg}</div>
+               <div class="podium-stars-row">${renderStars(parseFloat(c.avg), 14)}</div>
+               <div class="podium-count">${c.count} review${c.count !== 1 ? 's' : ''}</div>
+             </div>`;
+
+        return `
+          <div class="podium-slot" onclick="window.location.href='cafe.html?id=${c.id}'">
+            ${card}
+            <div class="podium-base">${crowns[i]}</div>
+          </div>`;
+      }).join('');
+
+      document.getElementById('podiumContainer').innerHTML = `<div class="podium">${html}</div>`;
+
+      // GSAP slide-up entrance
+      const podSlots = document.querySelectorAll('.podium-slot');
+      const order = [1, 0, 2]; // center first (index 0 = 1st place, rendered center)
+      const sorted = [podSlots[1], podSlots[0], podSlots[2]].filter(Boolean);
+      gsap.from(sorted, {
+        opacity: 0, y: 60, duration: 0.75, stagger: 0.12,
+        ease: 'back.out(1.2)',
+        scrollTrigger: { trigger: '#podiumContainer', start: 'top 85%' }
+      });
+    }
+
+    // ── Render rankings table ──
+    function renderRankings(ranked) {
+      if (!ranked.length) {
+        document.getElementById('rankingsContainer').innerHTML = `
+          <div class="empty-state"><div class="empty-icon">📊</div>Rankings appear once students start rating.</div>`;
+        return;
+      }
+
+      const maxAvg = Math.max(...ranked.map(c => parseFloat(c.avg)));
+      const rankColors = ['r1', 'r2', 'r3'];
+
+      const rows = ranked.map((c, i) => {
+        const cls  = rankColors[i] || '';
+        const pct  = maxAvg > 0 ? Math.round((parseFloat(c.avg) / 5) * 100) : 0;
+        const medal = ['🥇', '🥈', '🥉'][i] || '';
+        return `
+          <div class="rankings-row ${cls}" onclick="window.location.href='cafe.html?id=${c.id}'">
+            <div class="rank-num ${cls}">${medal || ('#' + (i + 1))}</div>
+            <div class="rank-cafe">
+              <div class="rank-emoji">${c.emoji}</div>
+              <div>
+                <div class="rank-cafe-name">${c.name}</div>
+                <div class="rank-cafe-loc">${c.location}</div>
+              </div>
+            </div>
+            <div class="rank-bar-col">
+              <div class="rank-bar-info">
+                <span class="rank-bar-reviews">${c.count} review${c.count !== 1 ? 's' : ''}</span>
+                <span class="rank-bar-pct">${pct}%</span>
+              </div>
+              <div class="rank-bar-wrap">
+                <div class="rank-bar-fill ${cls}" data-pct="${pct}"></div>
+              </div>
+            </div>
+            <div class="rank-right">
+              <div class="rank-avg-num ${cls}">${c.avg}</div>
+              <div class="rank-stars-row">${renderStars(parseFloat(c.avg), 12)}</div>
+            </div>
+          </div>`;
+      }).join('');
+
+      document.getElementById('rankingsContainer').innerHTML = `<div class="rankings-table">${rows}</div>`;
+
+      // Animate bars + rows
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        document.querySelectorAll('.rank-bar-fill').forEach(b => { b.style.width = b.dataset.pct + '%'; });
+      }));
+
+      gsap.from('.rankings-row', {
+        opacity: 0, x: -20, stagger: 0.1, duration: 0.55, ease: 'power3.out',
+        scrollTrigger: { trigger: '.rankings-table', start: 'top 88%' }
+      });
+    }
+
+    // ── Load ──
+    async function loadLeaderboard() {
+      try {
+        let ratings = {};
+
+        if (Auth._supabaseReady()) {
+          const [r1, r2, r3] = await Promise.all([
+            SbReviews.forCafe('1'), SbReviews.forCafe('2'), SbReviews.forCafe('3'),
+          ]);
+          ratings = {
+            '1': { avg: r1.avg, count: r1.count },
+            '2': { avg: r2.avg, count: r2.count },
+            '3': { avg: r3.avg, count: r3.count },
+          };
+        } else {
+          CAFES.forEach(c => {
+            const revs = DB.where('reviews', 'cafeId', c.id);
+            ratings[c.id] = revs.length
+              ? { avg: (revs.reduce((s, r) => s + r.rating, 0) / revs.length).toFixed(1), count: revs.length }
+              : { avg: null, count: 0 };
+          });
+        }
+
+        const ranked = CAFES
+          .map(c => ({ ...c, avg: ratings[c.id]?.avg ? parseFloat(ratings[c.id].avg).toFixed(1) : null, count: ratings[c.id]?.count || 0 }))
+          .filter(c => c.count > 0)
+          .sort((a, b) => parseFloat(b.avg) - parseFloat(a.avg));
+
+        const totalReviews = ranked.reduce((s, c) => s + c.count, 0);
+        const topScore = ranked.length ? parseFloat(ranked[0].avg) : null;
+
+        heroEntrance(totalReviews, topScore);
+        renderPodium(ranked);
+        renderRankings(ranked);
+
+        if (!user || totalReviews === 0)
+          document.getElementById('ctaStrip').style.display = 'flex';
+
+      } catch (e) {
+        console.error(e);
+        document.getElementById('podiumContainer').innerHTML = `
+          <div class="empty-state"><div class="empty-icon">⚠️</div>Could not load ratings. Please try again.</div>`;
+      }
+    }
+
+    Auth.restoreSession().then(loadLeaderboard).catch(loadLeaderboard);
+  </script>
+</body>
+</html>

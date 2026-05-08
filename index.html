@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Concordia Eats — NUST Cafe Ratings</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet" />
+
+  <!-- AOS — Animate on Scroll -->
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+
+  <!-- GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <!-- Supabase + App Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="js/supabase-client.js" defer></script>
+  <script src="js/db.js" defer></script>
+  <script src="js/auth.js" defer></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* ─── Reset ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    img, svg { display: block; }
+    button { font-family: inherit; cursor: pointer; }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+
+    /* ─── Design Tokens ───────────────────────────────────────── */
+    :root {
+      --bg:            #070707;
+      --surface:       #101010;
+      --surface2:      #171717;
+      --border:        rgba(255,255,255,0.07);
+      --border-accent: rgba(200,151,90,0.28);
+      --accent:        #C8975A;
+      --accent-light:  #dba96c;
+      --accent-dim:    rgba(200,151,90,0.11);
+      --text-primary:  #F0EDE6;
+      --text-muted:    rgba(240,237,230,0.46);
+      --radius-card:   14px;
+      --radius-btn:    8px;
+      --transition:    all 0.3s ease;
+      --glow-sm:       0 0 30px rgba(200,151,90,0.10);
+      --glow:          0 0 60px rgba(200,151,90,0.16);
+      --sp-xs:  8px;  --sp-sm: 16px;  --sp-md: 24px;
+      --sp-lg: 48px;  --sp-xl: 80px;  --sp-2xl: 120px;
+    }
+
+    /* ─── Base ────────────────────────────────────────────────── */
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+    h1, h2, h3, h4 { font-family: 'Syne', sans-serif; line-height: 1.12; }
+
+    /* ─── Animated dot-grid background (UIVerse) ──────────────── */
+    .bg-dots {
+      position: fixed; inset: 0; z-index: 0;
+      background-image: radial-gradient(rgba(200,151,90,0.07) 1px, transparent 1px);
+      background-size: 42px 42px;
+      pointer-events: none;
+      mask-image: radial-gradient(ellipse 90% 90% at 50% 0%, black 30%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 90% 90% at 50% 0%, black 30%, transparent 100%);
+    }
+
+    /* ─── Layout ──────────────────────────────────────────────── */
+    .container { max-width: 1160px; margin: 0 auto; padding: 0 var(--sp-md); position: relative; z-index: 1; }
+    section { padding: var(--sp-xl) 0; }
+
+    /* ─── Navbar ──────────────────────────────────────────────── */
+    .navbar {
+      position: fixed; inset: 0 0 auto 0; z-index: 100;
+      background: rgba(7,7,7,0.82);
+      backdrop-filter: blur(22px) saturate(160%);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+      transition: box-shadow 0.4s;
+    }
+    .navbar.scrolled {
+      box-shadow: 0 4px 40px rgba(0,0,0,0.5), var(--glow-sm);
+    }
+    .navbar .container { display: flex; align-items: center; justify-content: space-between; }
+
+    .logo {
+      font-family: 'Syne', sans-serif; font-size: 1.32rem; font-weight: 700;
+      letter-spacing: -0.028em; color: var(--text-primary);
+    }
+    .logo .accent { color: var(--accent); }
+
+    .nav-right { display: flex; align-items: center; gap: var(--sp-lg); }
+    .nav-links { display: flex; gap: var(--sp-md); }
+    .nav-links a {
+      font-size: 0.875rem; font-weight: 500; color: var(--text-muted);
+      transition: var(--transition); letter-spacing: 0.01em; position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0; right: 100%;
+      height: 1px; background: var(--accent); transition: right 0.3s ease;
+    }
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links a:hover::after { right: 0; }
+
+    /* UIVerse shimmer button */
+    .btn-login {
+      position: relative; overflow: hidden;
+      background: transparent; color: #070707;
+      border: none; padding: 10px 22px;
+      border-radius: var(--radius-btn);
+      font-size: 0.875rem; font-weight: 700; letter-spacing: 0.01em;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      z-index: 0; cursor: pointer;
+    }
+    .btn-login::before {
+      content: ''; position: absolute; top: 50%; left: 50%;
+      width: 600%; height: 600%;
+      transform: translate(-50%, -50%) rotate(0deg);
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg 50deg,
+        rgba(255,240,160,0.9) 70deg 95deg,
+        rgba(255,255,255,1) 100deg 120deg,
+        rgba(235,175,60,0.85) 130deg 150deg,
+        transparent 170deg 300deg,
+        rgba(255,210,80,0.5) 315deg 340deg,
+        transparent 355deg 360deg
+      );
+      animation: lm-spin 3.5s linear infinite;
+      z-index: -2;
+    }
+    .btn-login::after {
+      content: ''; position: absolute; inset: 2px;
+      border-radius: calc(var(--radius-btn) - 2px);
+      background: var(--accent); z-index: -1; transition: background 0.25s;
+    }
+    .btn-login:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(200,151,90,0.42); }
+    .btn-login:hover::after { background: var(--accent-light); }
+
+    /* ─── Hero ────────────────────────────────────────────────── */
+    .hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center;
+      padding: var(--sp-xl) 0; overflow: hidden;
+    }
+
+    /* Ambient glow orbs */
+    .orb {
+      position: absolute; border-radius: 50%;
+      pointer-events: none; filter: blur(90px);
+    }
+    .orb-1 {
+      top: 5%; left: -15%; width: 750px; height: 750px;
+      background: radial-gradient(circle, rgba(200,151,90,0.07) 0%, transparent 65%);
+      animation: orb-drift 14s ease-in-out infinite;
+    }
+    .orb-2 {
+      bottom: -10%; right: -18%; width: 680px; height: 680px;
+      background: radial-gradient(circle, rgba(200,151,90,0.055) 0%, transparent 65%);
+      animation: orb-drift 18s ease-in-out infinite reverse;
+    }
+    .orb-3 {
+      top: 55%; left: 38%; width: 460px; height: 460px;
+      background: radial-gradient(circle, rgba(200,151,90,0.04) 0%, transparent 70%);
+      animation: orb-drift 11s ease-in-out infinite 3s;
+    }
+    @keyframes lamp-width { from { width: 0; } to { width: 100%; } }
+    @keyframes lamp-glow  { from { opacity:0; transform:translateX(-50%) scaleX(0.4); }
+                             to   { opacity:1; transform:translateX(-50%) scaleX(1); } }
+
+    @keyframes orb-drift {
+      0%,100% { transform: translate(0,0) scale(1); }
+      33%      { transform: translate(40px,-25px) scale(1.06); }
+      66%      { transform: translate(-25px,18px) scale(0.97); }
+    }
+
+    /* CSS-only floating particles */
+    .particles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .particle {
+      position: absolute; border-radius: 50%;
+      background: rgba(200,151,90,0.18);
+      animation: ptcl linear infinite;
+    }
+    @keyframes ptcl {
+      0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+      8%   { opacity: 1; }
+      92%  { opacity: 1; }
+      100% { transform: translateY(-80px) rotate(720deg); opacity: 0; }
+    }
+
+    .hero-content { position: relative; z-index: 1; max-width: 770px; }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(200,151,90,0.28);
+      border-radius: 100px; padding: 7px 17px;
+      font-size: 0.73rem; font-weight: 700; letter-spacing: 0.09em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: var(--sp-md);
+      position: relative; overflow: hidden;
+    }
+    .hero-badge::before {
+      content: ''; position: absolute; top: 0; left: -120%;
+      width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(200,151,90,0.22), transparent);
+      animation: badge-sweep 3.5s ease-in-out infinite 1.2s;
+    }
+    @keyframes badge-sweep { 0% { left:-120%; } 100% { left: 200%; } }
+    .hero-badge i { width: 12px; height: 12px; }
+
+    .hero h1 {
+      font-size: clamp(2.9rem, 5.8vw, 5rem);
+      font-weight: 800; letter-spacing: -0.042em;
+      color: var(--text-primary); margin-bottom: var(--sp-sm);
+    }
+    .hero h1 .accent { color: var(--accent); }
+
+    /* ── Aceternity UI — Split-Flap Board ─────────────────── */
+    .sfd-board {
+      display: flex !important;
+      flex-direction: column;
+      gap: 0.1em;
+    }
+    .sfd-line {
+      display: flex;
+      align-items: center;
+      flex-wrap: nowrap;
+      gap: 0.04em;
+      line-height: 1;
+    }
+    .sfd-cell {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 5px;
+      min-width: 0.6em;
+      height: 1em;
+      position: relative;
+      overflow: hidden;
+      padding: 0 0.04em;
+      transition: background 0.18s ease;
+    }
+    .sfd-cell::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; top: 50%;
+      height: 1px;
+      background: rgba(0,0,0,0.52);
+      z-index: 2;
+      pointer-events: none;
+    }
+    .sfd-char {
+      font-family: inherit;
+      font-size: 1em;
+      font-weight: inherit;
+      color: var(--text-primary);
+      position: relative;
+      z-index: 1;
+      display: block;
+      line-height: 1;
+    }
+    .sfd-char.gold { color: var(--accent); }
+    .sfd-sp { display: inline-block; width: 0.28em; flex-shrink: 0; }
+
+    .hero-sub {
+      font-size: 1.06rem; color: var(--text-muted);
+      max-width: 500px; line-height: 1.77;
+      margin-bottom: var(--sp-lg); opacity: 0;
+    }
+
+    .hero-actions { display: flex; gap: 13px; flex-wrap: wrap; opacity: 0; }
+
+    /* UIVerse shimmer primary button */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #070707;
+      border: none; padding: 14px 30px;
+      border-radius: var(--radius-btn);
+      font-size: 0.95rem; font-weight: 700;
+      transition: var(--transition);
+      position: relative; overflow: hidden; z-index: 0;
+    }
+    .btn-primary::before {
+      content: ''; position: absolute; top: 0; left: -120%;
+      width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.32), transparent);
+      transition: left 0.55s ease;
+    }
+    .btn-primary:hover { background: var(--accent-light); transform: translateY(-2px); box-shadow: 0 14px 36px rgba(200,151,90,0.38); }
+    .btn-primary:hover::before { left: 160%; }
+    .btn-primary i { width: 17px; height: 17px; }
+
+    /* UIVerse animated border ghost button */
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent; color: var(--text-primary);
+      border: 1px solid var(--border); padding: 14px 30px;
+      border-radius: var(--radius-btn);
+      font-size: 0.95rem; font-weight: 500;
+      transition: var(--transition); position: relative; overflow: hidden;
+    }
+    .btn-ghost::before {
+      content: ''; position: absolute; inset: 0;
+      background: rgba(200,151,90,0.05); opacity: 0; transition: opacity 0.3s;
+    }
+    .btn-ghost:hover { border-color: var(--border-accent); transform: translateY(-2px); }
+    .btn-ghost:hover::before { opacity: 1; }
+    .btn-ghost i { width: 17px; height: 17px; }
+
+    /* ─── Section Labels (UIVerse line-accent style) ───────────── */
+    .label {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.13em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 12px;
+    }
+    .label::before { content: ''; width: 22px; height: 1px; background: var(--accent); opacity: 0.65; }
+
+    .section-title {
+      font-size: clamp(1.9rem, 3.5vw, 2.75rem); font-weight: 800;
+      letter-spacing: -0.034em; color: var(--text-primary); margin-bottom: 14px;
+    }
+    .section-desc { font-size: 0.975rem; color: var(--text-muted); line-height: 1.78; max-width: 560px; }
+
+    /* ─── About ───────────────────────────────────────────────── */
+    #about { background: linear-gradient(180deg, var(--bg) 0%, rgba(14,10,6,0.35) 100%); }
+
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+    .about-text .section-desc { max-width: 100%; }
+    .about-text .section-desc + .section-desc { margin-top: 14px; }
+
+    .pills { display: flex; flex-wrap: wrap; gap: 10px; margin-top: var(--sp-md); }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 100px; padding: 7px 15px;
+      font-size: 0.8rem; color: var(--text-muted);
+      transition: var(--transition); cursor: default;
+    }
+    .pill:hover { border-color: var(--border-accent); color: var(--text-primary); transform: translateY(-1px); }
+    .pill i { color: var(--accent); width: 13px; height: 13px; }
+
+    /* UIVerse glow stat cards */
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-sm); }
+
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-card); padding: var(--sp-md) 20px;
+      transition: var(--transition); position: relative; overflow: hidden;
+    }
+    .stat-card::before {
+      content: ''; position: absolute; top: -50px; left: -50px;
+      width: 140px; height: 140px;
+      background: radial-gradient(circle, rgba(200,151,90,0.14) 0%, transparent 70%);
+      opacity: 0; transition: opacity 0.5s;
+    }
+    .stat-card:hover { border-color: var(--border-accent); transform: translateY(-3px); box-shadow: 0 18px 44px rgba(0,0,0,0.32), var(--glow-sm); }
+    .stat-card:hover::before { opacity: 1; }
+
+    .stat-number {
+      font-family: 'Syne', sans-serif; font-size: 2.5rem; font-weight: 800;
+      color: var(--accent); letter-spacing: -0.045em; margin-bottom: 4px; line-height: 1;
+    }
+    .stat-label { font-size: 0.825rem; color: var(--text-muted); }
+
+    /* ─── Cafes — UIVerse spinning-border cards ───────────────── */
+    .cafes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-md); margin-top: var(--sp-lg); }
+
+    .cafe-card {
+      background: var(--surface);
+      border-radius: var(--radius-card);
+      position: relative; overflow: hidden;
+      isolation: isolate;
+      transition: transform 0.35s ease, box-shadow 0.35s ease;
+    }
+
+    /* Spinning conic-gradient border (UIVerse technique) */
+    .cafe-card::before {
+      content: '';
+      position: absolute; left: -50%; top: -50%;
+      width: 200%; height: 200%;
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg, transparent 145deg,
+        rgba(200,151,90,0.85) 195deg, rgba(200,151,90,0.45) 215deg,
+        transparent 248deg, transparent 360deg
+      );
+      animation: card-spin 3.6s linear infinite;
+      animation-play-state: paused;
+      opacity: 0;
+      transition: opacity 0.45s ease;
+      z-index: -2;
+    }
+
+    /* Covers inside, leaving 1px visible as the animated border */
+    .cafe-card::after {
+      content: ''; position: absolute; inset: 1px;
+      background: var(--surface);
+      border-radius: calc(var(--radius-card) - 1px);
+      z-index: -1;
+    }
+
+    .cafe-card:hover { transform: translateY(-7px); box-shadow: 0 28px 70px rgba(0,0,0,0.42), var(--glow); }
+    .cafe-card:hover::before { animation-play-state: running; opacity: 1; }
+
+    @keyframes card-spin { 100% { transform: rotate(1turn); } }
+
+    /* Inner content layer sits above the pseudo-elements */
+    .cafe-inner {
+      position: relative; z-index: 1;
+      border: 1px solid var(--border); border-left: 2.5px solid var(--accent);
+      border-radius: calc(var(--radius-card) - 1px);
+      padding: var(--sp-md); height: 100%;
+      background: var(--surface);
+      transition: border-color 0.3s;
+    }
+    .cafe-card:hover .cafe-inner { border-color: rgba(200,151,90,0.15); border-left-color: var(--accent); }
+
+    .cafe-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+
+    .cafe-name { font-family: 'Syne', sans-serif; font-size: 1.18rem; font-weight: 700; letter-spacing: -0.022em; }
+
+    .rating-chip {
+      display: flex; align-items: center; gap: 4px;
+      background: rgba(200,151,90,0.1); border: 1px solid rgba(200,151,90,0.22);
+      border-radius: 100px; padding: 4px 11px;
+      font-family: 'Syne', sans-serif; font-size: 0.82rem; font-weight: 700; color: var(--accent);
+    }
+    .rating-chip i { width: 11px; height: 11px; fill: currentColor; }
+
+    .cafe-stars { display: flex; gap: 3px; margin-bottom: 10px; }
+    .cafe-stars i { width: 13px; height: 13px; color: var(--accent); }
+    .cafe-stars i.dim { color: rgba(200,151,90,0.2); }
+
+    .cafe-location { display: flex; align-items: center; gap: 5px; font-size: 0.8rem; color: var(--text-muted); margin-bottom: var(--sp-sm); }
+    .cafe-location i { width: 12px; height: 12px; color: var(--accent); flex-shrink: 0; }
+
+    .cafe-desc { font-size: 0.865rem; color: var(--text-muted); line-height: 1.73; margin-bottom: var(--sp-md); }
+
+    .cafe-footer { display: flex; align-items: center; justify-content: space-between; padding-top: var(--sp-sm); border-top: 1px solid var(--border); }
+    .review-count { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; color: var(--text-muted); }
+    .review-count i { width: 12px; height: 12px; }
+
+    /* UIVerse fill-sweep button */
+    .btn-view {
+      background: transparent; color: var(--accent);
+      border: none; box-shadow: inset 0 0 0 1px rgba(200,151,90,0.28);
+      padding: 7px 16px; border-radius: var(--radius-btn);
+      font-size: 0.8rem; font-weight: 600;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      position: relative; overflow: hidden; z-index: 0; cursor: pointer;
+    }
+    .btn-view::before {
+      content: ''; position: absolute; top: 50%; left: 50%;
+      width: 600%; height: 600%;
+      transform: translate(-50%, -50%) rotate(0deg);
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg 50deg,
+        rgba(200,151,90,0.85) 70deg 95deg,
+        rgba(255,255,255,0.65) 100deg 120deg,
+        rgba(200,151,90,0.6) 130deg 150deg,
+        transparent 170deg 300deg,
+        rgba(200,151,90,0.35) 315deg 340deg,
+        transparent 355deg 360deg
+      );
+      animation: lm-spin 3s linear infinite;
+      animation-play-state: paused;
+      opacity: 0; transition: opacity 0.3s ease;
+      z-index: -2;
+    }
+    .btn-view::after {
+      content: ''; position: absolute; inset: 2px;
+      border-radius: calc(var(--radius-btn) - 2px);
+      background: var(--bg); z-index: -1; transition: background 0.25s;
+    }
+    .btn-view:hover { box-shadow: none; }
+    .btn-view:hover::before { opacity: 1; animation-play-state: running; }
+    .btn-view:hover::after { background: rgba(200,151,90,0.06); }
+    .btn-view span { position: relative; z-index: 1; }
+
+    /* ─── How It Works ────────────────────────────────────────── */
+    #how-it-works { background: linear-gradient(180deg, var(--bg) 0%, rgba(12,8,4,0.3) 100%); }
+    .how-header { text-align: center; max-width: 540px; margin: 0 auto; }
+    .how-header .section-desc { margin: 0 auto; }
+
+    .steps-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-md);
+      margin-top: var(--sp-lg); position: relative;
+    }
+    .steps-row::before {
+      content: ''; position: absolute; top: 27px;
+      left: calc(16.67% + 18px); right: calc(16.67% + 18px);
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(200,151,90,0.38) 30%, rgba(200,151,90,0.38) 70%, transparent);
+    }
+
+    .step-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-card); padding: var(--sp-md);
+      transition: var(--transition); position: relative;
+    }
+    .step-card:hover { border-color: var(--border-accent); transform: translateY(-5px); box-shadow: 0 22px 52px rgba(0,0,0,0.28), var(--glow-sm); }
+
+    .step-number {
+      font-family: 'Syne', sans-serif; font-size: 3.6rem; font-weight: 800;
+      color: var(--accent); opacity: 0.16; line-height: 1; letter-spacing: -0.05em; margin-bottom: var(--sp-sm);
+    }
+
+    .step-icon {
+      width: 46px; height: 46px; background: var(--accent-dim);
+      border: 1px solid rgba(200,151,90,0.2); border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 14px; transition: var(--transition);
+    }
+    .step-card:hover .step-icon { background: rgba(200,151,90,0.2); box-shadow: 0 0 22px rgba(200,151,90,0.22); }
+    .step-icon i { width: 20px; height: 20px; color: var(--accent); }
+
+    .step-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+    .step-desc { font-size: 0.865rem; color: var(--text-muted); line-height: 1.73; }
+    .step-desc strong { color: var(--text-primary); font-weight: 500; }
+
+    /* ─── Features ────────────────────────────────────────────── */
+    .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-md); margin-top: var(--sp-lg); }
+
+    .feature-tile {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-card); padding: 30px;
+      display: flex; align-items: flex-start; gap: 20px;
+      transition: var(--transition); position: relative; overflow: hidden;
+    }
+    .feature-tile::after {
+      content: ''; position: absolute; bottom: -50px; right: -50px;
+      width: 160px; height: 160px;
+      background: radial-gradient(circle, rgba(200,151,90,0.09) 0%, transparent 70%);
+      opacity: 0; transition: opacity 0.5s;
+    }
+    .feature-tile:hover { border-color: var(--border-accent); transform: translateY(-3px); box-shadow: 0 18px 44px rgba(0,0,0,0.24), var(--glow-sm); }
+    .feature-tile:hover::after { opacity: 1; }
+
+    .feature-icon {
+      width: 54px; height: 54px; background: var(--accent-dim);
+      border: 1px solid rgba(200,151,90,0.18); border-radius: 13px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; flex-shrink: 0; transition: var(--transition);
+    }
+    .feature-tile:hover .feature-icon { background: rgba(200,151,90,0.2); transform: scale(1.1) rotate(4deg); box-shadow: 0 0 24px rgba(200,151,90,0.22); }
+
+    .feature-body h4 { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; letter-spacing: -0.014em; }
+    .feature-body p { font-size: 0.865rem; color: var(--text-muted); line-height: 1.73; }
+    .feature-body p strong { color: var(--text-primary); font-weight: 500; }
+
+    /* ─── Footer ──────────────────────────────────────────────── */
+    footer { border-top: 1px solid var(--border); padding: 48px 0 44px; position: relative; }
+    footer::before {
+      content: ''; position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+      width: 220px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+    footer .container { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
+    .footer-logo { font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 700; letter-spacing: -0.025em; }
+    .footer-logo .accent { color: var(--accent); }
+    .footer-tagline { font-size: 0.875rem; color: var(--text-muted); }
+    .footer-rule { width: 36px; height: 1px; background: var(--border); }
+    .footer-copy { font-size: 0.78rem; color: var(--text-muted); opacity: 0.5; }
+
+    /* ─── Responsive ──────────────────────────────────────────── */
+    @media (max-width: 960px) {
+      .about-grid    { grid-template-columns: 1fr; gap: var(--sp-lg); }
+      .cafes-grid    { grid-template-columns: 1fr; }
+      .steps-row     { grid-template-columns: 1fr; }
+      .steps-row::before { display: none; }
+      .features-grid { grid-template-columns: 1fr; }
+      .spotlight-nav { display: none; }
+    }
+    @media (max-width: 600px) {
+      .hero h1        { font-size: 2.5rem; }
+      .hero-actions   { flex-direction: column; align-items: flex-start; }
+      .stats-grid     { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ─── AOS pointer-events fix ──────────────────────────────── */
+    [data-aos] { pointer-events: none; }
+    [data-aos].aos-animate { pointer-events: auto; }
+
+    /* ════════════════════════════════════════════════════════════
+       VENGEANCE UI — REVEAL LOADER
+       Two shutter panels split open revealing the brand name
+    ══════════════════════════════════════════════════════════════ */
+    #reveal-loader {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+
+    .rl-panel {
+      position: absolute; left: 0; right: 0;
+      background: #070707;
+    }
+    .rl-top { top: 0; height: 50%; }
+    .rl-bot { bottom: 0; height: 50%; }
+
+    /* Subtle radial glow inside the loader */
+    .rl-top::after {
+      content: ''; position: absolute; bottom: -80px; left: 50%;
+      transform: translateX(-50%);
+      width: 500px; height: 160px;
+      background: radial-gradient(ellipse, rgba(200,151,90,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .rl-center { position: relative; z-index: 1; text-align: center; }
+
+    /* Brand name row */
+    .rl-name {
+      display: flex; gap: 0.22em; align-items: baseline;
+      justify-content: center; overflow: visible;
+    }
+
+    .rl-word { display: flex; overflow: hidden; }
+
+    .rl-letter {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(4.5rem, 12vw, 10rem);
+      font-weight: 800; letter-spacing: -0.04em;
+      color: var(--text-primary); line-height: 1;
+      display: inline-block;
+      transform: translateY(110%);
+      will-change: transform;
+    }
+    .rl-letter.gold { color: var(--accent); }
+
+    .rl-tagline {
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: rgba(240,237,230,0.38); margin-top: 16px;
+      opacity: 0;
+    }
+
+    .rl-bar {
+      width: 0; height: 2px; background: var(--accent);
+      margin: 10px auto 0; border-radius: 2px;
+    }
+
+    /* ════════════════════════════════════════════════════════════
+       VENGEANCE UI — FLIP FADE TEXT
+       Letter-by-letter 3D flip cycling through food words
+    ══════════════════════════════════════════════════════════════ */
+    .fft-row {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px; height: 2rem;
+      opacity: 0; /* revealed after loader */
+    }
+
+    .fft-tag {
+      font-size: 0.8rem; font-weight: 600;
+      color: var(--text-muted); letter-spacing: 0.06em;
+      text-transform: uppercase; white-space: nowrap;
+    }
+
+    .fft-divider {
+      width: 1px; height: 18px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .fft-display {
+      display: flex; gap: 0.04em;
+      perspective: 500px;
+    }
+
+    .fft-letter {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem; font-weight: 800;
+      letter-spacing: 0.06em; color: var(--accent);
+      display: inline-block;
+      transform-style: preserve-3d;
+      transform: rotateX(-90deg);
+      opacity: 0;
+      transform-origin: center bottom;
+    }
+
+    /* ════════════════════════════════════════════════════════════
+       VENGEANCE UI — SOCIAL FLIP BUTTON
+       Each key shows a letter; on hover it flips to reveal an icon
+    ══════════════════════════════════════════════════════════════ */
+    .sfb-wrap {
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      margin-top: 4px;
+    }
+
+    .sfb-label {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--text-muted);
+    }
+
+    /* Row with animated border beams top & bottom */
+    .sfb-row {
+      display: flex; gap: 8px;
+      position: relative; padding: 8px 10px;
+    }
+
+    .sfb-row::before,
+    .sfb-row::after {
+      content: ''; position: absolute; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0;
+      animation: sfb-beam 3s ease-in-out infinite;
+    }
+    .sfb-row::before { top: 0; }
+    .sfb-row::after  { bottom: 0; animation-delay: 1.5s; }
+
+    @keyframes sfb-beam {
+      0%,100% { opacity: 0; transform: scaleX(0.15); }
+      35%,65% { opacity: 0.6; transform: scaleX(1); }
+    }
+
+    /* Individual key container */
+    .sfb-key {
+      position: relative; width: 52px; height: 52px;
+      display: block; perspective: 380px;
+      text-decoration: none;
+    }
+
+    /* Both faces share layout */
+    .sfb-front,
+    .sfb-back {
+      position: absolute; inset: 0;
+      border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      backface-visibility: hidden;
+      transition: transform 0.44s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    /* Letter face — resting at 0deg, flips up-and-away on hover */
+    .sfb-front {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      font-family: 'Syne', sans-serif;
+      font-size: 1.08rem; font-weight: 700;
+      color: var(--text-primary);
+      transform: rotateX(0deg);
+      transform-origin: center top;
+    }
+
+    /* Icon face — starts hidden below, flips in from bottom */
+    .sfb-back {
+      background: var(--accent-dim);
+      border: 1px solid rgba(200,151,90,0.32);
+      color: var(--accent);
+      transform: rotateX(-90deg);
+      transform-origin: center bottom;
+    }
+    .sfb-back svg { width: 19px; height: 19px; }
+
+    /* Flip: letter goes up, icon comes in */
+    .sfb-key:hover .sfb-front { transform: rotateX(90deg); }
+    .sfb-key:hover .sfb-back  { transform: rotateX(0deg); }
+
+    /* Key shadow on hover */
+    .sfb-key:hover .sfb-back {
+      box-shadow: 0 0 18px rgba(200,151,90,0.25);
+    }
+
+    /* ════════════════════════════════════════════════════════════
+       VENGEANCE UI — SPOTLIGHT NAVBAR
+       Pill-shaped nav with sliding indicator + mouse-tracked glow
+    ══════════════════════════════════════════════════════════════ */
+    .spotlight-nav {
+      position: relative;
+      display: flex; align-items: center;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 100px;
+      padding: 5px;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    /* Mouse-tracked radial spotlight */
+    .spotlight-nav::before {
+      content: '';
+      position: absolute;
+      width: 180px; height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(200,151,90,0.26) 0%, transparent 70%);
+      transform: translate(-50%, -50%);
+      left: var(--sx, 50%);
+      top: var(--sy, 50%);
+      pointer-events: none; z-index: 0;
+      opacity: 0;
+      transition: opacity 0.28s, left 0.06s linear, top 0.06s linear;
+    }
+    .spotlight-nav:hover::before { opacity: 1; }
+
+    /* Sliding indicator pill */
+    .spot-indicator {
+      position: absolute;
+      height: calc(100% - 10px); top: 5px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 100px;
+      transition: left 0.38s cubic-bezier(0.34, 1.5, 0.64, 1),
+                  width 0.38s cubic-bezier(0.34, 1.5, 0.64, 1);
+      pointer-events: none; z-index: 1;
+    }
+
+    /* Individual nav links */
+    .spot-link {
+      position: relative; z-index: 2;
+      display: inline-block;
+      padding: 8px 18px;
+      font-size: 0.875rem; font-weight: 500;
+      color: var(--text-muted);
+      border-radius: 100px;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: color 0.25s;
+      user-select: none;
+    }
+    .spot-link:hover { color: var(--text-primary); }
+    .spot-link.active { color: var(--text-primary); font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <!-- ══ REVEAL LOADER (Vengeance UI) ══════════════════════════ -->
+  <div id="reveal-loader" aria-hidden="true">
+    <div class="rl-panel rl-top"></div>
+    <div class="rl-panel rl-bot"></div>
+    <div class="rl-center">
+      <div class="rl-name">
+        <div class="rl-word" id="rlWord1">
+          <span class="rl-letter">C</span><span class="rl-letter">O</span>
+          <span class="rl-letter">N</span><span class="rl-letter">C</span>
+          <span class="rl-letter">O</span><span class="rl-letter">R</span>
+          <span class="rl-letter">D</span><span class="rl-letter">I</span>
+          <span class="rl-letter">A</span>
+        </div>
+        <div class="rl-word" id="rlWord2">
+          <span class="rl-letter gold">E</span><span class="rl-letter gold">A</span>
+          <span class="rl-letter gold">T</span><span class="rl-letter gold">S</span>
+        </div>
+      </div>
+      <div class="rl-bar" id="rlBar"></div>
+      <div class="rl-tagline" id="rlTagline">NUST · Concordia Campus</div>
+    </div>
+  </div>
+
+  <div class="bg-dots" aria-hidden="true"></div>
+  <div class="particles" id="particles" aria-hidden="true"></div>
+
+  <!-- ══ NAVBAR ══════════════════════════════════════════════ -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="#home" class="logo">Concordia <span class="accent">Eats</span></a>
+      <div class="nav-right">
+        <!-- Spotlight Navbar (Vengeance UI) -->
+        <nav class="spotlight-nav" id="spotNav">
+          <div class="spot-indicator" id="spotIndicator"></div>
+          <a href="#home"            class="spot-link active" data-section="home">Home</a>
+          <a href="#cafes"           class="spot-link"        data-section="cafes">Cafes</a>
+          <a href="leaderboard.html" class="spot-link">Leaderboard</a>
+        </nav>
+        <button class="btn-login" onclick="goToLogin()">Login with NUST</button>
+      </div>
+    </div>
+  </nav>
+
+
+  <!-- ══ HERO ════════════════════════════════════════════════ -->
+  <section class="hero" id="home">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-badge" id="heroBadge">
+          <i data-lucide="map-pin"></i>
+          NUST · Concordia Campus
+        </div>
+        <h1 class="sfd-board" id="sfdBoard"></h1>
+
+        <!-- FLIP FADE TEXT (Vengeance UI) -->
+        <div class="fft-row" id="fftRow">
+          <span class="fft-tag">Trending now</span>
+          <div class="fft-divider"></div>
+          <div class="fft-display" id="fftDisplay"></div>
+        </div>
+
+        <p class="hero-sub" id="heroSub">
+          Rate NUST's Concordia cafes. Honest reviews by real students —
+          dish by dish, one star at a time.
+        </p>
+        <div class="hero-actions" id="heroActions">
+          <button onclick="goToLogin()" class="btn-primary">
+            <i data-lucide="log-in"></i>
+            Get Started
+          </button>
+          <a href="#how-it-works" class="btn-ghost">
+            <i data-lucide="info"></i>
+            How it Works
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══ ABOUT ════════════════════════════════════════════════ -->
+  <section id="about">
+    <div class="container">
+      <div class="about-grid">
+
+        <div class="about-text" data-aos="fade-right" data-aos-duration="750">
+          <span class="label">About the App</span>
+          <h2 class="section-title">Built for real NUST students.</h2>
+          <p class="section-desc">
+            Concordia Eats is a verified student review platform for the three
+            Concordia cafes on NUST campus. Sign in with your NUST institutional email —
+            <strong style="color:var(--text-primary);font-weight:600;">@seecs.edu.pk</strong>,
+            <strong style="color:var(--text-primary);font-weight:600;">@nbs.nust.edu.pk</strong>,
+            <strong style="color:var(--text-primary);font-weight:600;">@smme.nust.edu.pk</strong> and more —
+            then start rating dishes, vibes, and overall experience.
+          </p>
+          <p class="section-desc">
+            All reviews are completely anonymous. No politics, no bias, no agenda —
+            just honest opinions from the people who eat there every single day.
+          </p>
+          <div class="pills">
+            <span class="pill"><i data-lucide="shield-check"></i> NUST-Verified Only</span>
+            <span class="pill"><i data-lucide="eye-off"></i> Fully Anonymous</span>
+            <span class="pill"><i data-lucide="star"></i> Dish-Level Ratings</span>
+            <span class="pill"><i data-lucide="trophy"></i> Weekly Leaderboard</span>
+          </div>
+        </div>
+
+        <div class="stats-grid" data-aos="fade-left" data-aos-duration="750" data-aos-delay="100">
+          <div class="stat-card">
+            <div class="stat-number" id="stat1">3</div>
+            <div class="stat-label">Concordia Cafes on campus</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="stat2">100%</div>
+            <div class="stat-label">Student-only access</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">∞</div>
+            <div class="stat-label">Dishes to rate &amp; rank</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Bias. Zero. Guaranteed.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══ CAFES ════════════════════════════════════════════════ -->
+  <section id="cafes">
+    <!-- Aceternity UI Lamp Section Header -->
+    <div style="display:flex;justify-content:center;align-items:flex-end;height:120px;overflow:hidden;pointer-events:none;margin-bottom:-32px">
+      <div style="position:relative;height:1px;width:0%;max-width:560px;flex-shrink:0;
+        background:linear-gradient(to right,transparent 0%,rgba(200,151,90,0) 5%,rgba(200,151,90,0.9) 35%,rgba(255,230,140,1) 50%,rgba(200,151,90,0.9) 65%,rgba(200,151,90,0) 95%,transparent 100%);
+        animation:lamp-width 1.1s cubic-bezier(0.4,0,0.2,1) 0.1s forwards;
+        box-shadow:0 0 18px 4px rgba(200,151,90,0.5),0 0 48px 10px rgba(200,151,90,0.18);">
+        <div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%) scaleX(0.4);width:520px;height:240px;
+          background:radial-gradient(ellipse 55% 100% at 50% 0%,rgba(200,151,90,0.25) 0%,rgba(200,151,90,0.08) 40%,transparent 72%);
+          animation:lamp-glow 1.2s cubic-bezier(0.4,0,0.2,1) 0.2s forwards;opacity:0;pointer-events:none"></div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div data-aos="fade-up">
+        <span class="label">On Campus</span>
+        <h2 class="section-title">The Three Concordia Cafes</h2>
+        <p class="section-desc">
+          All three cafes live on NUST's main campus. Each has its own crowd, vibe, and menu.
+          Find out which one your fellow students swear by.
+        </p>
+      </div>
+
+      <div class="cafes-grid">
+
+        <div class="cafe-card" data-aos="fade-up" data-aos-delay="60" data-aos-duration="620">
+          <div class="cafe-inner">
+            <div class="cafe-top">
+              <span class="cafe-name">Concordia 1</span>
+              <span class="rating-chip"><i data-lucide="star"></i>4.2</span>
+            </div>
+            <div class="cafe-stars">
+              <i data-lucide="star"></i><i data-lucide="star"></i>
+              <i data-lucide="star"></i><i data-lucide="star"></i>
+              <i data-lucide="star" class="dim"></i>
+            </div>
+            <div class="cafe-location"><i data-lucide="map-pin"></i>Near NBS Ground</div>
+            <p class="cafe-desc">Quick bites, great chai, and a chill vibe between classes. The go-to spot when you have 10 minutes between lectures.</p>
+            <div class="cafe-footer">
+              <span class="review-count"><i data-lucide="message-circle"></i>124 reviews</span>
+              <button class="btn-view"><span>View Reviews</span></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cafe-card" data-aos="fade-up" data-aos-delay="150" data-aos-duration="620">
+          <div class="cafe-inner">
+            <div class="cafe-top">
+              <span class="cafe-name">Concordia 2</span>
+              <span class="rating-chip"><i data-lucide="star"></i>4.5</span>
+            </div>
+            <div class="cafe-stars">
+              <i data-lucide="star"></i><i data-lucide="star"></i>
+              <i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i>
+            </div>
+            <div class="cafe-location"><i data-lucide="map-pin"></i>Near SEECS</div>
+            <p class="cafe-desc">Fuel for late-night lab sessions. The favorite of CS and EE students — always packed after 8 pm, somehow still manages fast service.</p>
+            <div class="cafe-footer">
+              <span class="review-count"><i data-lucide="message-circle"></i>207 reviews</span>
+              <button class="btn-view"><span>View Reviews</span></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cafe-card" data-aos="fade-up" data-aos-delay="240" data-aos-duration="620">
+          <div class="cafe-inner">
+            <div class="cafe-top">
+              <span class="cafe-name">Concordia 3</span>
+              <span class="rating-chip"><i data-lucide="star"></i>3.9</span>
+            </div>
+            <div class="cafe-stars">
+              <i data-lucide="star"></i><i data-lucide="star"></i>
+              <i data-lucide="star"></i><i data-lucide="star"></i>
+              <i data-lucide="star" class="dim"></i>
+            </div>
+            <div class="cafe-location"><i data-lucide="map-pin"></i>In front of NUST Main Office</div>
+            <p class="cafe-desc">The most central cafe on campus. Always buzzing with students from every department. Great for a quick bite or a long hangout.</p>
+            <div class="cafe-footer">
+              <span class="review-count"><i data-lucide="message-circle"></i>89 reviews</span>
+              <button class="btn-view"><span>View Reviews</span></button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══ HOW IT WORKS ════════════════════════════════════════ -->
+  <section id="how-it-works">
+    <div class="container">
+      <div class="how-header" data-aos="fade-up">
+        <span class="label">Simple Process</span>
+        <h2 class="section-title">How it Works</h2>
+        <p class="section-desc">Three steps and you're contributing to the most honest food review platform on NUST campus.</p>
+      </div>
+
+      <div class="steps-row">
+        <div class="step-card" data-aos="fade-up" data-aos-delay="90">
+          <div class="step-number">01</div>
+          <div class="step-icon"><i data-lucide="log-in"></i></div>
+          <div class="step-title">Login with NUST</div>
+          <p class="step-desc">Use your NUST institutional email (<strong>@seecs.edu.pk</strong>, <strong>@nbs.nust.edu.pk</strong>, <strong>@smme.nust.edu.pk</strong>, <strong>@scme.nust.edu.pk</strong>, <strong>@s3h.nust.edu.pk</strong> &amp; others). No outsiders. Only verified NUST students get in.</p>
+        </div>
+        <div class="step-card" data-aos="fade-up" data-aos-delay="190">
+          <div class="step-number">02</div>
+          <div class="step-icon"><i data-lucide="store"></i></div>
+          <div class="step-title">Pick a Concordia Cafe</div>
+          <p class="step-desc">Browse all three Concordia cafes. See what others are saying, which dishes are trending, and who's winning the weekly leaderboard.</p>
+        </div>
+        <div class="step-card" data-aos="fade-up" data-aos-delay="290">
+          <div class="step-number">03</div>
+          <div class="step-icon"><i data-lucide="star"></i></div>
+          <div class="step-title">Rate &amp; Review Anonymously</div>
+          <p class="step-desc">Rate individual dishes, leave a comment, and submit — completely anonymously. Your identity stays private. Your verdict stays public.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══ FEATURES ════════════════════════════════════════════ -->
+  <section id="features">
+    <div class="container">
+      <div data-aos="fade-up">
+        <span class="label">Platform Features</span>
+        <h2 class="section-title">Everything you need.</h2>
+        <p class="section-desc">Built to make campus food reviews actually useful — not just a star and a vague one-liner.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-tile" data-aos="fade-up" data-aos-delay="80">
+          <div class="feature-icon">⭐</div>
+          <div class="feature-body">
+            <h4>Dish-Level Ratings</h4>
+            <p>Don't just rate the cafe — rate the biryani, the chai, the paratha. Granular ratings mean you actually know what to order before you walk in.</p>
+          </div>
+        </div>
+        <div class="feature-tile" data-aos="fade-up" data-aos-delay="170">
+          <div class="feature-icon">💬</div>
+          <div class="feature-body">
+            <h4>Anonymous Comments</h4>
+            <p>Say exactly what you think without worrying who's reading. All comments are <strong>100% anonymous</strong> — no names, no handles, no traces.</p>
+          </div>
+        </div>
+        <div class="feature-tile" data-aos="fade-up" data-aos-delay="80">
+          <div class="feature-icon">🏆</div>
+          <div class="feature-body">
+            <h4>Weekly Leaderboard</h4>
+            <p>See which Concordia cafe is winning this week. Rankings reset every Monday based on fresh student ratings — no stale scores, no old glory.</p>
+          </div>
+        </div>
+        <div class="feature-tile" data-aos="fade-up" data-aos-delay="170">
+          <div class="feature-icon">🔒</div>
+          <div class="feature-body">
+            <h4>NUST-Only Access</h4>
+            <p>Only verified NUST institutional emails (<strong>@seecs.edu.pk</strong>, <strong>@nbs.nust.edu.pk</strong> &amp; all other departments) can post reviews. Completely free from outsider noise.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══ FOOTER ═══════════════════════════════════════════════ -->
+  <footer>
+    <div class="container">
+      <div class="footer-logo">Concordia <span class="accent">Eats</span></div>
+      <div class="footer-tagline">Built for NUST students, by a NUST student.</div>
+
+      <!-- ══ SOCIAL FLIP BUTTON (Vengeance UI) ══════════════════ -->
+      <div class="sfb-wrap" data-aos="fade-up" data-aos-duration="600">
+        <p class="sfb-label">Connect</p>
+        <div class="sfb-row">
+
+          <!-- G → GitHub -->
+          <a class="sfb-key" href="https://github.com" target="_blank" rel="noopener" title="GitHub">
+            <span class="sfb-front">G</span>
+            <span class="sfb-back">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            </span>
+          </a>
+
+          <!-- I → Instagram -->
+          <a class="sfb-key" href="#" target="_blank" rel="noopener" title="Instagram">
+            <span class="sfb-front">I</span>
+            <span class="sfb-back">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            </span>
+          </a>
+
+          <!-- L → LinkedIn -->
+          <a class="sfb-key" href="#" target="_blank" rel="noopener" title="LinkedIn">
+            <span class="sfb-front">L</span>
+            <span class="sfb-back">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </span>
+          </a>
+
+          <!-- M → Mail -->
+          <a class="sfb-key" href="mailto:concordiaeats@nust.edu.pk" title="Email">
+            <span class="sfb-front">M</span>
+            <span class="sfb-back">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </span>
+          </a>
+
+          <!-- X → Twitter / X -->
+          <a class="sfb-key" href="#" target="_blank" rel="noopener" title="Twitter / X">
+            <span class="sfb-front">X</span>
+            <span class="sfb-back">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </span>
+          </a>
+
+        </div>
+      </div>
+
+      <div class="footer-rule"></div>
+      <div class="footer-copy">© 2025 Concordia Eats &nbsp;·&nbsp; For campus use only &nbsp;·&nbsp; All reviews are anonymous</div>
+    </div>
+  </footer>
+
+
+  <!-- AOS -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+  <script>
+    // ── Init icons & AOS ──────────────────────────────────────
+    lucide.createIcons();
+    AOS.init({ once: true, offset: 55, easing: 'ease-out-cubic' });
+    gsap.registerPlugin(ScrollTrigger);
+
+    // ── Floating particles ────────────────────────────────────
+    (() => {
+      const wrap = document.getElementById('particles');
+      for (let i = 0; i < 20; i++) {
+        const el = document.createElement('div');
+        el.className = 'particle';
+        const s = Math.random() * 4 + 1.5;
+        el.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;` +
+          `animation-duration:${Math.random()*22+14}s;` +
+          `animation-delay:${Math.random()*18}s;opacity:${Math.random()*0.35+0.08};`;
+        wrap.appendChild(el);
+      }
+    })();
+
+    /* ════════════════════════════════════════════════════════
+       VENGEANCE UI — REVEAL LOADER
+    ═════════════════════════════════════════════════════════ */
+    document.body.style.overflow = 'hidden';
+
+    const rlTl = gsap.timeline({
+      onComplete() {
+        document.getElementById('reveal-loader').style.display = 'none';
+        document.body.style.overflow = '';
+        heroEntrance();
+        setTimeout(() => fftNext(), 300);
+      }
+    });
+
+    rlTl
+      // Letters stagger up from behind the shutter panels
+      .to('.rl-letter', {
+        y: 0, duration: 0.75, stagger: 0.048, ease: 'power3.out', delay: 0.2
+      })
+      // Bar draws in
+      .to('#rlBar', { width: 56, duration: 0.55, ease: 'power2.out' }, '-=0.15')
+      // Tagline fades in
+      .to('#rlTagline', { opacity: 1, duration: 0.5, ease: 'power2.out' }, '-=0.35')
+      // Hold so user can read
+      .to({}, { duration: 0.65 })
+      // Shutters slide apart — cinematic reveal
+      .to('.rl-top', { y: '-100%', duration: 0.82, ease: 'power2.inOut' })
+      .to('.rl-bot', { y:  '100%', duration: 0.82, ease: 'power2.inOut' }, '<')
+      // Brand text scales + fades as panels leave
+      .to('.rl-center', { opacity: 0, scale: 1.04, duration: 0.45, ease: 'power2.in' }, '<+0.1')
+      // Loader overlay fades away
+      .to('#reveal-loader', { opacity: 0, duration: 0.25 }, '-=0.05');
+
+    /* ════════════════════════════════════════════════════════
+       ACETERNITY UI — SPLIT-FLAP BOARD
+    ═════════════════════════════════════════════════════════ */
+    const SFD_CHARSET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#!?%&';
+    const SFD_LINES = [
+      { text: 'YOUR CAMPUS.',  gold: [] },
+      { text: 'YOUR TASTE.',   gold: [5,6,7,8,9,10] },
+      { text: 'YOUR VERDICT.', gold: [] },
+    ];
+
+    function buildSFD() {
+      const board = document.getElementById('sfdBoard');
+      board.innerHTML = '';
+      const allCells = [];
+      SFD_LINES.forEach(({ text, gold }) => {
+        const line = document.createElement('div');
+        line.className = 'sfd-line';
+        [...text].forEach((ch, i) => {
+          if (ch === ' ') {
+            const sp = document.createElement('span');
+            sp.className = 'sfd-sp';
+            line.appendChild(sp);
+          } else {
+            const cell = document.createElement('div');
+            cell.className = 'sfd-cell';
+            const charEl = document.createElement('span');
+            charEl.className = 'sfd-char' + (gold.includes(i) ? ' gold' : '');
+            charEl.textContent = SFD_CHARSET[Math.floor(Math.random() * SFD_CHARSET.length)];
+            cell.appendChild(charEl);
+            line.appendChild(cell);
+            allCells.push({ el: charEl, final: ch });
+          }
+        });
+        board.appendChild(line);
+      });
+      return allCells;
+    }
+
+    function animateSFD(cells) {
+      cells.forEach(({ el, final }, idx) => {
+        let iterations = 0;
+        const total = 6 + Math.floor(Math.random() * 5);
+        setTimeout(() => {
+          const iv = setInterval(() => {
+            el.textContent = SFD_CHARSET[Math.floor(Math.random() * SFD_CHARSET.length)];
+            if (++iterations >= total) {
+              clearInterval(iv);
+              el.textContent = final;
+              const cell = el.closest('.sfd-cell');
+              cell.style.background = 'rgba(200,151,90,0.13)';
+              setTimeout(() => { cell.style.background = ''; }, 130);
+            }
+          }, 55);
+        }, idx * 46);
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════
+       HERO ENTRANCE (runs after loader completes)
+    ═════════════════════════════════════════════════════════ */
+    function heroEntrance() {
+      const cells = buildSFD();
+      gsap.timeline()
+        .from('#heroBadge',   { opacity: 0, y: 22, duration: 0.65, ease: 'power3.out' })
+        .from('#sfdBoard',    { opacity: 0, y: 36, duration: 0.85, ease: 'power3.out' }, '-=0.35')
+        .add(() => animateSFD(cells), '-=0.45')
+        .to  ('#fftRow',      { opacity: 1, duration: 0.5,  ease: 'power2.out' }, '-=0.25')
+        .to  ('#heroSub',     { opacity: 1, duration: 0.6,  ease: 'power2.out' }, '-=0.2')
+        .to  ('#heroActions', { opacity: 1, duration: 0.55, ease: 'power2.out' }, '-=0.2');
+    }
+
+    /* ════════════════════════════════════════════════════════
+       VENGEANCE UI — FLIP FADE TEXT
+       Letter-by-letter 3D flip cycling through food words
+    ═════════════════════════════════════════════════════════ */
+    const FFT_WORDS = ['BIRYANI', 'CHAI', 'PARATHA', 'ZINGER', 'SAMOSA', 'SANDWICH'];
+    let fftIdx = 0;
+    const fftEl = document.getElementById('fftDisplay');
+
+    function fftNext() {
+      const word = FFT_WORDS[fftIdx];
+      fftEl.innerHTML = '';
+
+      // Create letter spans
+      const letters = [...word].map(ch => {
+        const s = document.createElement('span');
+        s.className = 'fft-letter';
+        s.textContent = ch;
+        fftEl.appendChild(s);
+        return s;
+      });
+
+      // Flip in — rotateX from -90deg (below) to 0
+      gsap.fromTo(letters,
+        { rotateX: -90, opacity: 0, transformOrigin: '50% 100%' },
+        {
+          rotateX: 0, opacity: 1,
+          duration: 0.48, stagger: 0.065, ease: 'back.out(1.3)',
+          onComplete() {
+            // Hold, then flip out
+            gsap.delayedCall(2.2, () => {
+              gsap.to(letters, {
+                rotateX: 90, opacity: 0,
+                transformOrigin: '50% 0%',
+                duration: 0.35, stagger: 0.045, ease: 'power2.in',
+                onComplete() {
+                  fftIdx = (fftIdx + 1) % FFT_WORDS.length;
+                  fftNext();
+                }
+              });
+            });
+          }
+        }
+      );
+    }
+
+    /* ════════════════════════════════════════════════════════
+       STAT COUNTERS (ScrollTrigger)
+    ═════════════════════════════════════════════════════════ */
+    function animateCounter(el, end, suffix) {
+      const obj = { n: 0 };
+      gsap.to(obj, {
+        n: end, duration: 1.6, ease: 'power2.out',
+        onUpdate: () => { el.textContent = Math.round(obj.n) + (suffix || ''); },
+        scrollTrigger: { trigger: el, start: 'top 88%', once: true }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const s1 = document.getElementById('stat1');
+      const s2 = document.getElementById('stat2');
+      if (s1) animateCounter(s1, 3);
+      if (s2) animateCounter(s2, 100, '%');
+    });
+
+    // ── Navbar shadow on scroll ───────────────────────────────
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', scrollY > 20);
+    }, { passive: true });
+
+    // ── Auth redirect ─────────────────────────────────────────
+    function goToLogin() {
+      if (typeof Auth !== 'undefined' && Auth.isLoggedIn()) {
+        window.location.href = 'dashboard.html';
+      } else {
+        window.location.href = 'login.html';
+      }
+    }
+
+    // ── View Reviews buttons ──────────────────────────────────
+    document.querySelectorAll('.btn-view').forEach((btn, i) => {
+      btn.addEventListener('click', () => { window.location.href = `cafe.html?id=${i + 1}`; });
+    });
+
+    /* ════════════════════════════════════════════════════════
+       VENGEANCE UI — SPOTLIGHT NAVBAR logic
+    ═════════════════════════════════════════════════════════ */
+    const spotNav = document.getElementById('spotNav');
+    const spotInd = document.getElementById('spotIndicator');
+    const spotLinks = spotNav ? spotNav.querySelectorAll('.spot-link') : [];
+
+    function positionIndicator(link) {
+      if (!link || !spotNav || !spotInd) return;
+      const pRect = spotNav.getBoundingClientRect();
+      const lRect = link.getBoundingClientRect();
+      spotInd.style.left  = (lRect.left - pRect.left) + 'px';
+      spotInd.style.width = lRect.width + 'px';
+    }
+
+    // Init indicator at active link once layout is ready
+    window.addEventListener('load', () => {
+      const active = spotNav && spotNav.querySelector('.spot-link.active');
+      if (active) positionIndicator(active);
+    });
+
+    // Mouse-tracked spotlight glow
+    if (spotNav) {
+      spotNav.addEventListener('mousemove', e => {
+        const r = spotNav.getBoundingClientRect();
+        spotNav.style.setProperty('--sx', (e.clientX - r.left) + 'px');
+        spotNav.style.setProperty('--sy', (e.clientY - r.top)  + 'px');
+      });
+
+      // Slide indicator on hover
+      spotLinks.forEach(link => {
+        link.addEventListener('mouseenter', () => positionIndicator(link));
+      });
+
+      // On mouse-leave: snap back to active
+      spotNav.addEventListener('mouseleave', () => {
+        const active = spotNav.querySelector('.spot-link.active');
+        if (active) positionIndicator(active);
+      });
+    }
+
+    // IntersectionObserver → update active + reposition indicator
+    const secObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        spotLinks.forEach(link => {
+          const sec = link.dataset.section;
+          const isActive = sec && sec === e.target.id;
+          link.classList.toggle('active', isActive);
+          if (isActive) positionIndicator(link);
+        });
+      });
+    }, { threshold: 0.45 });
+    document.querySelectorAll('section[id]').forEach(s => secObs.observe(s));
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Concordia Eats</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/shared.css" />
+  <style>
+    .page { padding: 88px 0 60px; }
+
+    /* ── Hero banner ── */
+    .dash-hero {
+      background: linear-gradient(135deg, var(--surface) 0%, rgba(22,22,22,0.6) 100%);
+      border-bottom: 1px solid var(--border); padding: 40px 0 36px;
+      margin-bottom: 48px;
+    }
+    .dash-welcome { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; letter-spacing: -0.03em; }
+    .dash-sub { font-size: 0.95rem; color: var(--text-muted); margin-top: 6px; }
+
+    /* ── Leaderboard strip ── */
+    .lb-strip {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 48px;
+    }
+    .lb-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-card); padding: 20px;
+      display: flex; align-items: center; gap: 16px; transition: var(--transition);
+    }
+    .lb-item:hover { border-color: rgba(200,151,90,0.2); transform: translateY(-2px); }
+    .lb-rank {
+      font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800;
+      letter-spacing: -0.04em; opacity: 0.15; min-width: 40px; text-align: center;
+    }
+    .lb-rank.gold { color: var(--accent); opacity: 0.85; }
+    .lb-info { flex: 1; }
+    .lb-name { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; }
+    .lb-loc { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+    .lb-rating {
+      display: flex; align-items: center; gap: 5px;
+      background: var(--accent-dim); border: 1px solid rgba(200,151,90,0.2);
+      border-radius: 100px; padding: 5px 12px;
+      font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--accent);
+    }
+
+    /* ── Cafe cards grid ── */
+    .cafes-section h2 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 20px; }
+    .cafes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+    .cafe-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 3px solid var(--accent); border-radius: var(--radius-card);
+      padding: 24px; transition: var(--transition); cursor: pointer; position: relative; overflow: hidden;
+    }
+    .cafe-card::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(200,151,90,0.04), transparent 55%);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .cafe-card:hover { transform: translateY(-4px); border-color: rgba(200,151,90,0.4); box-shadow: 0 20px 48px rgba(0,0,0,0.3); }
+    .cafe-card:hover::after { opacity: 1; }
+
+    .cafe-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+    .cafe-emoji { font-size: 1.6rem; margin-bottom: 10px; }
+    .cafe-name { font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 700; }
+    .cafe-loc { display: flex; align-items: center; gap: 5px; font-size: 0.8rem; color: var(--text-muted); margin: 6px 0 12px; }
+    .cafe-desc { font-size: 0.865rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 18px; }
+    .cafe-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 16px; border-top: 1px solid var(--border); }
+    .review-meta { font-size: 0.78rem; color: var(--text-muted); }
+    .rating-chip {
+      display: flex; align-items: center; gap: 4px;
+      background: var(--accent-dim); border: 1px solid rgba(200,151,90,0.2);
+      border-radius: 100px; padding: 4px 11px;
+      font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--accent);
+    }
+
+    /* ── Recent reviews panel ── */
+    .bottom-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 48px; }
+
+    .panel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-card); padding: 24px;
+    }
+    .panel-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 18px; }
+    .panel-empty { font-size: 0.875rem; color: var(--text-muted); text-align: center; padding: 24px 0; }
+
+    .review-row {
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .review-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .review-row-top { display: flex; align-items: center; justify-content: space-between; }
+    .review-cafe-tag {
+      font-size: 0.73rem; font-weight: 600; color: var(--accent);
+      background: var(--accent-dim); border-radius: 100px; padding: 2px 10px;
+    }
+    .review-stars { display: flex; gap: 2px; align-items: center; }
+    .review-text { font-size: 0.855rem; color: var(--text-muted); line-height: 1.6; }
+    .review-time { font-size: 0.73rem; color: var(--text-muted); opacity: 0.7; }
+
+    /* ── Quick stats panel ── */
+    .stat-row { padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-label { font-size: 0.83rem; color: var(--text-muted); }
+    .stat-val { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--accent); }
+
+    /* ── Magic UI Marquee ── */
+    .marquee-section { margin-top: 56px; }
+    .marquee-label-row { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+    .marquee-label-row .label { margin-bottom: 0; }
+    .marquee-label-row span { font-size: 0.8rem; color: var(--text-muted); }
+
+    .marquee-wrap {
+      overflow: hidden; position: relative;
+    }
+    .marquee-wrap::before,
+    .marquee-wrap::after {
+      content: ''; position: absolute; top: 0; bottom: 0;
+      width: 140px; z-index: 2; pointer-events: none;
+    }
+    .marquee-wrap::before { left: 0;  background: linear-gradient(to right, var(--bg) 10%, transparent); }
+    .marquee-wrap::after  { right: 0; background: linear-gradient(to left,  var(--bg) 10%, transparent); }
+
+    .marquee-track {
+      display: flex; gap: 14px;
+      animation: mq-scroll 32s linear infinite;
+      width: max-content; will-change: transform;
+    }
+    .marquee-track.reverse {
+      animation: mq-scroll-rev 36s linear infinite;
+      margin-top: 14px;
+    }
+    .marquee-wrap:hover .marquee-track { animation-play-state: paused; }
+
+    @keyframes mq-scroll     { from { transform: translateX(0); }    to { transform: translateX(-50%); } }
+    @keyframes mq-scroll-rev { from { transform: translateX(-50%); } to { transform: translateX(0); }   }
+
+    .mq-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-card); padding: 18px 20px;
+      width: 268px; flex-shrink: 0; position: relative; overflow: hidden;
+      transition: border-color 0.25s ease;
+    }
+    .mq-card:hover { border-color: var(--border-accent); }
+    .mq-card::after {
+      content: ''; position: absolute; bottom: -30px; right: -30px;
+      width: 90px; height: 90px;
+      background: radial-gradient(circle, rgba(200,151,90,0.09), transparent 70%);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .mq-card:hover::after { opacity: 1; }
+
+    .mq-head { display: flex; align-items: center; gap: 11px; margin-bottom: 10px; }
+    .mq-avatar {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.78rem; font-weight: 700; color: #fff;
+    }
+    .mq-meta-name { font-size: 0.855rem; font-weight: 600; color: var(--text-primary); }
+    .mq-meta-dept { font-size: 0.72rem; color: var(--text-muted); margin-top: 1px; }
+
+    .mq-stars { display: flex; gap: 2px; margin-bottom: 9px; }
+    .mq-star { width: 11px; height: 11px; fill: var(--accent); }
+    .mq-star.empty { fill: rgba(200,151,90,0.18); }
+
+    .mq-text {
+      font-size: 0.825rem; color: var(--text-muted); line-height: 1.65;
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .mq-footer {
+      margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .mq-cafe-tag {
+      font-size: 0.7rem; font-weight: 600; color: var(--accent);
+      background: var(--accent-dim); border-radius: 100px; padding: 2px 9px;
+    }
+    .mq-time { font-size: 0.7rem; color: var(--text-muted); opacity: 0.7; }
+
+    @media (max-width: 900px) {
+      .cafes-grid { grid-template-columns: 1fr; }
+      .lb-strip { grid-template-columns: 1fr; }
+      .bottom-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="dashboard.html" class="logo">Concordia <span class="accent">Eats</span></a>
+      <ul class="nav-links hide-mobile">
+        <li><a href="dashboard.html">Home</a></li>
+        <li><a href="#cafes">Cafes</a></li>
+        <li><a href="leaderboard.html">Leaderboard</a></li>
+      </ul>
+      <div class="nav-right" id="navRight"></div>
+    </div>
+  </nav>
+
+  <div class="page">
+    <!-- Welcome Hero -->
+    <div class="dash-hero">
+      <div class="container">
+        <div class="dash-welcome" id="welcomeMsg">Welcome back 👋</div>
+        <div class="dash-sub">Here's how the Concordia cafes are doing today.</div>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Leaderboard -->
+      <div class="fade-in">
+        <span class="label">This Week's Leaderboard</span>
+        <div class="lb-strip" id="leaderboard"></div>
+      </div>
+
+      <!-- Cafe Cards -->
+      <div class="cafes-section fade-in" id="cafes">
+        <h2>Explore All Cafes</h2>
+        <div class="cafes-grid" id="cafesGrid"></div>
+      </div>
+
+      <!-- Magic UI Marquee — What students are saying -->
+      <div class="marquee-section fade-in" id="marqueeSection" style="display:none">
+        <div class="marquee-label-row">
+          <span class="label">What Students Are Saying</span>
+          <span id="mqCount"></span>
+        </div>
+        <div class="marquee-wrap">
+          <div class="marquee-track" id="mqRow1"></div>
+          <div class="marquee-track reverse" id="mqRow2"></div>
+        </div>
+      </div>
+
+      <!-- Bottom: Reviews + Stats -->
+      <div class="bottom-grid fade-in">
+        <div class="panel">
+          <div class="panel-title">Recent Campus Reviews</div>
+          <div id="recentReviews"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Your Stats</div>
+          <div id="userStats"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/cafes.js"></script>
+  <script>
+    if (!Auth.requireAuth()) throw new Error('redirect');
+
+    const user = Auth.getUser();
+
+    // ── Navbar user chip ──
+    document.getElementById('navRight').innerHTML = `
+      <div class="user-chip">
+        <div class="user-avatar">${user.name.charAt(0).toUpperCase()}</div>
+        <div>
+          <div class="user-name">${user.name}</div>
+          <div class="user-dept">${user.department}</div>
+        </div>
+      </div>
+      <button class="btn-ghost btn-sm" onclick="Auth.logout()">Logout</button>
+    `;
+
+    document.getElementById('welcomeMsg').textContent = `Welcome back, ${user.name.split(' ')[0]} 👋`;
+
+    // ── Render helpers ──
+    function renderLeaderboard(ratings) {
+      const withReviews = CAFES
+        .map(c => ({ ...c, avg: parseFloat(ratings[c.id]?.avg || 0), count: ratings[c.id]?.count || 0 }))
+        .filter(c => c.count > 0)
+        .sort((a, b) => b.avg - a.avg);
+
+      const lb = document.getElementById('leaderboard');
+      if (!withReviews.length) {
+        lb.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:28px 0;font-size:0.9rem;color:var(--text-muted);">
+          No ratings yet — be the first to review a cafe!
+        </div>`;
+        return;
+      }
+
+      const medals = ['gold', '', ''];
+      lb.innerHTML = withReviews.map((c, i) => `
+        <div class="lb-item" onclick="window.location.href='cafe.html?id=${c.id}'" style="cursor:pointer">
+          <div class="lb-rank ${medals[i] || ''}">#${i + 1}</div>
+          <div class="lb-info">
+            <div class="lb-name">${c.name}</div>
+            <div class="lb-loc">${c.count} review${c.count !== 1 ? 's' : ''}</div>
+          </div>
+          <div class="lb-rating">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="#C8975A"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            ${c.avg.toFixed(1)}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderCafes(ratings) {
+      document.getElementById('cafesGrid').innerHTML = CAFES.map(c => {
+        const r = ratings[c.id];
+        const hasReviews = r && r.count > 0;
+        const ratingChip = hasReviews
+          ? `<div class="rating-chip">
+               <svg width="11" height="11" viewBox="0 0 24 24" fill="#C8975A"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+               ${parseFloat(r.avg).toFixed(1)}
+             </div>`
+          : `<div class="rating-chip" style="opacity:0.4;font-size:0.75rem;">Not rated</div>`;
+        const reviewMeta = hasReviews
+          ? `${r.count} review${r.count !== 1 ? 's' : ''}`
+          : 'No reviews yet';
+        return `
+          <div class="cafe-card" onclick="window.location.href='cafe.html?id=${c.id}'">
+            <div class="cafe-emoji">${c.emoji}</div>
+            <div class="cafe-top">
+              <div class="cafe-name">${c.name}</div>
+              ${ratingChip}
+            </div>
+            <div class="cafe-loc">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C8975A" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              ${c.location}
+            </div>
+            <div class="cafe-desc">${c.description}</div>
+            <div class="cafe-footer">
+              <div class="review-meta">${reviewMeta}</div>
+              <button class="btn-primary btn-sm">View Cafe →</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderRecentReviews(reviews) {
+      const container = document.getElementById('recentReviews');
+      if (!reviews.length) {
+        container.innerHTML = '<div class="panel-empty">No reviews yet. Be the first to rate a cafe!</div>';
+        return;
+      }
+      container.innerHTML = reviews.slice(0, 5).map(r => {
+        const cafe = getCafe(r.cafeId);
+        return `
+          <div class="review-row">
+            <div class="review-row-top">
+              <span class="review-cafe-tag">${cafe ? cafe.name : 'Cafe'}</span>
+              <div class="review-stars">${renderStars(r.rating, 12)}</div>
+            </div>
+            ${r.comment ? `<div class="review-text">"${r.comment}"</div>` : ''}
+            <div class="review-time">${r.department} · ${timeAgo(r.createdAt)}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderUserStats(myCount, totalCount) {
+      document.getElementById('userStats').innerHTML = `
+        <div class="stat-row">
+          <div class="stat-label">Your reviews</div>
+          <div class="stat-val">${myCount}</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-label">Total campus reviews</div>
+          <div class="stat-val">${totalCount}</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-label">Your department</div>
+          <div class="stat-val">${user.department}</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-label">Cafes available</div>
+          <div class="stat-val">3</div>
+        </div>
+        <div style="margin-top:18px">
+          <button class="btn-primary" style="width:100%;justify-content:center" onclick="window.location.href='cafe.html?id=1'">
+            Rate a Cafe →
+          </button>
+        </div>
+      `;
+    }
+
+    // ── Magic UI Marquee ──
+    const DEPT_COLORS = {
+      'SEECS': '#6366f1', 'NBS': '#0ea5e9', 'SMME': '#10b981',
+      'SCME': '#f59e0b', 'SNS': '#ec4899', 'NUST': '#C8975A',
+    };
+    function deptColor(dept) {
+      const key = Object.keys(DEPT_COLORS).find(k => dept && dept.toUpperCase().includes(k));
+      return key ? DEPT_COLORS[key] : '#6b7280';
+    }
+    function deptInitial(dept) {
+      return dept ? dept.trim()[0].toUpperCase() : '?';
+    }
+    function mqStars(rating) {
+      return Array.from({ length: 5 }, (_, i) =>
+        `<svg class="mq-star${i < rating ? '' : ' empty'}" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`
+      ).join('');
+    }
+    function mqCard(r) {
+      const cafe = getCafe(r.cafeId);
+      const color = deptColor(r.department);
+      const initial = deptInitial(r.department);
+      const comment = r.comment || 'Solid experience overall — worth visiting.';
+      return `
+        <div class="mq-card">
+          <div class="mq-head">
+            <div class="mq-avatar" style="background:${color}22;color:${color};border:1px solid ${color}44">${initial}</div>
+            <div>
+              <div class="mq-meta-name">Anonymous Student</div>
+              <div class="mq-meta-dept">${r.department || 'NUST Student'}</div>
+            </div>
+          </div>
+          <div class="mq-stars">${mqStars(r.rating)}</div>
+          <div class="mq-text">"${comment}"</div>
+          <div class="mq-footer">
+            <span class="mq-cafe-tag">${cafe ? cafe.name : 'Concordia'}</span>
+            <span class="mq-time">${timeAgo(r.createdAt)}</span>
+          </div>
+        </div>`;
+    }
+    function renderMarquee(reviews) {
+      const withComments = reviews.filter(r => r.comment && r.comment.length > 5);
+      const all = withComments.length >= 4 ? withComments : reviews;
+      if (!all.length) return;
+
+      document.getElementById('marqueeSection').style.display = '';
+      document.getElementById('mqCount').textContent = `${all.length} review${all.length !== 1 ? 's' : ''}`;
+
+      const half = Math.ceil(all.length / 2);
+      const row1 = all.slice(0, half);
+      const row2 = all.slice(half);
+
+      // Duplicate cards for seamless infinite loop
+      const build = (arr) => [...arr, ...arr].map(mqCard).join('');
+      document.getElementById('mqRow1').innerHTML = build(row1.length ? row1 : all);
+      document.getElementById('mqRow2').innerHTML = build(row2.length ? row2 : all);
+    }
+
+    // ── Load dashboard data ──
+    async function loadDashboard() {
+      if (Auth._supabaseReady()) {
+        const [r1, r2, r3, recent, myRevs] = await Promise.all([
+          SbReviews.forCafe('1'), SbReviews.forCafe('2'), SbReviews.forCafe('3'),
+          SbReviews.recent(10), SbReviews.mine(user.id),
+        ]);
+        // Only real counts — no fallbacks
+        const ratings = {
+          '1': { avg: r1.avg, count: r1.count },
+          '2': { avg: r2.avg, count: r2.count },
+          '3': { avg: r3.avg, count: r3.count },
+        };
+        renderLeaderboard(ratings);
+        renderCafes(ratings);
+        renderRecentReviews(recent);
+        renderMarquee(recent);
+        renderUserStats(myRevs.length, r1.count + r2.count + r3.count);
+      } else {
+        // localStorage fallback — also only real data
+        const ratings = {};
+        CAFES.forEach(c => {
+          const revs = DB.where('reviews', 'cafeId', c.id);
+          if (revs.length) {
+            const avg = (revs.reduce((s, r) => s + r.rating, 0) / revs.length).toFixed(1);
+            ratings[c.id] = { avg, count: revs.length };
+          } else {
+            ratings[c.id] = { avg: null, count: 0 };
+          }
+        });
+        const allRevs = DB.getAll('reviews').sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        const myRevs = DB.where('reviews', 'userId', user.id);
+        renderLeaderboard(ratings);
+        renderCafes(ratings);
+        renderRecentReviews(allRevs);
+        renderMarquee(allRevs);
+        renderUserStats(myRevs.length, allRevs.length);
+      }
+    }
+
+    Auth.restoreSession().then(loadDashboard).catch(console.error);
+  </script>
+</body>
+</html>

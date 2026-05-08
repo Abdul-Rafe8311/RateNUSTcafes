@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cafe — Concordia Eats</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/shared.css" />
+  <style>
+    .page { padding: 88px 0 80px; }
+
+    /* ── Cafe Hero ── */
+    .cafe-hero {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 40px 0 32px; margin-bottom: 40px;
+    }
+    .cafe-hero-inner { display: flex; align-items: flex-start; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+    .cafe-hero-left { flex: 1; }
+    .cafe-hero-emoji { font-size: 2.4rem; margin-bottom: 12px; }
+    .cafe-hero-name { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; letter-spacing: -0.03em; }
+    .cafe-hero-loc { display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 0.875rem; margin-top: 8px; }
+    .cafe-hero-desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.75; margin-top: 14px; max-width: 560px; }
+
+    .cafe-hero-right { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; flex-shrink: 0; }
+    .big-rating {
+      text-align: center; background: var(--accent-dim); border: 1px solid rgba(200,151,90,0.2);
+      border-radius: 16px; padding: 20px 28px;
+    }
+    .big-rating-num { font-family: 'Syne', sans-serif; font-size: 3rem; font-weight: 800; color: var(--accent); line-height: 1; }
+    .big-rating-stars { display: flex; gap: 3px; justify-content: center; margin: 8px 0 4px; }
+    .big-rating-count { font-size: 0.78rem; color: var(--text-muted); }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 32px;
+    }
+    .tab-btn {
+      padding: 11px 24px; border: none; background: transparent;
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500;
+      color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent;
+      margin-bottom: -1px; transition: var(--transition);
+    }
+    .tab-btn.active { color: var(--text-primary); border-bottom-color: var(--accent); }
+    .tab-btn:hover { color: var(--text-primary); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Content layout ── */
+    .content-grid { display: grid; grid-template-columns: 1fr 380px; gap: 28px; align-items: start; }
+
+    /* ── Review form ── */
+    .review-form-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-card); padding: 24px; position: sticky; top: 88px;
+    }
+    .review-form-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 20px; }
+
+    .rating-label { font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 10px; display: block; }
+    .star-picker { display: flex; gap: 8px; margin-bottom: 18px; }
+    .star-picker svg {
+      width: 34px; height: 34px; cursor: pointer; color: rgba(200,151,90,0.2);
+      transition: color 0.15s, transform 0.15s;
+    }
+    .star-picker svg:hover, .star-picker svg.hov { color: rgba(200,151,90,0.6); transform: scale(1.12); }
+    .star-picker svg.sel { color: var(--accent); }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
+    .form-group textarea {
+      width: 100%; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 10px; padding: 11px 13px; font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem; color: var(--text-primary); resize: vertical; min-height: 90px;
+      outline: none; transition: var(--transition); line-height: 1.6;
+    }
+    .form-group textarea::placeholder { color: var(--text-muted); }
+    .form-group textarea:focus { border-color: rgba(200,151,90,0.5); box-shadow: 0 0 0 3px rgba(200,151,90,0.08); }
+
+    @keyframes lm-spin {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to   { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    .submit-review-btn {
+      width: 100%; padding: 12px; border-radius: 10px; border: none;
+      background: transparent; color: #0D0D0D; font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem; font-weight: 700; cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      position: relative; overflow: hidden; z-index: 0;
+    }
+    .submit-review-btn::before {
+      content: ''; position: absolute; top: 50%; left: 50%;
+      width: 600%; height: 600%;
+      transform: translate(-50%, -50%) rotate(0deg);
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg 50deg,
+        rgba(255,240,160,0.9) 70deg 95deg,
+        rgba(255,255,255,1) 100deg 120deg,
+        rgba(235,175,60,0.85) 130deg 150deg,
+        transparent 170deg 300deg,
+        rgba(255,210,80,0.5) 315deg 340deg,
+        transparent 355deg 360deg
+      );
+      animation: lm-spin 3.5s linear infinite;
+      z-index: -2;
+    }
+    .submit-review-btn::after {
+      content: ''; position: absolute; inset: 2px;
+      border-radius: 8px;
+      background: var(--accent); z-index: -1; transition: background 0.25s;
+    }
+    .submit-review-btn:hover { box-shadow: 0 8px 24px rgba(200,151,90,0.32); transform: translateY(-1px); }
+    .submit-review-btn:hover::after { background: var(--accent-light); }
+    .submit-review-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .submit-review-btn:disabled::before { animation-play-state: paused; }
+
+    .already-reviewed {
+      background: rgba(76,175,122,0.08); border: 1px solid rgba(76,175,122,0.2);
+      border-radius: 10px; padding: 14px; font-size: 0.83rem; color: var(--green);
+      text-align: center;
+    }
+
+    /* ── Reviews list ── */
+    .reviews-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .reviews-count { font-size: 0.85rem; color: var(--text-muted); }
+
+    .review-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-card); padding: 20px; margin-bottom: 14px;
+      transition: var(--transition);
+    }
+    .review-card:hover { border-color: rgba(200,151,90,0.15); }
+    .review-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .reviewer-info { display: flex; align-items: center; gap: 10px; }
+    .reviewer-avatar {
+      width: 34px; height: 34px; border-radius: 50%; background: var(--accent-dim);
+      border: 1px solid rgba(200,151,90,0.2); display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; color: var(--accent);
+    }
+    .reviewer-dept { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
+    .reviewer-time { font-size: 0.73rem; color: var(--text-muted); }
+    .review-stars { display: flex; gap: 2px; }
+    .review-text { font-size: 0.875rem; color: var(--text-muted); line-height: 1.7; }
+    .no-reviews { text-align: center; padding: 40px 0; color: var(--text-muted); font-size: 0.9rem; }
+
+    /* ── Menu ── */
+    .menu-category { margin-bottom: 32px; }
+    .menu-cat-title {
+      font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent);
+      margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    }
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 8px; }
+    .menu-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 14px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      transition: var(--transition);
+    }
+    .menu-item:hover { border-color: rgba(200,151,90,0.2); }
+    .menu-item-name { font-size: 0.855rem; color: var(--text-primary); flex: 1; line-height: 1.4; }
+    .menu-item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+
+    /* item rating display */
+    .item-avg {
+      display: flex; align-items: center; gap: 3px;
+      font-size: 0.75rem; color: var(--text-muted);
+    }
+    .item-avg span { color: var(--accent); font-weight: 600; font-size: 0.8rem; }
+
+    /* inline star picker per item */
+    .item-rate-btn {
+      background: transparent; border: 1px solid rgba(200,151,90,0.25);
+      color: var(--accent); padding: 4px 11px; border-radius: 6px;
+      font-size: 0.73rem; font-weight: 600; cursor: pointer; transition: var(--transition);
+      white-space: nowrap;
+    }
+    .item-rate-btn:hover { background: var(--accent-dim); border-color: rgba(200,151,90,0.5); }
+    .item-rate-btn.rated { background: var(--accent-dim); border-color: rgba(200,151,90,0.4); color: var(--accent); }
+
+    /* star popover */
+    .star-popover {
+      position: fixed; z-index: 200;
+      background: var(--surface2, #1C1C1C); border: 1px solid rgba(200,151,90,0.25);
+      border-radius: 12px; padding: 14px 18px; box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+      display: none; flex-direction: column; align-items: center; gap: 10px; min-width: 200px;
+    }
+    .star-popover.open { display: flex; }
+    .star-popover-label { font-size: 0.78rem; color: var(--text-muted); text-align: center; }
+    .star-popover-stars { display: flex; gap: 6px; }
+    .star-popover-stars svg {
+      width: 28px; height: 28px; cursor: pointer; color: rgba(200,151,90,0.2);
+      transition: color 0.12s, transform 0.12s;
+    }
+    .star-popover-stars svg:hover, .star-popover-stars svg.hov { color: rgba(200,151,90,0.6); transform: scale(1.15); }
+    .star-popover-stars svg.sel { color: var(--accent); }
+
+    /* ── Cafe nav ── */
+    .cafe-nav { display: flex; gap: 10px; margin-bottom: 40px; }
+    .cafe-nav-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 18px; font-size: 0.875rem; font-weight: 500;
+      color: var(--text-muted); cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 8px;
+    }
+    .cafe-nav-item:hover, .cafe-nav-item.active { border-color: rgba(200,151,90,0.3); color: var(--text-primary); background: var(--accent-dim); }
+
+    /* ── Flowbite Advanced Rating Breakdown ── */
+    .adv-rating {
+      margin-top: 28px; padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+    .adv-rating-head {
+      display: flex; align-items: baseline; gap: 10px; margin-bottom: 18px; flex-wrap: wrap;
+    }
+    .adv-rating-score {
+      font-family: 'Syne', sans-serif; font-size: 1.85rem; font-weight: 800;
+      letter-spacing: -0.03em; color: var(--text-primary);
+    }
+    .adv-rating-outof { font-size: 0.875rem; color: var(--text-muted); }
+    .adv-rating-total {
+      font-size: 0.8rem; color: var(--text-muted);
+      padding: 3px 10px; background: var(--surface2);
+      border: 1px solid var(--border); border-radius: 100px;
+    }
+
+    .adv-rating-row {
+      display: flex; align-items: center; gap: 14px; margin-bottom: 9px;
+    }
+    .adv-rating-row:last-child { margin-bottom: 0; }
+    .adv-rating-lbl {
+      font-size: 0.8rem; font-weight: 600; color: var(--accent);
+      min-width: 44px; white-space: nowrap;
+    }
+    .adv-bar-wrap {
+      flex: 1; height: 9px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 100px; overflow: hidden;
+    }
+    .adv-bar-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--accent) 0%, #e8b97a 100%);
+      border-radius: 100px;
+      transition: width 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .adv-bar-pct {
+      font-size: 0.78rem; font-weight: 600;
+      color: var(--text-muted); min-width: 34px; text-align: right;
+    }
+
+    @media (max-width: 900px) {
+      .content-grid { grid-template-columns: 1fr; }
+      .review-form-card { position: static; }
+      .cafe-hero-right { align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="dashboard.html" class="logo">Concordia <span class="accent">Eats</span></a>
+      <ul class="nav-links hide-mobile">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="dashboard.html#cafes">All Cafes</a></li>
+        <li><a href="leaderboard.html">Leaderboard</a></li>
+      </ul>
+      <div class="nav-right" id="navRight"></div>
+    </div>
+  </nav>
+
+  <div class="page">
+    <!-- Cafe Hero -->
+    <div class="cafe-hero" id="cafeHero">
+      <div class="container">
+        <div class="cafe-hero-inner">
+          <div class="cafe-hero-left">
+            <div class="cafe-hero-emoji" id="heroEmoji"></div>
+            <div class="cafe-hero-name" id="heroName">Loading...</div>
+            <div class="cafe-hero-loc" id="heroLoc"></div>
+            <div class="cafe-hero-desc" id="heroDesc"></div>
+          </div>
+          <div class="cafe-hero-right">
+            <div class="big-rating">
+              <div class="big-rating-num" id="bigRatingNum">—</div>
+              <div class="big-rating-stars" id="bigRatingStars"></div>
+              <div class="big-rating-count" id="bigRatingCount"></div>
+            </div>
+            <a href="dashboard.html" class="btn-ghost btn-sm">← All Cafes</a>
+          </div>
+        </div>
+
+        <!-- Flowbite Advanced Rating -->
+        <div id="advRating" style="display:none"></div>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Other cafes quick nav -->
+      <div class="cafe-nav" id="cafeNav"></div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('reviews')">Reviews</button>
+        <button class="tab-btn" onclick="switchTab('menu')">Menu</button>
+      </div>
+
+      <!-- Reviews Tab -->
+      <div class="tab-panel active" id="tabReviews">
+        <div class="content-grid">
+          <!-- Reviews List -->
+          <div>
+            <div class="reviews-header">
+              <span class="label">Student Reviews</span>
+              <span class="reviews-count" id="reviewCount"></span>
+            </div>
+            <div id="reviewsList"></div>
+          </div>
+
+          <!-- Review Form -->
+          <div class="review-form-card">
+            <div class="review-form-title">Leave a Review</div>
+            <div id="formArea">
+              <span class="rating-label">Your Rating *</span>
+              <div class="star-picker" id="starPicker"></div>
+
+              <div class="form-group">
+                <label>Comment (optional)</label>
+                <textarea id="reviewComment" placeholder="Share your honest opinion…" maxlength="400"></textarea>
+              </div>
+              <button class="submit-review-btn" id="submitBtn" onclick="submitReview()">
+                Submit Review
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Menu Tab -->
+      <div class="tab-panel" id="tabMenu">
+        <div id="menuContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Star popover for item rating -->
+  <div class="star-popover" id="starPopover">
+    <div class="star-popover-label" id="popoverLabel">Rate this item</div>
+    <div class="star-popover-stars" id="popoverStars"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/cafes.js"></script>
+  <script>
+    if (!Auth.requireAuth()) throw new Error('redirect');
+
+    const user = Auth.getUser();
+    const params = new URLSearchParams(window.location.search);
+    const cafeId = params.get('id') || '1';
+    const cafe = getCafe(cafeId);
+
+    if (!cafe) { window.location.href = 'dashboard.html'; throw new Error('bad id'); }
+
+    // Deduplicate localStorage reviews — keep only the latest per user+cafe
+    // (guards against stale duplicates from prior sessions)
+    if (Auth._supabaseReady && Auth._supabaseReady()) {
+      // Supabase is the source of truth; wipe local reviews to avoid false positives
+      try {
+        const allLocal = DB.getAll('reviews');
+        const deduped = [];
+        const seen = new Set();
+        allLocal.forEach(r => {
+          const key = `${r.cafeId}::${r.userId}`;
+          if (!seen.has(key)) { seen.add(key); deduped.push(r); }
+        });
+        if (deduped.length !== allLocal.length) DB.setAll('reviews', deduped);
+      } catch(_) {}
+    }
+
+    document.title = `${cafe.name} — Concordia Eats`;
+
+    // ── Navbar ──
+    document.getElementById('navRight').innerHTML = `
+      <div class="user-chip">
+        <div class="user-avatar">${user.name.charAt(0).toUpperCase()}</div>
+        <div class="user-name hide-mobile">${user.name}</div>
+      </div>
+      <button class="btn-ghost btn-sm" onclick="Auth.logout()">Logout</button>
+    `;
+
+    // ── Hero ──
+    function renderHero(avg, count) {
+      document.getElementById('heroEmoji').textContent = cafe.emoji;
+      document.getElementById('heroName').textContent = cafe.name;
+      document.getElementById('heroLoc').innerHTML = `
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C8975A" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+        </svg>
+        ${cafe.location}
+      `;
+      document.getElementById('heroDesc').textContent = cafe.description;
+
+      if (avg && count > 0) {
+        document.getElementById('bigRatingNum').textContent = parseFloat(avg).toFixed(1);
+        document.getElementById('bigRatingStars').innerHTML = renderStars(parseFloat(avg), 16);
+        document.getElementById('bigRatingCount').textContent = `${count} review${count !== 1 ? 's' : ''}`;
+      } else {
+        document.getElementById('bigRatingNum').textContent = '—';
+        document.getElementById('bigRatingStars').innerHTML = renderStars(0, 16);
+        document.getElementById('bigRatingCount').textContent = 'No reviews yet';
+      }
+    }
+
+    // ── Other cafes nav ──
+    document.getElementById('cafeNav').innerHTML = CAFES.map(c => `
+      <div class="cafe-nav-item ${c.id === cafe.id ? 'active' : ''}" onclick="window.location.href='cafe.html?id=${c.id}'">
+        ${c.emoji} ${c.name}
+      </div>
+    `).join('');
+
+    // ── Star picker ──
+    let selectedRating = 0;
+
+    function buildStarPicker() {
+      const picker = document.getElementById('starPicker');
+      picker.innerHTML = [1,2,3,4,5].map(n => `
+        <svg data-n="${n}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+          onmouseover="hoverStar(${n})" onmouseout="unhoverStar()"
+          onclick="selectStar(${n})">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+      `).join('');
+    }
+
+    function hoverStar(n) {
+      document.querySelectorAll('#starPicker svg').forEach((s, i) => {
+        s.classList.toggle('hov', i < n);
+      });
+    }
+    function unhoverStar() {
+      document.querySelectorAll('#starPicker svg').forEach(s => s.classList.remove('hov'));
+    }
+    function selectStar(n) {
+      selectedRating = n;
+      document.querySelectorAll('#starPicker svg').forEach((s, i) => {
+        s.classList.toggle('sel', i < n);
+        if (i < n) { s.setAttribute('fill', '#C8975A'); s.removeAttribute('stroke'); }
+        else { s.setAttribute('fill', 'none'); s.setAttribute('stroke', 'currentColor'); }
+      });
+    }
+
+    // ── State ──
+    let _useApi = false;
+    let _existingReview = null;
+
+    function showAlreadyReviewed(review) {
+      _existingReview = review;
+      const ratingNum = parseInt(review.rating) || 0;
+      const commentHtml = review.comment
+        ? `<p style="font-size:0.78rem;opacity:0.7;margin:6px 0 0;font-style:italic">"${review.comment}"</p>`
+        : '';
+      document.getElementById('formArea').innerHTML = `
+        <div class="already-reviewed">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin:0 auto 8px;display:block;color:var(--green)"><path d="M20 6L9 17l-5-5"/></svg>
+          You've already reviewed this cafe.<br/>
+          <span style="font-size:0.78rem;opacity:0.8;display:inline-flex;align-items:center;gap:4px">Your rating: ${renderStars(ratingNum, 14)}</span>
+          ${commentHtml}
+          <button class="btn-ghost btn-sm" style="margin-top:14px;width:100%" onclick="editMyReview()">Edit my review</button>
+        </div>
+      `;
+    }
+
+    function editMyReview() {
+      document.getElementById('formArea').innerHTML = `
+        <span class="rating-label">Your Rating *</span>
+        <div class="star-picker" id="starPicker"></div>
+        <div class="form-group">
+          <label>Comment (optional)</label>
+          <textarea id="reviewComment" placeholder="Share your honest opinion…" maxlength="400"></textarea>
+        </div>
+        <button class="submit-review-btn" id="submitBtn" onclick="submitReview()">Update Review</button>
+      `;
+      buildStarPicker();
+      if (_existingReview) {
+        const r = parseInt(_existingReview.rating) || 0;
+        if (r > 0) selectStar(r);
+        const ta = document.getElementById('reviewComment');
+        if (ta && _existingReview.comment) ta.value = _existingReview.comment;
+      }
+    }
+
+    // ── Submit review ──
+    async function submitReview() {
+      if (selectedRating === 0) { showToast('Please select a star rating first.', 'error'); return; }
+
+      const comment = document.getElementById('reviewComment').value.trim();
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner" style="border-color:rgba(13,13,13,0.3);border-top-color:#0D0D0D;"></div>';
+
+      try {
+        if (Auth._supabaseReady()) {
+          await Auth.restoreSession();
+          await SbReviews.submit(cafe.id, user.id, user.department, selectedRating, comment);
+        } else {
+          const existingLocal = DB.where('reviews', 'cafeId', cafe.id).find(rv => rv.userId === user.id);
+          if (existingLocal) {
+            DB.update('reviews', existingLocal.id, { rating: selectedRating, comment });
+          } else {
+            DB.insert('reviews', { cafeId: cafe.id, userId: user.id, department: user.department, rating: selectedRating, comment });
+          }
+        }
+        showToast('Review saved! Thank you.', 'success');
+        _existingReview = null;
+        await loadCafe();
+      } catch (e) {
+        showToast(e.message || 'Failed to submit review.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = _existingReview ? 'Update Review' : 'Submit Review';
+      }
+    }
+
+    // ── Flowbite Advanced Rating ──
+    function renderAdvancedRating(reviews) {
+      const el = document.getElementById('advRating');
+      if (!reviews.length) { el.style.display = 'none'; return; }
+
+      const total = reviews.length;
+      const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+      reviews.forEach(r => { const n = parseInt(r.rating); if (counts[n] !== undefined) counts[n]++; });
+
+      const avg = (reviews.reduce((s, r) => s + parseInt(r.rating), 0) / total).toFixed(2);
+
+      el.style.display = '';
+      el.innerHTML = `
+        <div class="adv-rating">
+          <div class="adv-rating-head">
+            <span class="adv-rating-score">${parseFloat(avg).toFixed(1)}</span>
+            <span class="adv-rating-outof">out of 5</span>
+            <span class="adv-rating-total">${total.toLocaleString()} review${total !== 1 ? 's' : ''}</span>
+          </div>
+          ${[5,4,3,2,1].map(n => {
+            const pct = total ? Math.round((counts[n] / total) * 100) : 0;
+            return `
+              <div class="adv-rating-row">
+                <span class="adv-rating-lbl">${n} star</span>
+                <div class="adv-bar-wrap">
+                  <div class="adv-bar-fill" data-pct="${pct}"></div>
+                </div>
+                <span class="adv-bar-pct">${pct}%</span>
+              </div>`;
+          }).join('')}
+        </div>`;
+
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        el.querySelectorAll('.adv-bar-fill').forEach(b => { b.style.width = b.dataset.pct + '%'; });
+      }));
+    }
+
+    // ── Render reviews list ──
+    function renderReviews(reviews, avg, count) {
+      document.getElementById('reviewCount').textContent =
+        count > 0 ? `${count} review${count !== 1 ? 's' : ''}` : 'No reviews yet';
+
+      const container = document.getElementById('reviewsList');
+      if (!reviews.length) {
+        container.innerHTML = `<div class="no-reviews">No reviews yet — be the first to share your thoughts!</div>`;
+        return;
+      }
+
+      container.innerHTML = reviews.map(r => `
+        <div class="review-card">
+          <div class="review-card-top">
+            <div class="reviewer-info">
+              <div class="reviewer-avatar">${r.department.charAt(0)}</div>
+              <div>
+                <div class="reviewer-dept">${r.department} Student</div>
+                <div class="reviewer-time">${timeAgo(r.created_at || r.createdAt)}</div>
+              </div>
+            </div>
+            <div class="review-stars">${renderStars(r.rating, 13)}</div>
+          </div>
+          ${r.comment ? `<div class="review-text">"${r.comment}"</div>` : ''}
+        </div>
+      `).join('');
+
+      renderAdvancedRating(reviews);
+    }
+
+    // ── Render menu with per-item ratings ──
+    let _itemRatings = {};   // { itemId -> { avg, count } }
+    let _myItemRatings = {}; // { itemId -> rating }
+
+    function renderMenu() {
+      const container = document.getElementById('menuContainer');
+      container.innerHTML = cafe.menu.map(cat => `
+        <div class="menu-category">
+          <div class="menu-cat-title">${cat.cat}</div>
+          <div class="menu-grid">
+            ${cat.items.map(item => {
+              const r = _itemRatings[item.id];
+              const myR = _myItemRatings[item.id];
+              const avgHtml = r
+                ? `<div class="item-avg">${renderStars(parseFloat(r.avg), 11)}<span>${r.avg}</span></div>`
+                : '';
+              const btnLabel = myR ? `★ ${myR}/5` : 'Rate';
+              const btnClass = myR ? 'item-rate-btn rated' : 'item-rate-btn';
+              return `
+                <div class="menu-item">
+                  <div class="menu-item-name">${item.name}</div>
+                  <div class="menu-item-right">
+                    <button class="${btnClass}" onclick="openRatePopover(event,'${item.id}','${item.name.replace(/'/g,'\\\'')}')">${btnLabel}</button>
+                    ${avgHtml}
+                  </div>
+                </div>`;
+            }).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ── Item rating popover ──
+    let _activeItemId = null;
+
+    function openRatePopover(e, itemId, itemName) {
+      e.stopPropagation();
+      _activeItemId = itemId;
+      const pop = document.getElementById('starPopover');
+      const stars = document.getElementById('popoverStars');
+      const label = document.getElementById('popoverLabel');
+
+      label.textContent = itemName.length > 28 ? itemName.slice(0, 28) + '…' : itemName;
+
+      const myR = _myItemRatings[itemId] || 0;
+      const starPath = 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z';
+      stars.innerHTML = [1,2,3,4,5].map(n => `
+        <svg data-n="${n}" viewBox="0 0 24 24"
+          fill="${n <= myR ? '#C8975A' : 'none'}"
+          stroke="${n <= myR ? 'none' : 'currentColor'}"
+          stroke-width="1.5"
+          class="${n <= myR ? 'sel' : ''}"
+          onmouseover="popHover(${n})" onmouseout="popUnhover(${myR})"
+          onclick="submitItemRating(${n})">
+          <path d="${starPath}"/>
+        </svg>`).join('');
+
+      // Position near the button (fixed element — no scrollY offset)
+      const btn  = e.target.closest('button') || e.target;
+      const rect = btn.getBoundingClientRect();
+      const popW = 220;
+      const left = Math.min(Math.max(8, rect.left + rect.width / 2 - popW / 2), window.innerWidth - popW - 8);
+      pop.style.top  = (rect.bottom + 8) + 'px';
+      pop.style.left = left + 'px';
+      pop.classList.add('open');
+    }
+
+    function popHover(n) {
+      document.querySelectorAll('#popoverStars svg').forEach((s, i) => {
+        s.classList.toggle('hov', i < n && !s.classList.contains('sel'));
+      });
+    }
+    function popUnhover(myR) {
+      document.querySelectorAll('#popoverStars svg').forEach(s => s.classList.remove('hov'));
+    }
+
+    async function submitItemRating(rating) {
+      const pop = document.getElementById('starPopover');
+      pop.classList.remove('open');
+      if (!_activeItemId) return;
+      try {
+        if (Auth._supabaseReady()) {
+          await Auth.restoreSession();
+          await SbItems.rate(cafe.id, _activeItemId, user.id, user.department, rating);
+        }
+        _myItemRatings[_activeItemId] = rating;
+        // Refresh avg locally
+        const old = _itemRatings[_activeItemId];
+        if (old) {
+          const newSum = parseFloat(old.avg) * old.count - (old.count > 1 ? 0 : 0) + rating;
+          _itemRatings[_activeItemId] = { avg: ((parseFloat(old.avg) * old.count + rating) / (old.count + 1)).toFixed(1), count: old.count + 1 };
+        } else {
+          _itemRatings[_activeItemId] = { avg: rating.toFixed(1), count: 1 };
+        }
+        renderMenu();
+        showToast('Item rated! Thanks.', 'success');
+      } catch(e) {
+        showToast(e.message || 'Could not save rating.', 'error');
+      }
+    }
+
+    // Close popover on outside click
+    document.addEventListener('click', () => {
+      document.getElementById('starPopover').classList.remove('open');
+    });
+
+    // ── Tab switcher ──
+    const tabPanels = { reviews: 'tabReviews', menu: 'tabMenu' };
+    function switchTab(name) {
+      document.querySelectorAll('.tab-btn').forEach((b, i) => {
+        b.classList.toggle('active', ['reviews','menu'][i] === name);
+      });
+      Object.entries(tabPanels).forEach(([k, id]) => {
+        document.getElementById(id).classList.toggle('active', k === name);
+      });
+    }
+
+    // ── Toast ──
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = `toast ${type} show`;
+      setTimeout(() => { t.classList.remove('show'); }, 3200);
+    }
+
+    // ── Main load ──
+    async function loadCafe() {
+      if (Auth._supabaseReady()) {
+        const [{ reviews, avg, count }, myRevs, itemRatings, myItemRatings] = await Promise.all([
+          SbReviews.forCafe(cafe.id),
+          SbReviews.mine(user.id),
+          SbItems.ratingsForCafe(cafe.id),
+          SbItems.myRatings(user.id),
+        ]);
+        _itemRatings   = itemRatings;
+        _myItemRatings = myItemRatings;
+
+        renderHero(avg, count);
+        renderReviews(reviews, avg, count);
+
+        const myReview = reviews.find(r => String(r.user_id) === String(user.id))
+                      || myRevs.find(r => String(r.cafe_id) === String(cafe.id));
+        if (myReview) showAlreadyReviewed(myReview);
+        else buildStarPicker();
+      } else {
+        const r = getCafeRating(cafe.id);
+        renderHero(r.avg, r.count);
+        const reviews = DB.where('reviews', 'cafeId', cafe.id)
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        renderReviews(reviews, r.avg, r.count);
+        const existing = reviews.find(rv => rv.userId === user.id);
+        if (existing) showAlreadyReviewed(existing);
+        else buildStarPicker();
+      }
+
+      renderMenu();
+    }
+
+    Auth.restoreSession().then(loadCafe).catch(console.error);
+  </script>
+</body>
+</html>
