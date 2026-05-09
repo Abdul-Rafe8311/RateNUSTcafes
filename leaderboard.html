@@ -35,11 +35,11 @@
       background: linear-gradient(
         to right,
         transparent 0%,
-        rgba(200,151,90,0.0) 5%,
-        rgba(200,151,90,0.95) 35%,
-        rgba(255,230,140,1) 50%,
-        rgba(200,151,90,0.95) 65%,
-        rgba(200,151,90,0.0) 95%,
+        rgba(0,200,240,0.0) 5%,
+        rgba(0,200,240,0.95) 35%,
+        rgba(180,240,255,1) 50%,
+        rgba(0,200,240,0.95) 65%,
+        rgba(0,200,240,0.0) 95%,
         transparent 100%
       );
       width: 0%;
@@ -54,9 +54,9 @@
       width: 680px; height: 320px;
       background: radial-gradient(
         ellipse 55% 100% at 50% 0%,
-        rgba(200,151,90,0.28) 0%,
-        rgba(200,151,90,0.10) 35%,
-        rgba(200,151,90,0.03) 60%,
+        rgba(0,200,240,0.28) 0%,
+        rgba(0,200,240,0.10) 35%,
+        rgba(0,200,240,0.03) 60%,
         transparent 80%
       );
       animation: lamp-glow 1.2s cubic-bezier(0.4,0,0.2,1) 0.3s forwards;
@@ -68,14 +68,14 @@
       position: absolute; top: 0; left: 50%;
       transform: translateX(-50%);
       width: 300px; height: 1px;
-      box-shadow: 0 0 18px 4px rgba(200,151,90,0.55),
-                  0 0 40px 8px rgba(200,151,90,0.22),
-                  0 0 80px 16px rgba(200,151,90,0.09);
+      box-shadow: 0 0 18px 4px rgba(0,200,240,0.55),
+                  0 0 40px 8px rgba(0,200,240,0.22),
+                  0 0 80px 16px rgba(0,200,240,0.09);
     }
     .lb-badge {
       display: inline-flex; align-items: center; gap: 7px;
-      background: var(--accent-dim); border: 1px solid rgba(200,151,90,0.25);
-      border-radius: 100px; padding: 5px 16px;
+      background: var(--accent-dim); border: 1px solid rgba(0,200,240,0.25);
+      border-radius: 2px; padding: 5px 16px;
       font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
       text-transform: uppercase; color: var(--accent);
       margin-bottom: 20px; position: relative;
@@ -169,7 +169,7 @@
     .podium-conic {
       position: absolute; inset: -2px;
       border-radius: 16px 16px 0 0;
-      background: conic-gradient(from 0deg, transparent 100deg, rgba(255,215,0,0.7) 180deg, transparent 260deg);
+      background: conic-gradient(from 0deg, transparent 100deg, rgba(0,200,240,0.85) 160deg, rgba(180,240,255,0.9) 180deg, rgba(0,200,240,0.85) 200deg, transparent 260deg);
       animation: pod-spin 3s linear infinite;
       z-index: 0;
     }
@@ -178,7 +178,7 @@
       position: relative; z-index: 1;
       background: var(--surface);
       border-radius: 16px 16px 0 0; padding: 28px 20px 22px; text-align: center;
-      border: 1px solid rgba(255,215,0,0.18); border-bottom: none;
+      border: 1px solid rgba(0,200,240,0.25); border-bottom: none;
     }
 
     .podium-crown { font-size: 1.6rem; line-height: 1; margin-bottom: 4px; }
@@ -219,7 +219,7 @@
       position: relative;
     }
     .rankings-row:last-child { border-bottom: none; }
-    .rankings-row:hover { background: rgba(200,151,90,0.03); }
+    .rankings-row:hover { background: rgba(0,200,240,0.03); }
 
     /* left accent on hover */
     .rankings-row::before {
@@ -245,9 +245,9 @@
 
     /* score bar column */
     .rank-bar-col { display: flex; flex-direction: column; gap: 5px; }
-    .rank-bar-wrap { height: 6px; background: rgba(255,255,255,0.07); border-radius: 100px; overflow: hidden; }
+    .rank-bar-wrap { height: 6px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
     .rank-bar-fill {
-      height: 100%; border-radius: 100px; width: 0%;
+      height: 100%; border-radius: 2px; width: 0%;
       transition: width 1s cubic-bezier(0.4,0,0.2,1);
     }
     .r1 .rank-bar-fill,
@@ -272,7 +272,7 @@
 
     /* ── CTA ── */
     .cta-strip {
-      background: var(--accent-dim); border: 1px solid rgba(200,151,90,0.22);
+      background: var(--accent-dim); border: 1px solid rgba(0,200,240,0.22);
       border-radius: var(--radius-card); padding: 26px 32px;
       display: flex; align-items: center; justify-content: space-between; gap: 16px;
       flex-wrap: wrap; margin-top: 28px;
@@ -435,7 +435,7 @@
     function renderStars(avg, size = 13) {
       const full = Math.round(avg);
       return [1,2,3,4,5].map(n => {
-        const c = n <= full ? '#C8975A' : 'rgba(200,151,90,0.18)';
+        const c = n <= full ? '#00C8F0' : 'rgba(0,200,240,0.18)';
         return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="${c}"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
       }).join('');
     }
