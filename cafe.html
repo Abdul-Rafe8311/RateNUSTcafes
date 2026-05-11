@@ -150,7 +150,8 @@
       transition: var(--transition);
     }
     .menu-item:hover { border-color: rgba(0,200,240,0.2); }
-    .menu-item-name { font-size: 0.855rem; color: var(--text-primary); flex: 1; line-height: 1.4; }
+    .menu-item-name { font-size: 0.855rem; color: var(--text-primary); flex: 1; line-height: 1.4; display: flex; flex-direction: column; gap: 3px; }
+    .menu-item-price { font-size: 0.78rem; font-weight: 600; color: var(--accent); opacity: 0.85; }
     .menu-item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
 
     /* item rating display */
@@ -257,6 +258,7 @@
       <ul class="nav-links hide-mobile">
         <li><a href="dashboard.html">Dashboard</a></li>
         <li><a href="dashboard.html#cafes">All Cafes</a></li>
+        <li><a href="search.html">Search</a></li>
         <li><a href="leaderboard.html">Leaderboard</a></li>
       </ul>
       <div class="nav-right" id="navRight"></div>
@@ -273,6 +275,16 @@
             <div class="cafe-hero-name" id="heroName">Loading...</div>
             <div class="cafe-hero-loc" id="heroLoc"></div>
             <div class="cafe-hero-desc" id="heroDesc"></div>
+            <!-- Crowd indicator -->
+            <div style="margin-top:14px;">
+              <div id="crowdBadgeWrap"></div>
+              <div class="crowd-vote-row" id="crowdVoteRow">
+                <span style="font-size:0.73rem;color:var(--text-muted);align-self:center;">Report crowd:</span>
+                <button class="crowd-vote-btn" id="vbq" onclick="voteCrowd('quiet')">Quiet</button>
+                <button class="crowd-vote-btn" id="vbm" onclick="voteCrowd('moderate')">Moderate</button>
+                <button class="crowd-vote-btn" id="vbb" onclick="voteCrowd('busy')">Busy</button>
+              </div>
+            </div>
           </div>
           <div class="cafe-hero-right">
             <div class="big-rating">
@@ -350,6 +362,7 @@
   <script src="js/db.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/cafes.js"></script>
+  <script src="js/crowd.js"></script>
   <script>
     if (!Auth.requireAuth()) throw new Error('redirect');
 
@@ -592,6 +605,7 @@
 
     function renderMenu() {
       const container = document.getElementById('menuContainer');
+      const availMap  = getAvailMap();
       container.innerHTML = cafe.menu.map(cat => `
         <div class="menu-category">
           <div class="menu-cat-title">${cat.cat}</div>
@@ -599,15 +613,30 @@
             ${cat.items.map(item => {
               const r = _itemRatings[item.id];
               const myR = _myItemRatings[item.id];
+              const avail = availMap[item.id];
               const avgHtml = r
                 ? `<div class="item-avg">${renderStars(parseFloat(r.avg), 11)}<span>${r.avg}</span></div>`
                 : '';
               const btnLabel = myR ? `★ ${myR}/5` : 'Rate';
               const btnClass = myR ? 'item-rate-btn rated' : 'item-rate-btn';
+              const priceHtml = item.price != null
+                ? `<span class="menu-item-price">Rs. ${item.price}</span>`
+                : '';
+              const availBadge = avail === 'sold_out'
+                ? `<span class="avail-badge avail-sold-out">Sold Out</span>`
+                : avail === 'special'
+                ? `<span class="avail-badge avail-special">Special Today</span>`
+                : '';
+              const availBtn = avail === 'sold_out'
+                ? `<button class="avail-toggle-btn" title="Mark as available" onclick="setAvail('${item.id}','sold_out')">↺</button>`
+                : avail === 'special'
+                ? `<button class="avail-toggle-btn" title="Remove special" onclick="setAvail('${item.id}','special')">↺</button>`
+                : `<button class="avail-toggle-btn" title="Mark sold out / special" onclick="showAvailMenu(event,'${item.id}')">⋯</button>`;
               return `
-                <div class="menu-item">
-                  <div class="menu-item-name">${item.name}</div>
+                <div class="menu-item"${avail === 'sold_out' ? ' style="opacity:0.55"' : ''}>
+                  <div class="menu-item-name">${item.name}${availBadge}${priceHtml}</div>
                   <div class="menu-item-right">
+                    ${availBtn}
                     <button class="${btnClass}" onclick="openRatePopover(event,'${item.id}','${item.name.replace(/'/g,'\\\'')}')">${btnLabel}</button>
                     ${avgHtml}
                   </div>
@@ -616,6 +645,26 @@
           </div>
         </div>
       `).join('');
+    }
+
+    // Small context menu for availability
+    function showAvailMenu(e, itemId) {
+      e.stopPropagation();
+      // Remove any existing menu
+      document.querySelectorAll('.avail-ctx-menu').forEach(m => m.remove());
+      const menu = document.createElement('div');
+      menu.className = 'avail-ctx-menu';
+      menu.style.cssText = `position:fixed;z-index:9999;background:var(--surface2);border:1px solid var(--border-accent);border-radius:6px;padding:6px 0;box-shadow:0 8px 24px rgba(0,0,0,0.4);min-width:160px;`;
+      menu.innerHTML = `
+        <div onclick="setAvail('${itemId}','sold_out');this.parentElement.remove();" style="padding:9px 16px;cursor:pointer;font-size:0.82rem;color:#FF4466;" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background=''">Sold Out</div>
+        <div onclick="setAvail('${itemId}','special');this.parentElement.remove();" style="padding:9px 16px;cursor:pointer;font-size:0.82rem;color:var(--accent);" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background=''">Special Today</div>
+      `;
+      const btn = e.currentTarget;
+      const r = btn.getBoundingClientRect();
+      menu.style.top  = (r.bottom + 4) + 'px';
+      menu.style.left = Math.max(8, r.left - 100) + 'px';
+      document.body.appendChild(menu);
+      setTimeout(() => document.addEventListener('click', () => menu.remove(), { once: true }), 0);
     }
 
     // ── Item rating popover ──
@@ -741,6 +790,45 @@
         else buildStarPicker();
       }
 
+      renderMenu();
+      initCrowd();
+    }
+
+    // ── Crowd indicator ──
+    function initCrowd() {
+      const wrap = document.getElementById('crowdBadgeWrap');
+      if (wrap) wrap.innerHTML = crowdBadgeHtml(cafe.id);
+      // Mark voted button if user already reported
+      const stored = localStorage.getItem('ce_crowd_' + cafe.id);
+      if (stored) {
+        const r = JSON.parse(stored);
+        if (Date.now() - r.ts < 45 * 60 * 1000) highlightVoteBtn(r.level);
+      }
+    }
+
+    function voteCrowd(level) {
+      setCrowdReport(cafe.id, level);
+      const wrap = document.getElementById('crowdBadgeWrap');
+      if (wrap) wrap.innerHTML = crowdBadgeHtml(cafe.id);
+      highlightVoteBtn(level);
+      showToast('Thanks for reporting! Helps everyone plan their trip.', 'success');
+    }
+
+    function highlightVoteBtn(level) {
+      ['quiet','moderate','busy'].forEach(l => {
+        const btn = document.getElementById('vb' + l[0]);
+        if (btn) btn.className = 'crowd-vote-btn' + (l === level ? ' voted-' + l : '');
+      });
+    }
+
+    // ── Item availability (daily reset) ──
+    const _todayKey = 'ce_avail_' + new Date().toISOString().slice(0,10);
+    function getAvailMap() { return JSON.parse(localStorage.getItem(_todayKey) || '{}'); }
+    function setAvail(itemId, state) {
+      const m = getAvailMap();
+      if (m[itemId] === state) delete m[itemId]; // toggle off
+      else m[itemId] = state;
+      localStorage.setItem(_todayKey, JSON.stringify(m));
       renderMenu();
     }
 

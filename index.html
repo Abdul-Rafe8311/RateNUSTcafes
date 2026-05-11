@@ -845,6 +845,7 @@
           <div class="spot-indicator" id="spotIndicator"></div>
           <a href="#home"            class="spot-link active" data-section="home">Home</a>
           <a href="#cafes"           class="spot-link"        data-section="cafes">Cafes</a>
+          <a href="search.html"      class="spot-link">Search</a>
           <a href="leaderboard.html" class="spot-link">Leaderboard</a>
         </nav>
         <button class="btn-login" onclick="goToLogin()">Login with NUST</button>
@@ -966,6 +967,19 @@
           All three cafes live on NUST's main campus. Each has its own crowd, vibe, and menu.
           Find out which one your fellow students swear by.
         </p>
+        <!-- Quick search bar -->
+        <div style="position:relative;max-width:420px;margin-top:20px;">
+          <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text-muted);pointer-events:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="heroSearch" type="text" placeholder="Search biryani, zinger, chai…"
+            style="width:100%;padding:12px 14px 12px 40px;background:var(--surface);border:1.5px solid var(--border-accent);border-radius:var(--radius-card);color:var(--text-primary);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;transition:var(--transition);"
+            onfocus="this.style.borderColor='var(--accent)'"
+            onblur="this.style.borderColor='var(--border-accent)'"
+            onkeydown="if(event.key==='Enter'&&this.value.trim())window.location.href='search.html?q='+encodeURIComponent(this.value.trim())" />
+          <button onclick="var v=document.getElementById('heroSearch').value.trim();if(v)window.location.href='search.html?q='+encodeURIComponent(v);"
+            style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--accent);border:none;color:#030C14;font-weight:700;font-size:0.75rem;padding:5px 12px;border-radius:4px;cursor:pointer;letter-spacing:0.04em;">
+            SEARCH
+          </button>
+        </div>
       </div>
 
       <div class="cafes-grid">
@@ -982,6 +996,7 @@
               <i data-lucide="star" class="dim"></i>
             </div>
             <div class="cafe-location"><i data-lucide="map-pin"></i>Near NBS Ground</div>
+            <div id="crowd-1" style="margin:8px 0 4px;"></div>
             <p class="cafe-desc">Quick bites, great chai, and a chill vibe between classes. The go-to spot when you have 10 minutes between lectures.</p>
             <div class="cafe-footer">
               <span class="review-count"><i data-lucide="message-circle"></i>124 reviews</span>
@@ -1001,6 +1016,7 @@
               <i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i>
             </div>
             <div class="cafe-location"><i data-lucide="map-pin"></i>Near SEECS</div>
+            <div id="crowd-2" style="margin:8px 0 4px;"></div>
             <p class="cafe-desc">Fuel for late-night lab sessions. The favorite of CS and EE students — always packed after 8 pm, somehow still manages fast service.</p>
             <div class="cafe-footer">
               <span class="review-count"><i data-lucide="message-circle"></i>207 reviews</span>
@@ -1021,6 +1037,7 @@
               <i data-lucide="star" class="dim"></i>
             </div>
             <div class="cafe-location"><i data-lucide="map-pin"></i>In front of NUST Main Office</div>
+            <div id="crowd-3" style="margin:8px 0 4px;"></div>
             <p class="cafe-desc">The most central cafe on campus. Always buzzing with students from every department. Great for a quick bite or a long hangout.</p>
             <div class="cafe-footer">
               <span class="review-count"><i data-lucide="message-circle"></i>89 reviews</span>
@@ -1434,6 +1451,18 @@
       });
     }, { threshold: 0.45 });
     document.querySelectorAll('section[id]').forEach(s => secObs.observe(s));
+  </script>
+
+  <!-- Crowd indicator -->
+  <script src="js/cafes.js"></script>
+  <script src="js/crowd.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      ['1','2','3'].forEach(id => {
+        const el = document.getElementById('crowd-' + id);
+        if (el) el.innerHTML = crowdBadgeHtml(id);
+      });
+    });
   </script>
 
 </body>

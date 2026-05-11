@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search — Concordia Eats</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/shared.css" />
+  <style>
+    .page { padding: 88px 0 80px; }
+
+    /* ── Search Hero ── */
+    .search-hero {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 40px 0 36px; margin-bottom: 36px;
+    }
+    .search-hero-title {
+      font-family: 'Syne', sans-serif; font-size: clamp(1.6rem,4vw,2.4rem);
+      font-weight: 800; letter-spacing: -0.03em; margin-bottom: 6px;
+    }
+    .search-hero-sub { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px; }
+
+    /* ── Search bar ── */
+    .search-wrap {
+      position: relative; max-width: 640px;
+    }
+    .search-wrap svg.search-icon {
+      position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+      width: 18px; height: 18px; color: var(--text-muted); pointer-events: none;
+    }
+    #searchInput {
+      width: 100%; padding: 14px 48px 14px 46px;
+      background: var(--bg); border: 1.5px solid var(--border-accent);
+      border-radius: var(--radius-card); color: var(--text-primary);
+      font-family: 'DM Sans', sans-serif; font-size: 1rem;
+      outline: none; transition: var(--transition);
+    }
+    #searchInput:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,200,240,0.10); }
+    #searchInput::placeholder { color: var(--text-muted); }
+    .clear-btn {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: var(--text-muted); cursor: pointer;
+      display: none; padding: 4px;
+    }
+    .clear-btn.visible { display: block; }
+
+    /* ── Tabs ── */
+    .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
+    .tab-btn {
+      padding: 11px 24px; border: none; background: transparent;
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500;
+      color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent;
+      margin-bottom: -1px; transition: var(--transition);
+    }
+    .tab-btn.active { color: var(--text-primary); border-bottom-color: var(--accent); }
+    .tab-btn:hover  { color: var(--text-primary); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Cafe filter chips ── */
+    .filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .filter-chip {
+      padding: 5px 14px; border: 1px solid var(--border); border-radius: 20px;
+      font-size: 0.8rem; font-weight: 500; cursor: pointer; color: var(--text-muted);
+      background: transparent; transition: var(--transition);
+    }
+    .filter-chip.active {
+      border-color: var(--accent); color: var(--accent);
+      background: rgba(0,200,240,0.08);
+    }
+
+    /* ── Search Results ── */
+    .results-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px;
+    }
+    .result-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-card); padding: 14px 16px;
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+      cursor: pointer; transition: var(--transition);
+    }
+    .result-card:hover { border-color: rgba(0,200,240,0.3); background: var(--surface2); }
+    .result-left { flex: 1; min-width: 0; }
+    .result-name { font-size: 0.875rem; font-weight: 600; color: var(--text-primary); }
+    .result-cafe { font-size: 0.75rem; color: var(--text-muted); margin-top: 3px; display: flex; align-items: center; gap: 4px; }
+    .result-right { text-align: right; flex-shrink: 0; }
+    .result-price { font-size: 0.9rem; font-weight: 700; color: var(--accent); }
+    .result-rating { font-size: 0.72rem; color: var(--text-muted); margin-top: 3px; }
+
+    .no-results {
+      text-align: center; padding: 60px 20px; color: var(--text-muted);
+    }
+    .no-results svg { width: 40px; height: 40px; margin: 0 auto 12px; opacity: 0.3; }
+    .no-results p { font-size: 0.9rem; }
+
+    .results-count { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px; }
+    .results-count span { color: var(--accent); font-weight: 600; }
+
+    /* ── Price Comparison Table ── */
+    .compare-search-wrap { max-width: 480px; margin-bottom: 20px; position: relative; }
+    .compare-search-wrap svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted); pointer-events: none; }
+    #compareInput {
+      width: 100%; padding: 11px 14px 11px 40px;
+      background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: var(--radius-card); color: var(--text-primary);
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem; outline: none;
+      transition: var(--transition);
+    }
+    #compareInput:focus { border-color: var(--accent); }
+    #compareInput::placeholder { color: var(--text-muted); }
+
+    .compare-table-wrap { overflow-x: auto; }
+    .compare-table {
+      width: 100%; border-collapse: collapse; font-size: 0.865rem;
+    }
+    .compare-table th {
+      text-align: left; padding: 10px 16px;
+      font-family: 'Syne', sans-serif; font-size: 0.78rem;
+      letter-spacing: 0.07em; text-transform: uppercase; color: var(--accent);
+      border-bottom: 1px solid var(--border); white-space: nowrap;
+    }
+    .compare-table td {
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+    }
+    .compare-table tr:hover td { background: var(--surface2); }
+    .compare-table .price-cell { font-weight: 600; white-space: nowrap; }
+    .compare-table .price-best { color: var(--green); }
+    .compare-table .price-na   { color: var(--text-muted); font-weight: 400; font-style: italic; font-size: 0.8rem; }
+    .compare-table .item-name  { font-weight: 600; }
+    .compare-table .cafe-tag   {
+      display: inline-block; padding: 2px 8px; border-radius: 10px;
+      font-size: 0.7rem; font-weight: 600; background: rgba(0,200,240,0.10);
+      color: var(--accent); margin: 2px 2px 0 0;
+    }
+    .sort-row { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+    .sort-label { font-size: 0.8rem; color: var(--text-muted); }
+    .sort-chip {
+      padding: 4px 12px; border: 1px solid var(--border); border-radius: 16px;
+      font-size: 0.78rem; cursor: pointer; color: var(--text-muted);
+      background: transparent; transition: var(--transition);
+    }
+    .sort-chip.active { border-color: var(--accent); color: var(--accent); background: rgba(0,200,240,0.08); }
+
+    .multi-badge {
+      display: inline-block; padding: 1px 7px; border-radius: 10px;
+      font-size: 0.68rem; font-weight: 700; background: rgba(0,200,240,0.12);
+      color: var(--accent); vertical-align: middle; margin-left: 6px;
+    }
+  </style>
+</head>
+<body>
+  <!-- ── Nav ── -->
+  <nav class="navbar">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;">
+      <a href="index.html" class="logo">Concordia <span class="accent">Eats</span></a>
+      <ul class="nav-links hide-mobile">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="search.html" style="color:var(--accent)">Search</a></li>
+        <li><a href="leaderboard.html">Leaderboard</a></li>
+      </ul>
+      <div id="navRight"></div>
+    </div>
+  </nav>
+
+  <div class="page">
+    <!-- ── Search Hero ── -->
+    <div class="search-hero">
+      <div class="container">
+        <div class="search-hero-title">Find Food Across <span style="color:var(--accent)">All Cafes</span></div>
+        <div class="search-hero-sub">Search any dish · Compare prices · See ratings from all 3 Concordia cafes</div>
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input id="searchInput" type="text" placeholder="Search biryani, zinger burger, cold coffee…" autocomplete="off" />
+          <button class="clear-btn" id="clearBtn" onclick="clearSearch()">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- ── Tabs ── -->
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('search',this)">Search Results</button>
+        <button class="tab-btn" onclick="switchTab('compare',this)">Price Comparison</button>
+      </div>
+
+      <!-- ── SEARCH TAB ── -->
+      <div class="tab-panel active" id="tab-search">
+        <div class="filter-row">
+          <button class="filter-chip active" onclick="setFilter('all',this)">All Cafes</button>
+          <button class="filter-chip" onclick="setFilter('1',this)">Concordia 1</button>
+          <button class="filter-chip" onclick="setFilter('2',this)">Concordia 2</button>
+          <button class="filter-chip" onclick="setFilter('3',this)">Concordia 3</button>
+        </div>
+        <div class="results-count" id="resultsCount"></div>
+        <div class="results-grid" id="resultsGrid"></div>
+      </div>
+
+      <!-- ── COMPARE TAB ── -->
+      <div class="tab-panel" id="tab-compare">
+        <div class="compare-search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input id="compareInput" type="text" placeholder="Filter comparison…" oninput="renderCompare()" />
+        </div>
+        <div class="sort-row">
+          <span class="sort-label">Sort by:</span>
+          <button class="sort-chip active" onclick="setSort('name',this)">Name A–Z</button>
+          <button class="sort-chip" onclick="setSort('price-asc',this)">Price ↑</button>
+          <button class="sort-chip" onclick="setSort('price-desc',this)">Price ↓</button>
+          <button class="sort-chip" onclick="setSort('cafes',this)">Most Cafes</button>
+        </div>
+        <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:16px;">
+          Items available in 2 or more cafes. <span style="color:var(--green);font-weight:600;">Green</span> = best price.
+        </p>
+        <div class="compare-table-wrap">
+          <table class="compare-table" id="compareTable">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Concordia 1</th>
+                <th>Concordia 2</th>
+                <th>Concordia 3</th>
+              </tr>
+            </thead>
+            <tbody id="compareBody"></tbody>
+          </table>
+        </div>
+        <div id="compareEmpty" class="no-results" style="display:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="8" y1="15" x2="16" y2="15"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+          <p>No matching items found</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/db.js"></script>
+  <script src="js/cafes.js"></script>
+  <script src="js/auth.js" defer></script>
+  <script>
+    /* ── State ── */
+    let _query     = '';
+    let _filter    = 'all';
+    let _sortMode  = 'name';
+    let _allItems  = []; // { name, cafeId, cafeName, price, itemId }
+    let _compareItems = []; // { name, c1, c2, c3 } — items in 2+ cafes
+
+    /* ── Build flat item index ── */
+    function buildIndex() {
+      CAFES.forEach(cafe => {
+        cafe.menu.forEach(cat => {
+          cat.items.forEach(item => {
+            _allItems.push({
+              name:     item.name,
+              nameLow:  item.name.toLowerCase(),
+              cafeId:   cafe.id,
+              cafeName: cafe.name,
+              price:    item.price,
+              itemId:   item.id,
+              cat:      cat.cat,
+            });
+          });
+        });
+      });
+      buildCompareIndex();
+    }
+
+    /* ── Build cross-cafe comparison index ── */
+    function buildCompareIndex() {
+      const map = {};
+      _allItems.forEach(item => {
+        const key = item.nameLow;
+        if (!map[key]) map[key] = { name: item.name, c1: null, c2: null, c3: null };
+        map[key]['c' + item.cafeId] = item.price;
+      });
+      _compareItems = Object.values(map).filter(r =>
+        [r.c1, r.c2, r.c3].filter(p => p != null).length >= 2
+      );
+    }
+
+    /* ── Search rendering ── */
+    function renderSearch() {
+      const q = _query.toLowerCase().trim();
+      let items = _allItems;
+      if (_filter !== 'all') items = items.filter(i => i.cafeId === _filter);
+      if (q) items = items.filter(i => i.nameLow.includes(q));
+
+      const grid = document.getElementById('resultsGrid');
+      const cnt  = document.getElementById('resultsCount');
+
+      if (!q && _filter === 'all') {
+        grid.innerHTML = '';
+        cnt.innerHTML = 'Type something above to search across all cafes.';
+        return;
+      }
+
+      cnt.innerHTML = items.length
+        ? `<span>${items.length}</span> item${items.length !== 1 ? 's' : ''} found`
+        : '';
+
+      if (!items.length) {
+        grid.innerHTML = `<div class="no-results" style="grid-column:1/-1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <p>No results for "<strong>${escHtml(q)}</strong>"</p>
+        </div>`;
+        return;
+      }
+
+      grid.innerHTML = items.map(item => `
+        <div class="result-card" onclick="window.location.href='cafe.html?id=${item.cafeId}'">
+          <div class="result-left">
+            <div class="result-name">${highlight(item.name, q)}</div>
+            <div class="result-cafe">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+              ${item.cafeName} · ${item.cat}
+            </div>
+          </div>
+          <div class="result-right">
+            <div class="result-price">Rs. ${item.price}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    /* ── Comparison rendering ── */
+    function renderCompare() {
+      const q = (document.getElementById('compareInput').value || '').toLowerCase().trim();
+      let rows = _compareItems.filter(r => !q || r.name.toLowerCase().includes(q));
+
+      if (_sortMode === 'name')       rows.sort((a,b) => a.name.localeCompare(b.name));
+      if (_sortMode === 'price-asc')  rows.sort((a,b) => minPrice(a) - minPrice(b));
+      if (_sortMode === 'price-desc') rows.sort((a,b) => minPrice(b) - minPrice(a));
+      if (_sortMode === 'cafes')      rows.sort((a,b) => cafeCount(b) - cafeCount(a));
+
+      const tbody = document.getElementById('compareBody');
+      const empty = document.getElementById('compareEmpty');
+
+      if (!rows.length) {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+
+      tbody.innerHTML = rows.map(r => {
+        const prices = [r.c1, r.c2, r.c3];
+        const validPrices = prices.filter(p => p != null);
+        const best = Math.min(...validPrices);
+        const count = validPrices.length;
+        const badge = count === 3
+          ? '<span class="multi-badge">All 3</span>'
+          : count === 2 ? '<span class="multi-badge">2 cafes</span>' : '';
+
+        return `<tr>
+          <td class="item-name">${r.name}${badge}</td>
+          ${priceCell(r.c1, best)}
+          ${priceCell(r.c2, best)}
+          ${priceCell(r.c3, best)}
+        </tr>`;
+      }).join('');
+    }
+
+    function priceCell(price, best) {
+      if (price == null) return `<td class="price-cell price-na">—</td>`;
+      const cls = price === best ? 'price-best' : '';
+      return `<td class="price-cell ${cls}">Rs. ${price}</td>`;
+    }
+
+    function minPrice(r)  { return Math.min(...[r.c1,r.c2,r.c3].filter(p=>p!=null)); }
+    function cafeCount(r) { return [r.c1,r.c2,r.c3].filter(p=>p!=null).length; }
+
+    function highlight(text, q) {
+      if (!q) return escHtml(text);
+      const i = text.toLowerCase().indexOf(q);
+      if (i < 0) return escHtml(text);
+      return escHtml(text.slice(0,i))
+        + `<mark style="background:rgba(0,200,240,0.2);color:var(--accent);border-radius:2px;">${escHtml(text.slice(i,i+q.length))}</mark>`
+        + escHtml(text.slice(i+q.length));
+    }
+
+    function escHtml(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    /* ── Controls ── */
+    function switchTab(tab, btn) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      btn.classList.add('active');
+      if (tab === 'compare') renderCompare();
+    }
+
+    function setFilter(f, btn) {
+      _filter = f;
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      renderSearch();
+    }
+
+    function setSort(s, btn) {
+      _sortMode = s;
+      document.querySelectorAll('.sort-chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      renderCompare();
+    }
+
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      _query = '';
+      document.getElementById('clearBtn').classList.remove('visible');
+      renderSearch();
+    }
+
+    /* ── Nav user ── */
+    function initNav() {
+      const user = SbAuth ? SbAuth.getSession() : null;
+      const el = document.getElementById('navRight');
+      if (!el) return;
+      if (user) {
+        el.innerHTML = `<span style="font-size:0.82rem;color:var(--text-muted)">${user.email?.split('@')[0] || 'Student'}</span>`;
+      }
+    }
+
+    /* ── Boot ── */
+    document.addEventListener('DOMContentLoaded', () => {
+      buildIndex();
+      renderSearch();
+      renderCompare();
+
+      const inp = document.getElementById('searchInput');
+      inp.addEventListener('input', () => {
+        _query = inp.value;
+        document.getElementById('clearBtn').classList.toggle('visible', !!inp.value);
+        renderSearch();
+      });
+
+      // Pre-fill from URL ?q=...
+      const urlQ = new URLSearchParams(location.search).get('q');
+      if (urlQ) { inp.value = urlQ; _query = urlQ; document.getElementById('clearBtn').classList.add('visible'); renderSearch(); }
+    });
+  </script>
+</body>
+</html>
