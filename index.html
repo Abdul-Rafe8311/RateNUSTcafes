@@ -1066,6 +1066,250 @@
     })();
   </script>
 
+  <!-- ══ CAMPUS MAP ══════════════════════════════════════════ -->
+  <section id="campus-map" style="padding:80px 0;">
+    <div class="container" style="text-align:center;margin-bottom:48px;">
+      <span class="label" data-aos="fade-up">NUST · H-12 Islamabad</span>
+      <h2 class="section-title" data-aos="fade-up" data-aos-delay="60">
+        Three cafes. One <span style="color:var(--accent)">campus.</span>
+      </h2>
+      <p class="section-desc" data-aos="fade-up" data-aos-delay="120" style="max-width:460px;margin:0 auto;">
+        All three Concordia cafes are on NUST's main campus. Tap a pin to see its crowd level and rating.
+      </p>
+    </div>
+
+    <!-- Map container -->
+    <div style="position:relative;max-width:960px;margin:0 auto;padding:0 24px;" data-aos="fade-up" data-aos-delay="180">
+      <div id="campusMapWrap" style="
+        position:relative; border-radius:12px; overflow:hidden;
+        border:1.5px solid rgba(0,200,240,0.18);
+        box-shadow:0 0 60px rgba(0,200,240,0.08), 0 24px 60px rgba(0,0,0,0.5);
+        background:#030C14;
+        aspect-ratio:16/9;
+      ">
+        <!-- HUD grid overlay -->
+        <div style="position:absolute;inset:0;z-index:1;pointer-events:none;
+          background-image:linear-gradient(rgba(0,200,240,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,240,0.04) 1px,transparent 1px);
+          background-size:40px 40px;"></div>
+
+        <!-- Scanline overlay -->
+        <div style="position:absolute;inset:0;z-index:1;pointer-events:none;
+          background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,200,240,0.012) 3px,rgba(0,200,240,0.012) 4px);"></div>
+
+        <!-- ── MAP BACKGROUND IMAGE ── -->
+        <!-- Replace the src below with your NUST map image -->
+        <img id="campusBg" src="" alt="NUST Campus Map"
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;filter:saturate(0) brightness(0.25) sepia(1) hue-rotate(170deg);transition:opacity 1s ease;"
+          onerror="this.style.display='none'" onload="this.style.opacity='1'" />
+
+        <!-- Placeholder grid campus sketch (shown when no image) -->
+        <svg id="campusSvg" viewBox="0 0 960 540" style="position:absolute;inset:0;width:100%;height:100%;z-index:2;" preserveAspectRatio="xMidYMid meet">
+
+          <!-- Road network -->
+          <g stroke="rgba(0,200,240,0.12)" stroke-width="1.5" fill="none">
+            <!-- Main horizontal road -->
+            <line x1="80" y1="270" x2="880" y2="270"/>
+            <!-- Vertical roads -->
+            <line x1="240" y1="100" x2="240" y2="440"/>
+            <line x1="480" y1="80"  x2="480" y2="460"/>
+            <line x1="720" y1="100" x2="720" y2="440"/>
+            <!-- Ring road -->
+            <rect x="100" y="100" width="760" height="340" rx="40" stroke-dasharray="8 6"/>
+          </g>
+
+          <!-- Building blocks -->
+          <g fill="rgba(0,200,240,0.04)" stroke="rgba(0,200,240,0.10)" stroke-width="1">
+            <!-- NBS area (C1) -->
+            <rect x="140" y="300" width="80" height="55" rx="3"/>
+            <rect x="140" y="240" width="55" height="45" rx="3"/>
+            <!-- SEECS area (C2) -->
+            <rect x="660" y="130" width="100" height="75" rx="3"/>
+            <rect x="670" y="215" width="60" height="40" rx="3"/>
+            <!-- Main Office area (C3) -->
+            <rect x="410" y="120" width="140" height="80" rx="3"/>
+            <!-- Other buildings -->
+            <rect x="600" y="320" width="90" height="60" rx="3"/>
+            <rect x="160" y="140" width="70" height="60" rx="3"/>
+            <rect x="780" y="300" width="60" height="80" rx="3"/>
+            <rect x="320" y="300" width="75" height="50" rx="3"/>
+          </g>
+
+          <!-- Labels -->
+          <g font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(200,232,245,0.25)" text-anchor="middle">
+            <text x="180" y="237">NBS</text>
+            <text x="710" y="125">SEECS</text>
+            <text x="480" y="117">Main Block</text>
+            <text x="645" y="317">SMME</text>
+            <text x="358" y="297">Student Centre</text>
+          </g>
+
+          <!-- ── Animated arcs between cafes ── -->
+          <!-- C1 (285,345) → C2 (715,185) -->
+          <path id="arc12" d="M 285 345 Q 500 220 715 185" fill="none" stroke="rgba(0,200,240,0.35)" stroke-width="1.5" stroke-dasharray="6 5">
+            <animate attributeName="stroke-dashoffset" from="0" to="-88" dur="2.4s" repeatCount="indefinite"/>
+          </path>
+          <!-- C2 (715,185) → C3 (480,170) -->
+          <path id="arc23" d="M 715 185 Q 600 150 480 170" fill="none" stroke="rgba(0,200,240,0.35)" stroke-width="1.5" stroke-dasharray="6 5">
+            <animate attributeName="stroke-dashoffset" from="0" to="-88" dur="1.8s" repeatCount="indefinite"/>
+          </path>
+          <!-- C3 (480,170) → C1 (285,345) -->
+          <path id="arc31" d="M 480 170 Q 380 260 285 345" fill="none" stroke="rgba(0,200,240,0.35)" stroke-width="1.5" stroke-dasharray="6 5">
+            <animate attributeName="stroke-dashoffset" from="0" to="-88" dur="2.1s" repeatCount="indefinite"/>
+          </path>
+
+          <!-- ── Cafe Pins ── -->
+
+          <!-- C1 — NBS Ground (285, 345) -->
+          <g id="pin1" style="cursor:pointer;" onclick="selectCafe(1)" transform="translate(285,345)">
+            <!-- Outer pulse rings -->
+            <circle r="28" fill="none" stroke="rgba(0,200,240,0.15)" stroke-width="1">
+              <animate attributeName="r" values="20;34;20" dur="2.8s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.6;0;0.6" dur="2.8s" repeatCount="indefinite"/>
+            </circle>
+            <circle r="18" fill="none" stroke="rgba(0,200,240,0.25)" stroke-width="1">
+              <animate attributeName="r" values="14;24;14" dur="2.8s" begin="0.4s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.8;0;0.8" dur="2.8s" begin="0.4s" repeatCount="indefinite"/>
+            </circle>
+            <!-- Pin body -->
+            <circle r="10" fill="rgba(0,200,240,0.18)" stroke="#00C8F0" stroke-width="1.5"/>
+            <circle r="4" fill="#00C8F0"/>
+            <!-- Label -->
+            <text x="0" y="24" text-anchor="middle" font-family="'Syne',sans-serif" font-size="9" font-weight="700" fill="#00C8F0">C1</text>
+          </g>
+
+          <!-- C2 — SEECS (715, 185) -->
+          <g id="pin2" style="cursor:pointer;" onclick="selectCafe(2)" transform="translate(715,185)">
+            <circle r="28" fill="none" stroke="rgba(0,200,240,0.15)" stroke-width="1">
+              <animate attributeName="r" values="20;34;20" dur="3.2s" begin="0.6s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.6;0;0.6" dur="3.2s" begin="0.6s" repeatCount="indefinite"/>
+            </circle>
+            <circle r="18" fill="none" stroke="rgba(0,200,240,0.25)" stroke-width="1">
+              <animate attributeName="r" values="14;24;14" dur="3.2s" begin="1s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.8;0;0.8" dur="3.2s" begin="1s" repeatCount="indefinite"/>
+            </circle>
+            <circle r="10" fill="rgba(0,200,240,0.18)" stroke="#00C8F0" stroke-width="1.5"/>
+            <circle r="4" fill="#00C8F0"/>
+            <text x="0" y="24" text-anchor="middle" font-family="'Syne',sans-serif" font-size="9" font-weight="700" fill="#00C8F0">C2</text>
+          </g>
+
+          <!-- C3 — Main Office (480, 170) -->
+          <g id="pin3" style="cursor:pointer;" onclick="selectCafe(3)" transform="translate(480,170)">
+            <circle r="28" fill="none" stroke="rgba(0,200,240,0.15)" stroke-width="1">
+              <animate attributeName="r" values="20;34;20" dur="2.5s" begin="1.2s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.6;0;0.6" dur="2.5s" begin="1.2s" repeatCount="indefinite"/>
+            </circle>
+            <circle r="18" fill="none" stroke="rgba(0,200,240,0.25)" stroke-width="1">
+              <animate attributeName="r" values="14;24;14" dur="2.5s" begin="1.6s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.8;0;0.8" dur="2.5s" begin="1.6s" repeatCount="indefinite"/>
+            </circle>
+            <circle r="10" fill="rgba(0,200,240,0.18)" stroke="#00C8F0" stroke-width="1.5"/>
+            <circle r="4" fill="#00C8F0"/>
+            <text x="0" y="24" text-anchor="middle" font-family="'Syne',sans-serif" font-size="9" font-weight="700" fill="#00C8F0">C3</text>
+          </g>
+
+        </svg><!-- /campusSvg -->
+
+        <!-- ── Cafe info card (floats on map) ── -->
+        <div id="cafeMapCard" style="
+          position:absolute; bottom:18px; left:50%; transform:translateX(-50%);
+          background:rgba(7,24,37,0.96); backdrop-filter:blur(12px);
+          border:1.5px solid rgba(0,200,240,0.28); border-radius:10px;
+          padding:14px 20px; min-width:280px; max-width:340px;
+          box-shadow:0 8px 32px rgba(0,0,0,0.5), 0 0 20px rgba(0,200,240,0.08);
+          z-index:10; transition:opacity 0.3s, transform 0.3s;
+          display:none;
+        ">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div>
+              <div id="cardName" style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:#C8E8F5;"></div>
+              <div id="cardLoc"  style="font-size:0.75rem;color:rgba(200,232,245,0.5);margin-top:2px;"></div>
+            </div>
+            <div style="text-align:right;">
+              <div id="cardRating" style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:#00C8F0;"></div>
+              <div id="cardCrowd"  style="margin-top:4px;"></div>
+            </div>
+          </div>
+          <div id="cardDesc" style="font-size:0.78rem;color:rgba(200,232,245,0.5);margin:10px 0;line-height:1.6;"></div>
+          <div style="display:flex;gap:8px;">
+            <button onclick="window.location.href='cafe.html?id='+_selCafe"
+              style="flex:1;background:rgba(0,200,240,0.12);border:1px solid rgba(0,200,240,0.3);border-radius:5px;padding:7px;font-size:0.75rem;font-weight:700;color:#00C8F0;cursor:pointer;">
+              View Menu &amp; Reviews
+            </button>
+            <button onclick="document.getElementById('cafeMapCard').style.display='none'"
+              style="background:transparent;border:1px solid var(--border);border-radius:5px;padding:7px 10px;font-size:0.75rem;color:rgba(200,232,245,0.4);cursor:pointer;">✕</button>
+          </div>
+        </div>
+
+        <!-- Corner HUD brackets -->
+        <div style="position:absolute;top:10px;left:10px;width:22px;height:22px;border-top:2px solid rgba(0,200,240,0.4);border-left:2px solid rgba(0,200,240,0.4);z-index:3;pointer-events:none;"></div>
+        <div style="position:absolute;top:10px;right:10px;width:22px;height:22px;border-top:2px solid rgba(0,200,240,0.4);border-right:2px solid rgba(0,200,240,0.4);z-index:3;pointer-events:none;"></div>
+        <div style="position:absolute;bottom:10px;left:10px;width:22px;height:22px;border-bottom:2px solid rgba(0,200,240,0.4);border-left:2px solid rgba(0,200,240,0.4);z-index:3;pointer-events:none;"></div>
+        <div style="position:absolute;bottom:10px;right:10px;width:22px;height:22px;border-bottom:2px solid rgba(0,200,240,0.4);border-right:2px solid rgba(0,200,240,0.4);z-index:3;pointer-events:none;"></div>
+
+        <!-- HUD label -->
+        <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:3;font-family:'Syne',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:0.16em;color:rgba(0,200,240,0.5);text-transform:uppercase;pointer-events:none;">NUST · H-12 · Concordia Campus</div>
+
+      </div><!-- /campusMapWrap -->
+
+      <!-- Legend below map -->
+      <div style="display:flex;justify-content:center;gap:28px;margin-top:20px;flex-wrap:wrap;">
+        <div onclick="selectCafe(1)" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 14px;border:1px solid var(--border);border-radius:20px;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(0,200,240,0.4)'" onmouseout="this.style.borderColor='var(--border)'">
+          <span style="width:8px;height:8px;border-radius:50%;background:#00C8F0;box-shadow:0 0 8px rgba(0,200,240,0.8);"></span>
+          <span style="font-size:0.8rem;font-weight:600;color:var(--text-muted);">C1 · Near NBS Ground</span>
+        </div>
+        <div onclick="selectCafe(2)" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 14px;border:1px solid var(--border);border-radius:20px;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(0,200,240,0.4)'" onmouseout="this.style.borderColor='var(--border)'">
+          <span style="width:8px;height:8px;border-radius:50%;background:#00C8F0;box-shadow:0 0 8px rgba(0,200,240,0.8);"></span>
+          <span style="font-size:0.8rem;font-weight:600;color:var(--text-muted);">C2 · Near SEECS</span>
+        </div>
+        <div onclick="selectCafe(3)" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 14px;border:1px solid var(--border);border-radius:20px;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(0,200,240,0.4)'" onmouseout="this.style.borderColor='var(--border)'">
+          <span style="width:8px;height:8px;border-radius:50%;background:#00C8F0;box-shadow:0 0 8px rgba(0,200,240,0.8);"></span>
+          <span style="font-size:0.8rem;font-weight:600;color:var(--text-muted);">C3 · Main Office</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    /* ── Campus map pin interaction ── */
+    var _selCafe = null;
+    var _mapCafes = {
+      1: { name:'Concordia 1', loc:'Near NBS Ground', rating:'4.2', desc:'Quick bites, great chai, and a chill vibe between classes. The go-to spot when you have 10 minutes between lectures.', crowd:'quiet' },
+      2: { name:'Concordia 2', loc:'Near SEECS',      rating:'4.5', desc:'Fuel for late-night lab sessions. Favorite of CS and EE students — always packed after 8 pm.', crowd:'busy' },
+      3: { name:'Concordia 3', loc:'Main Office',     rating:'3.9', desc:'The most central cafe on campus. Always buzzing with students from every department.', crowd:'moderate' }
+    };
+    var _crowdLabel = { busy:'Busy now', moderate:'Moderate', quiet:'Quiet now' };
+    var _crowdColor = { busy:'#FF4466', moderate:'#FFB800', quiet:'#00E87A' };
+
+    function selectCafe(id) {
+      _selCafe = id;
+      var c = _mapCafes[id];
+      document.getElementById('cardName').textContent   = c.name;
+      document.getElementById('cardLoc').textContent    = c.loc;
+      document.getElementById('cardRating').textContent = '★ ' + c.rating;
+      document.getElementById('cardDesc').textContent   = c.desc;
+
+      // Use live crowd if available
+      var level = (typeof getCrowdLevel === 'function') ? getCrowdLevel(String(id)).level : c.crowd;
+      var col   = _crowdColor[level];
+      document.getElementById('cardCrowd').innerHTML =
+        '<span style="display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;font-weight:600;color:'+col+'">' +
+        '<span style="width:6px;height:6px;border-radius:50%;background:'+col+';display:inline-block;"></span>' +
+        _crowdLabel[level] + '</span>';
+
+      // Highlight selected pin
+      [1,2,3].forEach(function(i) {
+        var pin = document.getElementById('pin'+i);
+        if (!pin) return;
+        pin.querySelectorAll('circle[r="10"]').forEach(function(c) {
+          c.setAttribute('fill', i===id ? 'rgba(0,200,240,0.35)' : 'rgba(0,200,240,0.18)');
+        });
+      });
+
+      var card = document.getElementById('cafeMapCard');
+      card.style.display = 'block';
+    }
+  </script>
+
   <!-- ══ ABOUT ════════════════════════════════════════════════ -->
   <section id="about">
     <div class="container">
