@@ -25,7 +25,7 @@
 
     .cafe-hero-right { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; flex-shrink: 0; }
     .big-rating {
-      text-align: center; background: var(--accent-dim); border: 1px solid rgba(0,200,240,0.2);
+      text-align: center; background: var(--accent-dim); border: 1px solid rgba(34,197,94,0.2);
       border-radius: 16px; padding: 20px 28px;
     }
     .big-rating-num { font-family: 'Syne', sans-serif; font-size: 3rem; font-weight: 800; color: var(--accent); line-height: 1; }
@@ -61,10 +61,10 @@
     .rating-label { font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 10px; display: block; }
     .star-picker { display: flex; gap: 8px; margin-bottom: 18px; }
     .star-picker svg {
-      width: 34px; height: 34px; cursor: pointer; color: rgba(0,200,240,0.2);
+      width: 34px; height: 34px; cursor: pointer; color: rgba(34,197,94,0.2);
       transition: color 0.15s, transform 0.15s;
     }
-    .star-picker svg:hover, .star-picker svg.hov { color: rgba(0,200,240,0.6); transform: scale(1.12); }
+    .star-picker svg:hover, .star-picker svg.hov { color: rgba(34,197,94,0.6); transform: scale(1.12); }
     .star-picker svg.sel { color: var(--accent); }
 
     .form-group { margin-bottom: 16px; }
@@ -76,7 +76,7 @@
       outline: none; transition: var(--transition); line-height: 1.6;
     }
     .form-group textarea::placeholder { color: var(--text-muted); }
-    .form-group textarea:focus { border-color: rgba(0,200,240,0.5); box-shadow: 0 0 0 3px rgba(0,200,240,0.08); }
+    .form-group textarea:focus { border-color: rgba(34,197,94,0.5); box-shadow: 0 0 0 3px rgba(34,197,94,0.08); }
 
     @keyframes hud-sweep-btn {
       0%   { left: -80%; }
@@ -84,8 +84,8 @@
     }
     .submit-review-btn {
       width: 100%; padding: 12px; border-radius: 2px;
-      border: 1px solid rgba(0,200,240,0.45);
-      background: rgba(0,200,240,0.08); color: var(--accent);
+      border: 1px solid rgba(34,197,94,0.45);
+      background: rgba(34,197,94,0.08); color: var(--accent);
       font-family: 'DM Sans', sans-serif;
       font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
       cursor: pointer; transition: all 0.22s ease;
@@ -94,14 +94,14 @@
     }
     .submit-review-btn::before {
       content: ''; position: absolute; top: 0; left: -80%; width: 55%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(0,200,240,0.28), transparent);
+      background: linear-gradient(90deg, transparent, rgba(34,197,94,0.28), transparent);
       pointer-events: none;
     }
     .submit-review-btn::after { display: none; }
     .submit-review-btn:hover {
-      background: rgba(0,200,240,0.15); border-color: var(--accent);
-      box-shadow: 0 0 28px rgba(0,200,240,0.35), inset 0 0 14px rgba(0,200,240,0.07);
-      color: #fff; text-shadow: 0 0 10px rgba(0,200,240,0.6);
+      background: rgba(34,197,94,0.15); border-color: var(--accent);
+      box-shadow: 0 0 28px rgba(34,197,94,0.35), inset 0 0 14px rgba(34,197,94,0.07);
+      color: #fff; text-shadow: 0 0 10px rgba(34,197,94,0.6);
     }
     .submit-review-btn:hover::before { animation: hud-sweep-btn 0.5s ease forwards; }
     .submit-review-btn:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; }
@@ -121,12 +121,12 @@
       border-radius: var(--radius-card); padding: 20px; margin-bottom: 14px;
       transition: var(--transition);
     }
-    .review-card:hover { border-color: rgba(0,200,240,0.15); }
+    .review-card:hover { border-color: rgba(34,197,94,0.15); }
     .review-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
     .reviewer-info { display: flex; align-items: center; gap: 10px; }
     .reviewer-avatar {
       width: 34px; height: 34px; border-radius: 50%; background: var(--accent-dim);
-      border: 1px solid rgba(0,200,240,0.2); display: flex; align-items: center; justify-content: center;
+      border: 1px solid rgba(34,197,94,0.2); display: flex; align-items: center; justify-content: center;
       font-size: 0.75rem; font-weight: 700; color: var(--accent);
     }
     .reviewer-dept { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
@@ -135,46 +135,93 @@
     .review-text { font-size: 0.875rem; color: var(--text-muted); line-height: 1.7; }
     .no-reviews { text-align: center; padding: 40px 0; color: var(--text-muted); font-size: 0.9rem; }
 
-    /* ── Menu ── */
-    .menu-category { margin-bottom: 32px; }
-    .menu-cat-title {
-      font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 700;
-      letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent);
-      margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    /* ── Menu search ── */
+    .menu-search-wrap {
+      position: relative; margin-bottom: 16px;
     }
-    .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 8px; }
-    .menu-item {
+    .menu-search-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--text-muted); pointer-events: none;
+    }
+    .menu-search {
+      width: 100%; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px 16px 12px 44px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--text-primary);
+      outline: none; transition: border-color 0.2s;
+    }
+    .menu-search::placeholder { color: var(--text-muted); }
+    .menu-search:focus { border-color: rgba(34,197,94,0.45); }
+
+    /* ── Category chip nav (sticky) ── */
+    .menu-cat-nav {
+      position: sticky; top: 64px; z-index: 40;
+      background: var(--bg); padding: 12px 0 14px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 30px;
+      display: flex; gap: 8px; overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .menu-cat-nav::-webkit-scrollbar { display: none; }
+    .cat-chip {
+      flex-shrink: 0; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 100px;
+      padding: 7px 16px; font-size: 0.78rem; font-weight: 600;
+      color: var(--text-muted); cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .cat-chip:hover { border-color: rgba(34,197,94,0.4); color: var(--text-primary); }
+    .cat-chip.active {
+      background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.5); color: var(--accent);
+    }
+
+    /* ── Menu section block ── */
+    .menu-section { margin-bottom: 40px; scroll-margin-top: 130px; }
+    .menu-section-hdr {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 0 12px;
+      border-bottom: 2px solid var(--accent);
+      margin-bottom: 0;
+      position: sticky; top: 126px; z-index: 30;
+      background: var(--bg);
+    }
+    .menu-sec-emoji { font-size: 1.45rem; line-height: 1; }
+    .menu-sec-name {
+      font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 800; color: var(--text-primary);
+    }
+    .menu-sec-count {
+      margin-left: auto; font-size: 0.7rem; color: var(--text-muted);
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 10px; padding: 12px 14px;
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      transition: var(--transition);
+      border-radius: 100px; padding: 2px 10px;
     }
-    .menu-item:hover { border-color: rgba(0,200,240,0.2); }
-    .menu-item-name { font-size: 0.855rem; color: var(--text-primary); flex: 1; line-height: 1.4; display: flex; flex-direction: column; gap: 3px; }
-    .menu-item-price { font-size: 0.78rem; font-weight: 600; color: var(--accent); opacity: 0.85; }
-    .menu-item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
 
-    /* item rating display */
-    .item-avg {
-      display: flex; align-items: center; gap: 3px;
-      font-size: 0.75rem; color: var(--text-muted);
+    /* ── Individual menu item (restaurant style) ── */
+    .menu-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 8px; border-bottom: 1px solid var(--border);
+      border-radius: 0; transition: background 0.15s;
     }
-    .item-avg span { color: var(--accent); font-weight: 600; font-size: 0.8rem; }
+    .menu-item:last-child { border-bottom: none; }
+    .menu-item:hover { background: rgba(34,197,94,0.04); border-radius: 8px; }
+    .menu-item-emoji-col { font-size: 1.65rem; width: 40px; text-align: center; flex-shrink: 0; }
+    .menu-item-body { flex: 1; min-width: 0; }
+    .menu-item-name { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); line-height: 1.3; }
+    .menu-item-price { font-size: 1rem; font-weight: 800; color: var(--accent); margin-top: 3px; }
+    .menu-item-rating-row { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; display: flex; align-items: center; gap: 5px; }
+    .menu-item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
 
-    /* inline star picker per item */
+    /* rate button */
     .item-rate-btn {
-      background: transparent; border: 1px solid rgba(0,200,240,0.25);
-      color: var(--accent); padding: 4px 11px; border-radius: 6px;
-      font-size: 0.73rem; font-weight: 600; cursor: pointer; transition: var(--transition);
+      background: transparent; border: 1px solid rgba(34,197,94,0.3);
+      color: var(--accent); padding: 5px 14px; border-radius: 100px;
+      font-size: 0.73rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
       white-space: nowrap;
     }
-    .item-rate-btn:hover { background: var(--accent-dim); border-color: rgba(0,200,240,0.5); }
-    .item-rate-btn.rated { background: var(--accent-dim); border-color: rgba(0,200,240,0.4); color: var(--accent); }
+    .item-rate-btn:hover { background: var(--accent-dim); border-color: rgba(34,197,94,0.6); }
+    .item-rate-btn.rated { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.45); }
 
     /* star popover */
     .star-popover {
       position: fixed; z-index: 200;
-      background: var(--surface2, #1C1C1C); border: 1px solid rgba(0,200,240,0.25);
+      background: var(--surface2, #1C1C1C); border: 1px solid rgba(34,197,94,0.25);
       border-radius: 12px; padding: 14px 18px; box-shadow: 0 16px 48px rgba(0,0,0,0.5);
       display: none; flex-direction: column; align-items: center; gap: 10px; min-width: 200px;
     }
@@ -182,10 +229,10 @@
     .star-popover-label { font-size: 0.78rem; color: var(--text-muted); text-align: center; }
     .star-popover-stars { display: flex; gap: 6px; }
     .star-popover-stars svg {
-      width: 28px; height: 28px; cursor: pointer; color: rgba(0,200,240,0.2);
+      width: 28px; height: 28px; cursor: pointer; color: rgba(34,197,94,0.2);
       transition: color 0.12s, transform 0.12s;
     }
-    .star-popover-stars svg:hover, .star-popover-stars svg.hov { color: rgba(0,200,240,0.6); transform: scale(1.15); }
+    .star-popover-stars svg:hover, .star-popover-stars svg.hov { color: rgba(34,197,94,0.6); transform: scale(1.15); }
     .star-popover-stars svg.sel { color: var(--accent); }
 
     /* ── Cafe nav ── */
@@ -195,7 +242,7 @@
       border-radius: 10px; padding: 12px 18px; font-size: 0.875rem; font-weight: 500;
       color: var(--text-muted); cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 8px;
     }
-    .cafe-nav-item:hover, .cafe-nav-item.active { border-color: rgba(0,200,240,0.3); color: var(--text-primary); background: var(--accent-dim); }
+    .cafe-nav-item:hover, .cafe-nav-item.active { border-color: rgba(34,197,94,0.3); color: var(--text-primary); background: var(--accent-dim); }
 
     /* ── Flowbite Advanced Rating Breakdown ── */
     .adv-rating {
@@ -226,14 +273,14 @@
     }
     .adv-bar-wrap {
       flex: 1; height: 6px;
-      background: rgba(0,200,240,0.08);
+      background: rgba(34,197,94,0.08);
       border-radius: 0; overflow: hidden;
-      border: 1px solid rgba(0,200,240,0.12);
+      border: 1px solid rgba(34,197,94,0.12);
     }
     .adv-bar-fill {
       height: 100%; width: 0%;
-      background: linear-gradient(90deg, rgba(0,200,240,0.6) 0%, #00C8F0 60%, #33D6F5 100%);
-      box-shadow: 0 0 8px rgba(0,200,240,0.5);
+      background: linear-gradient(90deg, rgba(34,197,94,0.6) 0%, #00C8F0 60%, #33D6F5 100%);
+      box-shadow: 0 0 8px rgba(34,197,94,0.5);
       border-radius: 0;
       transition: width 0.85s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -344,6 +391,14 @@
 
       <!-- Menu Tab -->
       <div class="tab-panel" id="tabMenu">
+        <!-- Search within menu -->
+        <div class="menu-search-wrap">
+          <svg class="menu-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="search" class="menu-search" id="menuSearch" placeholder="Search menu items…" autocomplete="off" oninput="renderMenu()">
+        </div>
+        <!-- Sticky category chips -->
+        <nav class="menu-cat-nav" id="menuCatNav" aria-label="Menu categories"></nav>
+        <!-- Items -->
         <div id="menuContainer"></div>
       </div>
     </div>
@@ -603,48 +658,118 @@
     let _itemRatings = {};   // { itemId -> { avg, count } }
     let _myItemRatings = {}; // { itemId -> rating }
 
+    const CAT_EMOJI = {
+      'BBQ':'🔥','Burgers':'🍔','Rolls':'🥙','Sandwiches':'🥪','Bread':'🍞',
+      'Biryani':'🍚','Karahi':'🍲','Noodles':'🍜','Pasta':'🍝','Pizza':'🍕',
+      'Beverages':'☕','Chai':'☕','Cold Drinks':'🥤','Drinks':'🥤','Juices':'🥤',
+      'Snacks':'🍟','Chaat':'🫕','Desserts':'🍦','Sweets':'🍮','Ice Cream':'🍦',
+      'Breakfast':'🥞','Main Course':'🍽️','Seafood':'🐟','Rice':'🍚',
+      'Special':'⭐','Combos':'🎁','Salads':'🥗','Soups':'🍵',
+      'Continental':'🍽️','Chinese':'🥢','Wraps':'🌯','Kabab':'🍢',
+      'Desi':'🫕','Fried':'🍟','Grilled':'🥩','Parathas':'🫓',
+      'Sandwiches and Wraps':'🥪','BBQ Items':'🔥','Shakes':'🥤',
+    };
+    function getCatEmoji(cat) {
+      if (CAT_EMOJI[cat]) return CAT_EMOJI[cat];
+      const key = Object.keys(CAT_EMOJI).find(k => cat.toLowerCase().includes(k.toLowerCase()));
+      return key ? CAT_EMOJI[key] : '🍽️';
+    }
+
+    function renderCatNav() {
+      const nav = document.getElementById('menuCatNav');
+      if (!nav) return;
+      nav.innerHTML = cafe.menu.map(cat => {
+        const id = 'cat-' + cat.cat.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+        return `<button class="cat-chip" data-target="${id}" onclick="scrollToCat('${id}')">${getCatEmoji(cat.cat)} ${cat.cat} <span style="opacity:0.55;font-size:0.7em;font-weight:400;">(${cat.items.length})</span></button>`;
+      }).join('');
+
+      // Highlight active chip on scroll
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            const activeId = e.target.id;
+            nav.querySelectorAll('.cat-chip').forEach(chip => {
+              chip.classList.toggle('active', chip.dataset.target === activeId);
+              if (chip.dataset.target === activeId) {
+                chip.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+              }
+            });
+          }
+        });
+      }, { threshold: 0.25, rootMargin: '-130px 0px -55% 0px' });
+      document.querySelectorAll('.menu-section').forEach(s => observer.observe(s));
+    }
+
+    function scrollToCat(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     function renderMenu() {
       const container = document.getElementById('menuContainer');
       const availMap  = getAvailMap();
-      container.innerHTML = cafe.menu.map(cat => `
-        <div class="menu-category">
-          <div class="menu-cat-title">${cat.cat}</div>
-          <div class="menu-grid">
-            ${cat.items.map(item => {
-              const r = _itemRatings[item.id];
-              const myR = _myItemRatings[item.id];
-              const avail = availMap[item.id];
-              const avgHtml = r
-                ? `<div class="item-avg">${renderStars(parseFloat(r.avg), 11)}<span>${r.avg}</span></div>`
-                : '';
-              const btnLabel = myR ? `★ ${myR}/5` : 'Rate';
-              const btnClass = myR ? 'item-rate-btn rated' : 'item-rate-btn';
-              const priceHtml = item.price != null
-                ? `<span class="menu-item-price">Rs. ${item.price}</span>`
-                : '';
-              const availBadge = avail === 'sold_out'
-                ? `<span class="avail-badge avail-sold-out">Sold Out</span>`
-                : avail === 'special'
-                ? `<span class="avail-badge avail-special">Special Today</span>`
-                : '';
-              const availBtn = avail === 'sold_out'
-                ? `<button class="avail-toggle-btn" title="Mark as available" onclick="setAvail('${item.id}','sold_out')">↺</button>`
-                : avail === 'special'
-                ? `<button class="avail-toggle-btn" title="Remove special" onclick="setAvail('${item.id}','special')">↺</button>`
-                : `<button class="avail-toggle-btn" title="Mark sold out / special" onclick="showAvailMenu(event,'${item.id}')">⋯</button>`;
-              return `
-                <div class="menu-item"${avail === 'sold_out' ? ' style="opacity:0.55"' : ''}>
-                  <div class="menu-item-name">${item.name}${availBadge}${priceHtml}</div>
-                  <div class="menu-item-right">
-                    ${availBtn}
-                    <button class="${btnClass}" onclick="openRatePopover(event,'${item.id}','${item.name.replace(/'/g,'\\\'')}')">${btnLabel}</button>
-                    ${avgHtml}
-                  </div>
-                </div>`;
-            }).join('')}
-          </div>
-        </div>
-      `).join('');
+      const q = (document.getElementById('menuSearch') || {}).value || '';
+      const query = q.trim().toLowerCase();
+
+      const cats = query
+        ? cafe.menu.map(cat => ({ ...cat, items: cat.items.filter(it => it.name.toLowerCase().includes(query)) })).filter(cat => cat.items.length > 0)
+        : cafe.menu;
+
+      if (!cats.length) {
+        container.innerHTML = `<div style="text-align:center;padding:60px 0;color:var(--text-muted);">No items match "<strong>${query}</strong>"</div>`;
+        return;
+      }
+
+      container.innerHTML = cats.map(cat => {
+        const emoji = getCatEmoji(cat.cat);
+        const catId = 'cat-' + cat.cat.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+        const items = cat.items.map(item => {
+          const r      = _itemRatings[item.id];
+          const myR    = _myItemRatings[item.id];
+          const avail  = availMap[item.id];
+          const btnLabel = myR ? `★ ${myR}/5` : '+ Rate';
+          const btnClass = myR ? 'item-rate-btn rated' : 'item-rate-btn';
+          const priceHtml = item.price != null ? `<div class="menu-item-price">Rs. ${item.price}</div>` : '';
+          const availBadge = avail === 'sold_out'
+            ? `<span class="avail-badge avail-sold-out">Sold Out</span>`
+            : avail === 'special'
+            ? `<span class="avail-badge avail-special">Special Today</span>`
+            : '';
+          const availBtn = (avail === 'sold_out' || avail === 'special')
+            ? `<button class="avail-toggle-btn" title="Reset" onclick="setAvail('${item.id}','${avail}')">↺</button>`
+            : `<button class="avail-toggle-btn" onclick="showAvailMenu(event,'${item.id}')">⋯</button>`;
+          const ratingRow = r
+            ? `<div class="menu-item-rating-row">${renderStars(parseFloat(r.avg),10)}<span>${r.avg} (${r.count})</span></div>`
+            : '';
+          return `
+            <div class="menu-item"${avail === 'sold_out' ? ' style="opacity:0.5"' : ''}>
+              <div class="menu-item-emoji-col">${emoji}</div>
+              <div class="menu-item-body">
+                <div class="menu-item-name">${item.name}${availBadge ? ' ' + availBadge : ''}</div>
+                ${priceHtml}
+                ${ratingRow}
+              </div>
+              <div class="menu-item-right">
+                <button class="${btnClass}" onclick="openRatePopover(event,'${item.id}','${item.name.replace(/'/g,"\\'")}')">
+                  ${btnLabel}
+                </button>
+                ${availBtn}
+              </div>
+            </div>`;
+        }).join('');
+
+        return `
+          <div class="menu-section" id="${catId}">
+            <div class="menu-section-hdr">
+              <span class="menu-sec-emoji">${emoji}</span>
+              <span class="menu-sec-name">${cat.cat}</span>
+              <span class="menu-sec-count">${cat.items.length} items</span>
+            </div>
+            ${items}
+          </div>`;
+      }).join('');
+
+      if (!query) renderCatNav();
     }
 
     // Small context menu for availability

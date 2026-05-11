@@ -37,7 +37,7 @@
       font-family: 'DM Sans', sans-serif; font-size: 1rem;
       outline: none; transition: var(--transition);
     }
-    #searchInput:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,200,240,0.10); }
+    #searchInput:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(34,197,94,0.10); }
     #searchInput::placeholder { color: var(--text-muted); }
     .clear-btn {
       position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
@@ -68,7 +68,7 @@
     }
     .filter-chip.active {
       border-color: var(--accent); color: var(--accent);
-      background: rgba(0,200,240,0.08);
+      background: rgba(34,197,94,0.08);
     }
 
     /* ── Search Results ── */
@@ -81,7 +81,7 @@
       display: flex; justify-content: space-between; align-items: center; gap: 12px;
       cursor: pointer; transition: var(--transition);
     }
-    .result-card:hover { border-color: rgba(0,200,240,0.3); background: var(--surface2); }
+    .result-card:hover { border-color: rgba(34,197,94,0.3); background: var(--surface2); }
     .result-left { flex: 1; min-width: 0; }
     .result-name { font-size: 0.875rem; font-weight: 600; color: var(--text-primary); }
     .result-cafe { font-size: 0.75rem; color: var(--text-muted); margin-top: 3px; display: flex; align-items: center; gap: 4px; }
@@ -132,7 +132,7 @@
     .compare-table .item-name  { font-weight: 600; }
     .compare-table .cafe-tag   {
       display: inline-block; padding: 2px 8px; border-radius: 10px;
-      font-size: 0.7rem; font-weight: 600; background: rgba(0,200,240,0.10);
+      font-size: 0.7rem; font-weight: 600; background: rgba(34,197,94,0.10);
       color: var(--accent); margin: 2px 2px 0 0;
     }
     .sort-row { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
@@ -142,11 +142,11 @@
       font-size: 0.78rem; cursor: pointer; color: var(--text-muted);
       background: transparent; transition: var(--transition);
     }
-    .sort-chip.active { border-color: var(--accent); color: var(--accent); background: rgba(0,200,240,0.08); }
+    .sort-chip.active { border-color: var(--accent); color: var(--accent); background: rgba(34,197,94,0.08); }
 
     .multi-badge {
       display: inline-block; padding: 1px 7px; border-radius: 10px;
-      font-size: 0.68rem; font-weight: 700; background: rgba(0,200,240,0.12);
+      font-size: 0.68rem; font-weight: 700; background: rgba(34,197,94,0.12);
       color: var(--accent); vertical-align: middle; margin-left: 6px;
     }
   </style>
@@ -379,7 +379,7 @@
       const i = text.toLowerCase().indexOf(q);
       if (i < 0) return escHtml(text);
       return escHtml(text.slice(0,i))
-        + `<mark style="background:rgba(0,200,240,0.2);color:var(--accent);border-radius:2px;">${escHtml(text.slice(i,i+q.length))}</mark>`
+        + `<mark style="background:rgba(34,197,94,0.2);color:var(--accent);border-radius:2px;">${escHtml(text.slice(i,i+q.length))}</mark>`
         + escHtml(text.slice(i+q.length));
     }
 
