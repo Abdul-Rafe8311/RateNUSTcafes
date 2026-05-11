@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cafe Detail — Concordia Eats</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    img, svg { display: block; }
+    a { text-decoration: none; color: inherit; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    :root {
+      --bg:      #0D0315;
+      --surface: #160824;
+      --accent:  #A855F7;
+      --accent-light: #C084FC;
+      --text-primary: #F0EDE6;
+      --text-muted:   rgba(240,237,230,0.46);
+      --border:  rgba(168,85,247,0.14);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+    h1,h2,h3,h4 { font-family: 'Syne', sans-serif; line-height: 1.12; }
+
+    /* ── Navbar ──────────────────────────── */
+    .navbar {
+      position: fixed; inset: 0 0 auto 0; z-index: 100;
+      background: rgba(13,3,21,0.88);
+      backdrop-filter: blur(22px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+    }
+    .nav-inner {
+      max-width: 1160px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo { font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 700; }
+    .logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a {
+      font-size: 0.875rem; font-weight: 500; color: var(--text-muted);
+      transition: color 0.2s; position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0; right: 100%;
+      height: 1px; background: var(--accent); transition: right 0.3s;
+    }
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links a:hover::after { right: 0; }
+    .nav-cta {
+      background: var(--accent); color: #fff;
+      border-radius: 100px; padding: 9px 22px;
+      font-size: 0.82rem; font-weight: 700;
+      box-shadow: 0 0 20px rgba(168,85,247,0.35);
+      transition: all 0.2s;
+    }
+    .nav-cta:hover { background: var(--accent-light); transform: translateY(-1px); }
+
+    /* ── Image Slider ─────────────────── */
+    .slider-wrap {
+      position: relative; width: 100%; height: 100vh;
+      overflow: hidden; background: #000;
+    }
+    .slide {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center;
+      opacity: 0; transition: opacity 0.9s ease;
+    }
+    .slide.active { opacity: 1; }
+    .slide::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(13,3,21,0.18) 0%,
+        rgba(13,3,21,0.05) 40%,
+        rgba(13,3,21,0.55) 75%,
+        rgba(13,3,21,0.88) 100%
+      );
+    }
+    /* Photo placeholder label (shown until real images are loaded) */
+    .slide-placeholder {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 4rem; letter-spacing: 4px;
+      color: rgba(168,85,247,0.2);
+      font-family: 'Syne', sans-serif; font-weight: 800;
+    }
+
+    .slide-content {
+      position: absolute; bottom: 120px; left: 0; right: 0;
+      z-index: 2; padding: 0 48px;
+      display: flex; align-items: flex-end; justify-content: space-between;
+    }
+    .slide-text { max-width: 580px; }
+    .slide-label {
+      display: inline-block; background: rgba(168,85,247,0.18);
+      border: 1px solid rgba(168,85,247,0.4);
+      color: var(--accent); border-radius: 100px;
+      padding: 5px 16px; font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px;
+    }
+    .slide-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 800; line-height: 1.08;
+      color: #fff; margin-bottom: 10px;
+    }
+    .slide-caption { font-size: 1rem; color: rgba(255,255,255,0.65); }
+
+    /* Counter */
+    .slide-counter {
+      font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700;
+      color: rgba(255,255,255,0.5); white-space: nowrap;
+    }
+    .slide-counter span { color: #fff; }
+
+    /* Arrows */
+    .arrow-btn {
+      position: absolute; top: 50%; z-index: 3;
+      transform: translateY(-50%);
+      width: 52px; height: 52px; border-radius: 50%;
+      background: rgba(13,3,21,0.6); backdrop-filter: blur(12px);
+      border: 1px solid rgba(168,85,247,0.3);
+      color: #fff; font-size: 1.4rem;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .arrow-btn:hover { background: rgba(168,85,247,0.25); border-color: var(--accent); }
+    .arrow-prev { left: 24px; }
+    .arrow-next { right: 24px; }
+
+    /* Dot indicators */
+    .dots {
+      position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+      z-index: 3; display: flex; gap: 8px;
+    }
+    .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,255,255,0.3); cursor: pointer;
+      transition: all 0.3s;
+    }
+    .dot.active { background: var(--accent); width: 22px; border-radius: 3px; }
+
+    /* Progress bar */
+    .slider-progress {
+      position: absolute; bottom: 0; left: 0; height: 2px;
+      background: var(--accent); z-index: 3;
+      transition: width 0.1s linear;
+    }
+
+    /* ── Content below slider ─────────── */
+    .content-wrap { max-width: 1100px; margin: 0 auto; padding: 64px 24px; }
+
+    /* Tab nav */
+    .tab-nav {
+      display: flex; gap: 4px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 48px;
+    }
+    .tab-btn {
+      padding: 12px 28px; font-family: 'Syne', sans-serif;
+      font-size: 0.875rem; font-weight: 600;
+      color: var(--text-muted); border-bottom: 2px solid transparent;
+      transition: all 0.2s; cursor: pointer; position: relative; top: 1px;
+    }
+    .tab-btn:hover { color: var(--text-primary); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* About section */
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start;
+    }
+    @media (max-width: 768px) { .about-grid { grid-template-columns: 1fr; } }
+    .about-title { font-size: clamp(1.8rem,3vw,2.6rem); font-weight: 800; margin-bottom: 16px; }
+    .about-desc { color: var(--text-muted); line-height: 1.75; margin-bottom: 20px; }
+    .info-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+    .info-icon { color: var(--accent); flex-shrink: 0; margin-top: 2px; }
+    .info-label { font-size: 0.78rem; color: var(--text-muted); font-weight: 500; }
+    .info-val { font-size: 0.9rem; font-weight: 600; }
+
+    /* Rating display */
+    .rating-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 28px;
+    }
+    .rating-num {
+      font-family: 'Syne', sans-serif; font-size: 4rem; font-weight: 800;
+      color: var(--accent); line-height: 1;
+    }
+    .rating-stars { font-size: 1.2rem; color: #FFB800; margin: 8px 0; letter-spacing: 3px; }
+    .rating-count { font-size: 0.8rem; color: var(--text-muted); }
+
+    /* Menu highlights */
+    .menu-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 14px;
+    }
+    .menu-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px 20px;
+      transition: border-color 0.2s;
+    }
+    .menu-card:hover { border-color: rgba(168,85,247,0.4); }
+    .menu-card-emoji { font-size: 2rem; margin-bottom: 10px; }
+    .menu-card-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.92rem; margin-bottom: 4px; }
+    .menu-card-price { font-size: 0.82rem; color: var(--accent); font-weight: 700; }
+    .menu-card-cat { font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; }
+
+    /* Review cards */
+    .review-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 16px;
+    }
+    .review-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+    }
+    .review-stars { color: #FFB800; font-size: 0.85rem; margin-bottom: 10px; }
+    .review-text { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 12px; font-style: italic; }
+    .review-dish { font-size: 0.78rem; font-weight: 600; color: var(--accent); }
+    .review-anon { font-size: 0.72rem; color: rgba(240,237,230,0.3); margin-top: 4px; }
+
+    /* CTA bar */
+    .cta-bar {
+      display: flex; gap: 14px; margin-top: 48px; flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #0D0315;
+      border-radius: 8px; padding: 13px 28px;
+      font-size: 0.95rem; font-weight: 700;
+      transition: all 0.2s;
+    }
+    .btn-primary:hover { background: var(--accent-light); transform: translateY(-2px); }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent; color: var(--text-muted);
+      border: 1px solid var(--border); border-radius: 8px; padding: 13px 28px;
+      font-size: 0.95rem; font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-ghost:hover { border-color: rgba(168,85,247,0.4); color: var(--text-primary); }
+
+    /* footer */
+    footer { text-align: center; padding: 32px 24px; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid var(--border); }
+    footer a { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navbar ───────────────────────────────── -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">Concordia <span>Eats</span></a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#cafes">Cafes</a>
+        <a href="search.html">Search</a>
+        <a href="leaderboard.html">Leaderboard</a>
+      </div>
+      <a href="login.html" class="nav-cta">Login with NUST</a>
+    </div>
+  </nav>
+
+  <!-- ── Image Slider ─────────────────────────── -->
+  <div class="slider-wrap" id="sliderWrap">
+    <!-- Slides injected by JS -->
+    <div id="slidesContainer"></div>
+
+    <!-- Arrows -->
+    <button class="arrow-btn arrow-prev" id="prevBtn" aria-label="Previous">&#8592;</button>
+    <button class="arrow-btn arrow-next" id="nextBtn" aria-label="Next">&#8594;</button>
+
+    <!-- Slide content overlay -->
+    <div class="slide-content">
+      <div class="slide-text">
+        <div class="slide-label" id="sliderLabel"></div>
+        <h1 class="slide-title" id="sliderTitle"></h1>
+        <p class="slide-caption" id="sliderCaption"></p>
+      </div>
+      <div class="slide-counter"><span id="sliderCurrent">1</span> / <span id="sliderTotal">4</span></div>
+    </div>
+
+    <!-- Dots -->
+    <div class="dots" id="dotsWrap"></div>
+    <!-- Progress -->
+    <div class="slider-progress" id="sliderProgress"></div>
+  </div>
+
+  <!-- ── Main Content ─────────────────────────── -->
+  <main class="content-wrap">
+
+    <!-- Tab nav -->
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="about">About</button>
+      <button class="tab-btn" data-tab="menu">Menu Highlights</button>
+      <button class="tab-btn" data-tab="reviews">Reviews</button>
+    </nav>
+
+    <!-- ABOUT tab -->
+    <div class="tab-panel active" id="tab-about">
+      <div class="about-grid">
+        <div>
+          <h2 class="about-title" id="abtTitle"></h2>
+          <p class="about-desc" id="abtDesc"></p>
+
+          <div class="info-row">
+            <i data-lucide="map-pin" class="info-icon" style="width:16px;height:16px;"></i>
+            <div><div class="info-label">Location</div><div class="info-val" id="abtLoc"></div></div>
+          </div>
+          <div class="info-row">
+            <i data-lucide="clock" class="info-icon" style="width:16px;height:16px;"></i>
+            <div><div class="info-label">Hours</div><div class="info-val" id="abtHours"></div></div>
+          </div>
+          <div class="info-row">
+            <i data-lucide="users" class="info-icon" style="width:16px;height:16px;"></i>
+            <div><div class="info-label">Best For</div><div class="info-val" id="abtFor"></div></div>
+          </div>
+
+          <div class="cta-bar">
+            <button class="btn-primary" onclick="document.querySelector('[data-tab=menu]').click()">
+              <i data-lucide="utensils" style="width:16px;height:16px;"></i> View Menu
+            </button>
+            <a href="#" id="rateLink" class="btn-ghost">
+              <i data-lucide="star" style="width:16px;height:16px;"></i> Rate this Cafe
+            </a>
+          </div>
+        </div>
+
+        <div class="rating-card">
+          <div style="font-size:0.75rem;font-weight:700;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase;margin-bottom:16px;">Student Rating</div>
+          <div class="rating-num" id="abtRating"></div>
+          <div class="rating-stars" id="abtStars"></div>
+          <div class="rating-count" id="abtCount"></div>
+          <hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">
+          <div id="abtSpecialties" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MENU tab -->
+    <div class="tab-panel" id="tab-menu">
+      <h2 style="font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;margin-bottom:8px;">Menu Highlights</h2>
+      <p style="color:var(--text-muted);margin-bottom:32px;font-size:0.9rem;">Top-rated dishes by students. <a href="search.html" style="color:var(--accent);">Search the full menu →</a></p>
+      <div class="menu-grid" id="menuGrid"></div>
+    </div>
+
+    <!-- REVIEWS tab -->
+    <div class="tab-panel" id="tab-reviews">
+      <h2 style="font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;margin-bottom:8px;">Recent Reviews</h2>
+      <p style="color:var(--text-muted);margin-bottom:32px;font-size:0.9rem;">Anonymous reviews from verified NUST students.</p>
+      <div class="review-grid" id="reviewGrid"></div>
+      <div style="margin-top:28px;">
+        <a id="rateLink2" href="#" class="btn-primary" style="display:inline-flex;">
+          <i data-lucide="star" style="width:16px;height:16px;"></i> Write a Review
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <a href="index.html">← Back to Concordia Eats</a> &nbsp;·&nbsp; For campus use only &nbsp;·&nbsp; All reviews are anonymous
+  </footer>
+
+  <script>
+  /* ═══════════════════════════════════════════════════════
+     CAFE DATA
+  ═══════════════════════════════════════════════════════ */
+  var CAFES = {
+    '1': {
+      name: 'Concordia I',
+      location: 'Near NBS Ground, NUST H-12',
+      hours: '7:00 AM – 10:00 PM (Mon–Sat)',
+      bestFor: 'Quick bites between lectures, chai lovers, NBS students',
+      desc: 'Concordia I is the go-to spot for NBS and nearby department students. Known for its incredible chai, freshly made parathas, and the legendary Special Biryani. Great for a quick meal between lectures or a relaxed post-class hangout.',
+      rating: '4.2',
+      ratingCount: '247 reviews',
+      specialties: ['Special Biryani','Seekh Kabab','Kashmiri Chai','Chicken Roll','Dahi Puri'],
+      slides: [
+        { label:'Concordia I · NBS Ground', title:'The Original.', caption:'The most beloved cafe near NBS — open since day one.' },
+        { label:'Popular Dishes', title:'Biryani so good\nit\'s legendary.', caption:'The Special Biryani at C1 has a cult following. Every. Single. Day.' },
+        { label:'Vibes & Atmosphere', title:'Quick bites,\ngreat chai.', caption:'Perfect for a 10-minute break between back-to-back lectures.' },
+        { label:'Menu Highlights', title:'457 items.\nChoose wisely.', caption:'From seekh kabab to kashmiri chai — C1 has it all.' },
+      ],
+      menu: [
+        {e:'🍚',n:'Special Biryani',p:220,c:'Main Course'},{e:'🧆',n:'Seekh Kabab',p:200,c:'BBQ'},
+        {e:'☕',n:'Kashmiri Chai',p:80,c:'Beverages'},{e:'🥙',n:'Chicken Roll',p:160,c:'Rolls'},
+        {e:'🫕',n:'Dahi Puri',p:120,c:'Chaat'},{e:'🍖',n:'Chicken Achari Boti',p:350,c:'BBQ'},
+        {e:'🍔',n:'Special Beef Burger',p:280,c:'Burgers'},{e:'🍜',n:'Chicken Noodles',p:180,c:'Noodles'},
+      ],
+      reviews: [
+        {stars:'★★★★★',text:'"Biryani at C1 is absolutely fire. Goes for Rs.220 and worth every rupee."',dish:'Special Biryani'},
+        {stars:'★★★★★',text:'"Best kashmiri chai on campus. No debate. Nothing else comes close."',dish:'Kashmiri Chai'},
+        {stars:'★★★★☆',text:'"Seekh kabab is always freshly made. The mint chutney is 👌"',dish:'Seekh Kabab'},
+        {stars:'★★★★★',text:'"C1 is my daily lunch stop. Consistent quality every single time."',dish:'Multiple dishes'},
+        {stars:'★★★☆☆',text:'"Gets very crowded at 12–1pm. Food is great but be prepared to wait."',dish:'General'},
+        {stars:'★★★★☆',text:'"Dahi puri here is incredible. Much better than C3\'s version."',dish:'Dahi Puri'},
+      ]
+    },
+    '2': {
+      name: 'Concordia II',
+      location: 'Near SEECS Building, NUST H-12',
+      hours: '7:00 AM – 12:00 AM (Mon–Sat)',
+      bestFor: 'Late-night study sessions, SEECS & CS students, group hangouts',
+      desc: 'Concordia II is the powerhouse cafe for SEECS and EE students. Open the latest of all three cafes, it\'s the go-to for late-night lab sessions, midnight chai runs, and post-deadline celebration meals. The Zinger Burger and Mutton Karahi are crowd favourites.',
+      rating: '4.5',
+      ratingCount: '389 reviews',
+      specialties: ['Zinger Burger','Mutton Karahi','Chicken Shawarma','Adrak Chai','Grilled Fish'],
+      slides: [
+        { label:'Concordia II · SEECS', title:'Fuel for\nlate-night grind.', caption:'Open till midnight — the lifeline for every SEECS student.' },
+        { label:'Top Dishes', title:'Zinger that hits\nevery time.', caption:'The Zinger Burger at C2 has been a student favourite for years.' },
+        { label:'Late Night Vibes', title:'Still open at\n11 PM.', caption:'When every other cafe has closed, C2 is still serving.' },
+        { label:'After Exams', title:'Celebrate here.', caption:'Post-exam Mutton Karahi is a NUST tradition.' },
+      ],
+      menu: [
+        {e:'🍔',n:'Zinger Burger',p:320,c:'Burgers'},{e:'🍖',n:'Mutton Karahi',p:580,c:'Main Course'},
+        {e:'🌯',n:'Chicken Shawarma',p:250,c:'Wraps'},{e:'🐟',n:'Grilled Fish Fillet',p:450,c:'Seafood'},
+        {e:'☕',n:'Adrak Chai',p:60,c:'Beverages'},{e:'🍗',n:'Chicken Tikka',p:350,c:'BBQ'},
+        {e:'🧀',n:'Club Sandwich',p:200,c:'Sandwiches'},{e:'🥞',n:'French Toast',p:120,c:'Breakfast'},
+      ],
+      reviews: [
+        {stars:'★★★★★',text:'"C2 stays open till midnight. An absolute lifesaver during finals week."',dish:'General'},
+        {stars:'★★★★★',text:'"Mutton Karahi here is restaurant quality. Rs.580 is completely worth it."',dish:'Mutton Karahi'},
+        {stars:'★★★★☆',text:'"Zinger burger never disappoints. Crispy, juicy, perfectly spiced."',dish:'Zinger Burger'},
+        {stars:'★★★★★',text:'"The only cafe on campus I trust for late-night food. Quality stays consistent."',dish:'Multiple dishes'},
+        {stars:'★★★☆☆',text:'"Always packed. Service slows down a lot after 9pm but the food makes up for it."',dish:'General'},
+        {stars:'★★★★★',text:'"Adrak chai at 11pm while debugging code is a whole vibe. Highly recommend."',dish:'Adrak Chai'},
+      ]
+    },
+    '3': {
+      name: 'Concordia III',
+      location: 'Near Main Office / Admin Block, NUST H-12',
+      hours: '7:00 AM – 9:00 PM (Mon–Sat)',
+      bestFor: 'All departments, central campus location, larger group meals',
+      desc: 'Concordia III sits right at the heart of the NUST campus, making it accessible to students from every department. Known for its haleem on Fridays, chicken tikka, and pizza. The largest seating area of all three cafes — perfect for group meals.',
+      rating: '3.9',
+      ratingCount: '198 reviews',
+      specialties: ['Haleem (Fridays)','Chicken Tikka','Club Sandwich','Masala Fries','Chicken Pizza'],
+      slides: [
+        { label:'Concordia III · Main Campus', title:'Central.\nAlways buzzing.', caption:'Right in the heart of NUST — every student walks past here.' },
+        { label:'Friday Special', title:'Haleem day\nis sacred.', caption:'Every Friday, C3\'s haleem draws students from across the campus.' },
+        { label:'Seating & Space', title:'Biggest seating\non campus.', caption:'Plenty of room for group study sessions and post-class hangouts.' },
+        { label:'Top Picks', title:'Tikka,\nfries & more.', caption:'The chicken tikka and masala fries combo is a student staple.' },
+      ],
+      menu: [
+        {e:'🫙',n:'Haleem (Fridays)',p:200,c:'Special'},{e:'🍗',n:'Chicken Tikka',p:450,c:'BBQ'},
+        {e:'🥪',n:'Club Sandwich',p:380,c:'Sandwiches'},{e:'🍟',n:'Masala Fries',p:150,c:'Snacks'},
+        {e:'🍕',n:'Chicken Pizza',p:450,c:'Pizza'},{e:'🍖',n:'Beef Chapli Kabab',p:280,c:'BBQ'},
+        {e:'🥗',n:'Pasta',p:280,c:'Pasta'},{e:'🍦',n:'Ice Cream',p:100,c:'Desserts'},
+      ],
+      reviews: [
+        {stars:'★★★★★',text:'"C3 haleem on Fridays is a NUST tradition. Every student must try it."',dish:'Haleem'},
+        {stars:'★★★★☆',text:'"Best location on campus — central and easily accessible from any department."',dish:'General'},
+        {stars:'★★★☆☆',text:'"Chicken tikka can be inconsistent. Sometimes amazing, sometimes just okay."',dish:'Chicken Tikka'},
+        {stars:'★★★★☆',text:'"Masala fries are a solid snack. Perfectly spiced and always fresh."',dish:'Masala Fries'},
+        {stars:'★★★★★',text:'"Largest seating of all three cafes. Perfect for group study sessions."',dish:'General'},
+        {stars:'★★★☆☆',text:'"Club sandwich is decent but C1 does it better. Still a solid option."',dish:'Club Sandwich'},
+      ]
+    }
+  };
+
+  /* Slide gradient backgrounds (placeholder until real photos) */
+  var SLIDE_BGS = [
+    'linear-gradient(135deg,#1a0533 0%,#3d1080 40%,#6d28d9 70%,#A855F7 100%)',
+    'linear-gradient(135deg,#0a0520 0%,#2d1065 30%,#4c1d95 60%,#7c3aed 100%)',
+    'linear-gradient(135deg,#200040 0%,#4a1090 40%,#8b5cf6 70%,#c4b5fd 100%)',
+    'linear-gradient(135deg,#0f0030 0%,#1e0a60 40%,#5b21b6 70%,#a78bfa 100%)',
+  ];
+
+  /* ── Init ────────────────────────────── */
+  var cafeId = (new URLSearchParams(location.search).get('cafe')) || '1';
+  if (!CAFES[cafeId]) cafeId = '1';
+  var cafe = CAFES[cafeId];
+  var curSlide = 0;
+  var autoTimer = null;
+  var SLIDE_DUR = 5500;
+
+  /* Build slides */
+  var container = document.getElementById('slidesContainer');
+  var dotsWrap = document.getElementById('dotsWrap');
+  document.getElementById('sliderTotal').textContent = cafe.slides.length;
+
+  cafe.slides.forEach(function(s, i) {
+    var el = document.createElement('div');
+    el.className = 'slide' + (i === 0 ? ' active' : '');
+    el.style.background = SLIDE_BGS[i % SLIDE_BGS.length];
+    // Placeholder text
+    var ph = document.createElement('div');
+    ph.className = 'slide-placeholder';
+    ph.textContent = 'PHOTO ' + (i+1);
+    el.appendChild(ph);
+    container.appendChild(el);
+
+    var dot = document.createElement('div');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('data-i', i);
+    dot.addEventListener('click', function() { goTo(i); });
+    dotsWrap.appendChild(dot);
+  });
+
+  /* Update overlay text */
+  function updateContent() {
+    var s = cafe.slides[curSlide];
+    document.getElementById('sliderLabel').textContent = s.label;
+    document.getElementById('sliderTitle').textContent = s.title.replace(/\\n/g, '\n');
+    document.getElementById('sliderCaption').textContent = s.caption;
+    document.getElementById('sliderCurrent').textContent = curSlide + 1;
+  }
+
+  /* Go to slide */
+  function goTo(i) {
+    var slides = container.querySelectorAll('.slide');
+    var dots = dotsWrap.querySelectorAll('.dot');
+    slides[curSlide].classList.remove('active');
+    dots[curSlide].classList.remove('active');
+    curSlide = (i + cafe.slides.length) % cafe.slides.length;
+    slides[curSlide].classList.add('active');
+    dots[curSlide].classList.add('active');
+    updateContent();
+    resetProgress();
+  }
+
+  document.getElementById('prevBtn').addEventListener('click', function(){ goTo(curSlide - 1); });
+  document.getElementById('nextBtn').addEventListener('click', function(){ goTo(curSlide + 1); });
+
+  /* Keyboard nav */
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowLeft') goTo(curSlide - 1);
+    if (e.key === 'ArrowRight') goTo(curSlide + 1);
+  });
+
+  /* Progress bar + auto-advance */
+  var progress = document.getElementById('sliderProgress');
+  var pStart, pRaf;
+  function resetProgress() {
+    clearTimeout(autoTimer);
+    cancelAnimationFrame(pRaf);
+    pStart = performance.now();
+    function animProg(now) {
+      var pct = Math.min(((now - pStart) / SLIDE_DUR) * 100, 100);
+      progress.style.width = pct + '%';
+      if (pct < 100) { pRaf = requestAnimationFrame(animProg); }
+      else { autoTimer = setTimeout(function(){ goTo(curSlide + 1); }, 0); }
+    }
+    pRaf = requestAnimationFrame(animProg);
+  }
+  resetProgress();
+  updateContent();
+
+  /* ── Populate About tab ─────────────── */
+  document.getElementById('abtTitle').textContent = cafe.name;
+  document.getElementById('abtDesc').textContent = cafe.desc;
+  document.getElementById('abtLoc').textContent = cafe.location;
+  document.getElementById('abtHours').textContent = cafe.hours;
+  document.getElementById('abtFor').textContent = cafe.bestFor;
+  document.getElementById('abtRating').textContent = cafe.rating;
+  document.getElementById('abtCount').textContent = cafe.ratingCount;
+  var starsVal = Math.round(parseFloat(cafe.rating));
+  document.getElementById('abtStars').textContent = '★'.repeat(starsVal) + '☆'.repeat(5 - starsVal);
+  var specWrap = document.getElementById('abtSpecialties');
+  cafe.specialties.forEach(function(sp) {
+    var chip = document.createElement('span');
+    chip.textContent = sp;
+    chip.style.cssText = 'background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.25);color:var(--accent);border-radius:100px;padding:4px 14px;font-size:0.75rem;font-weight:600;';
+    specWrap.appendChild(chip);
+  });
+  document.getElementById('rateLink').href = 'cafe.html?id=' + cafeId;
+  document.getElementById('rateLink2').href = 'cafe.html?id=' + cafeId;
+
+  /* ── Populate Menu tab ──────────────── */
+  var menuGrid = document.getElementById('menuGrid');
+  cafe.menu.forEach(function(item) {
+    var card = document.createElement('div');
+    card.className = 'menu-card';
+    card.innerHTML = '<div class="menu-card-emoji">'+item.e+'</div>'
+      +'<div class="menu-card-name">'+item.n+'</div>'
+      +'<div class="menu-card-price">Rs. '+item.p+'</div>'
+      +'<div class="menu-card-cat">'+item.c+'</div>';
+    menuGrid.appendChild(card);
+  });
+
+  /* ── Populate Reviews tab ───────────── */
+  var reviewGrid = document.getElementById('reviewGrid');
+  cafe.reviews.forEach(function(r) {
+    var card = document.createElement('div');
+    card.className = 'review-card';
+    card.innerHTML = '<div class="review-stars">'+r.stars+'</div>'
+      +'<div class="review-text">'+r.text+'</div>'
+      +'<div class="review-dish">'+r.dish+'</div>'
+      +'<div class="review-anon">Anonymous · NUST Student</div>';
+    reviewGrid.appendChild(card);
+  });
+
+  /* ── Tabs ───────────────────────────── */
+  document.querySelectorAll('.tab-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  /* Lucide icons */
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+
+  /* Update page title */
+  document.title = cafe.name + ' — Concordia Eats';
+  </script>
+</body>
+</html>
