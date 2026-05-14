@@ -474,6 +474,42 @@
     .footer-rule { width: 36px; height: 1px; background: var(--border); }
     .footer-copy { font-size: 0.78rem; color: var(--text-muted); opacity: 0.5; }
 
+    /* ─── Hamburger button ───────────────────────────────────── */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column; justify-content: center; align-items: center;
+      gap: 5px; width: 36px; height: 36px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+      border-radius: 8px; transition: background 0.2s;
+    }
+    .nav-hamburger:hover { background: var(--accent-dim); }
+    .nav-hamburger span {
+      display: block; width: 20px; height: 2px;
+      background: var(--text-primary); border-radius: 2px;
+      transition: all 0.25s ease;
+    }
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Mobile nav drawer */
+    .mobile-nav-drawer {
+      display: none;
+      position: fixed; top: 57px; left: 0; right: 0;
+      background: var(--bg); border-bottom: 1px solid var(--border);
+      z-index: 99; padding: 12px 0 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+    .mobile-nav-drawer.open { display: block; }
+    .mobile-nav-drawer a {
+      display: block; padding: 13px 24px;
+      font-size: 1rem; font-weight: 500;
+      color: var(--text-muted); text-decoration: none;
+      transition: color 0.18s, background 0.18s;
+    }
+    .mobile-nav-drawer a:hover,
+    .mobile-nav-drawer a.active { color: var(--text-primary); background: var(--accent-dim); }
+
     /* ─── Responsive ──────────────────────────────────────────── */
     @media (max-width: 960px) {
       .about-grid    { grid-template-columns: 1fr; gap: var(--sp-lg); }
@@ -482,6 +518,8 @@
       .steps-row::before { display: none; }
       .features-grid { grid-template-columns: 1fr; }
       .spotlight-nav { display: none; }
+      .nav-hamburger { display: flex; }
+      .btn-login     { padding: 8px 14px; font-size: 0.78rem; }
     }
     @media (max-width: 600px) {
       .hero-heading   { font-size: clamp(1.9rem, 8vw, 2.5rem); }
@@ -731,7 +769,7 @@
     <div class="container">
       <a href="#home" class="logo">Concordia <span class="accent">Eats</span></a>
       <div class="nav-right">
-        <!-- Spotlight Navbar (Vengeance UI) -->
+        <!-- Spotlight Navbar (desktop) -->
         <nav class="spotlight-nav" id="spotNav">
           <div class="spot-indicator" id="spotIndicator"></div>
           <a href="#home"            class="spot-link active" data-section="home">Home</a>
@@ -741,9 +779,21 @@
         </nav>
         <button class="theme-toggle" onclick="toggleTheme()"></button>
         <button class="btn-login" onclick="goToLogin()">Login with NUST</button>
+        <!-- Hamburger (mobile only) -->
+        <button class="nav-hamburger" id="navHamburger" aria-label="Menu" onclick="toggleMobileNav()">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </div>
   </nav>
+
+  <!-- Mobile nav drawer -->
+  <div class="mobile-nav-drawer" id="mobileNavDrawer">
+    <a href="#home"            onclick="closeMobileNav()">Home</a>
+    <a href="#cafes"           onclick="closeMobileNav()">Cafes</a>
+    <a href="search.html">Search</a>
+    <a href="leaderboard.html">Leaderboard</a>
+  </div>
 
 
   <!-- ══ HERO ════════════════════════════════════════════════ -->
@@ -1689,6 +1739,20 @@
       } else {
         window.location.href = 'login.html';
       }
+    }
+
+    function toggleMobileNav() {
+      var btn = document.getElementById('navHamburger');
+      var drawer = document.getElementById('mobileNavDrawer');
+      btn.classList.toggle('open');
+      drawer.classList.toggle('open');
+      document.body.style.overflow = drawer.classList.contains('open') ? 'hidden' : '';
+    }
+
+    function closeMobileNav() {
+      document.getElementById('navHamburger').classList.remove('open');
+      document.getElementById('mobileNavDrawer').classList.remove('open');
+      document.body.style.overflow = '';
     }
 
     // ── View Reviews buttons ───────────────────────────────
