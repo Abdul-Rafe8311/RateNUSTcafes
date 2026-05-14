@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/shared.css" />
+  <script src="js/theme.js"></script>
   <style>
     /* ── Page ── */
     .page { padding-top: 72px; }
@@ -420,6 +421,7 @@
     const user = Auth.getUser();
     if (user) {
       document.getElementById('navRight').innerHTML = `
+        <button class="theme-toggle" onclick="toggleTheme()"></button>
         <div class="user-chip">
           <div class="user-avatar">${user.name.charAt(0).toUpperCase()}</div>
           <div>
@@ -429,6 +431,7 @@
         <a href="dashboard.html" class="btn-ghost btn-sm">Dashboard</a>`;
     } else {
       document.getElementById('navRight').innerHTML = `
+        <button class="theme-toggle" onclick="toggleTheme()"></button>
         <a href="login.html" class="btn-primary">Login with NUST</a>`;
     }
 
@@ -436,7 +439,7 @@
     function renderStars(avg, size = 13) {
       const full = Math.round(avg);
       return [1,2,3,4,5].map(n => {
-        const c = n <= full ? '#00C8F0' : 'rgba(34,197,94,0.18)';
+        const c = n <= full ? '#f59e0b' : 'rgba(0,0,0,0.12)';
         return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="${c}"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
       }).join('');
     }

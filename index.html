@@ -8,7 +8,8 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet" />
+  <script src="js/theme.js"></script>
 
   <!-- AOS — Animate on Scroll -->
   <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
@@ -36,23 +37,34 @@
 
     /* ─── Design Tokens ───────────────────────────────────────── */
     :root {
-      --bg:            #030B04;
-      --surface:       #091409;
-      --surface2:      #0E2010;
-      --border:        rgba(34,197,94,0.10);
-      --border-accent: rgba(34,197,94,0.28);
-      --accent:        #22C55E;
-      --accent-light:  #4ADE80;
-      --accent-dim:    rgba(34,197,94,0.11);
-      --text-primary:  #F2FBF2;
-      --text-muted:    rgba(242,251,242,0.50);
-      --radius-card:   14px;
+      --bg:            #ffffff;
+      --surface:       #f5f5f7;
+      --surface2:      #e8e8ed;
+      --border:        rgba(0,0,0,0.10);
+      --border-accent: rgba(0,0,0,0.22);
+      --accent:        #1d1d1f;
+      --accent-light:  #424245;
+      --accent-dim:    rgba(0,0,0,0.05);
+      --text-primary:  #1d1d1f;
+      --text-muted:    rgba(29,29,31,0.56);
+      --radius-card:   12px;
       --radius-btn:    8px;
-      --transition:    all 0.3s ease;
-      --glow-sm:       0 0 30px rgba(34,197,94,0.10);
-      --glow:          0 0 60px rgba(34,197,94,0.16);
+      --transition:    all 0.2s ease;
       --sp-xs:  8px;  --sp-sm: 16px;  --sp-md: 24px;
       --sp-lg: 48px;  --sp-xl: 80px;  --sp-2xl: 120px;
+    }
+
+    [data-theme="dark"] {
+      --bg:            #000000;
+      --surface:       #111111;
+      --surface2:      #1c1c1c;
+      --border:        rgba(255,255,255,0.10);
+      --border-accent: rgba(255,255,255,0.22);
+      --accent:        #f5f5f7;
+      --accent-light:  #e0e0e2;
+      --accent-dim:    rgba(255,255,255,0.07);
+      --text-primary:  #f5f5f7;
+      --text-muted:    rgba(245,245,247,0.56);
     }
 
     /* ─── Base ────────────────────────────────────────────────── */
@@ -66,16 +78,6 @@
     }
     h1, h2, h3, h4 { font-family: 'Syne', sans-serif; line-height: 1.12; }
 
-    /* ─── Animated dot-grid background (UIVerse) ──────────────── */
-    .bg-dots {
-      position: fixed; inset: 0; z-index: 0;
-      background-image: radial-gradient(rgba(34,197,94,0.07) 1px, transparent 1px);
-      background-size: 42px 42px;
-      pointer-events: none;
-      mask-image: radial-gradient(ellipse 90% 90% at 50% 0%, black 30%, transparent 100%);
-      -webkit-mask-image: radial-gradient(ellipse 90% 90% at 50% 0%, black 30%, transparent 100%);
-    }
-
     /* ─── Layout ──────────────────────────────────────────────── */
     .container { max-width: 1160px; margin: 0 auto; padding: 0 var(--sp-md); position: relative; z-index: 1; }
     section { padding: var(--sp-xl) 0; }
@@ -83,15 +85,15 @@
     /* ─── Navbar ──────────────────────────────────────────────── */
     .navbar {
       position: fixed; inset: 0 0 auto 0; z-index: 100;
-      background: rgba(7,7,7,0.82);
-      backdrop-filter: blur(22px) saturate(160%);
-      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
       padding: 16px 0;
-      transition: box-shadow 0.4s;
+      transition: box-shadow 0.3s;
     }
     .navbar.scrolled {
-      box-shadow: 0 4px 40px rgba(0,0,0,0.5), var(--glow-sm);
+      box-shadow: 0 1px 12px rgba(0,0,0,0.08);
     }
     .navbar .container { display: flex; align-items: center; justify-content: space-between; }
 
@@ -99,272 +101,113 @@
       font-family: 'Syne', sans-serif; font-size: 1.32rem; font-weight: 700;
       letter-spacing: -0.028em; color: var(--text-primary);
     }
-    .logo .accent { color: var(--accent); }
+    .logo .accent { color: var(--text-primary); }
 
-    .nav-right { display: flex; align-items: center; gap: var(--sp-lg); }
+    .nav-right { display: flex; align-items: center; gap: 32px; }
     .nav-links { display: flex; gap: var(--sp-md); }
     .nav-links a {
       font-size: 0.875rem; font-weight: 500; color: var(--text-muted);
-      transition: var(--transition); letter-spacing: 0.01em; position: relative;
-    }
-    .nav-links a::after {
-      content: ''; position: absolute; bottom: -4px; left: 0; right: 100%;
-      height: 1px; background: var(--accent); transition: right 0.3s ease;
+      transition: var(--transition); letter-spacing: 0.01em;
     }
     .nav-links a:hover { color: var(--text-primary); }
-    .nav-links a:hover::after { right: 0; }
 
-    /* HUD primary button */
+    /* Login button */
     .btn-login {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      background: rgba(34,197,94,0.08); color: var(--accent);
-      border: 1px solid rgba(34,197,94,0.42); padding: 10px 22px;
-      border-radius: 2px; font-size: 0.78rem; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      transition: all 0.22s ease;
-      position: relative; overflow: hidden; z-index: 0; cursor: pointer;
-      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%);
+      background: var(--accent); color: #ffffff;
+      border: none; padding: 10px 22px;
+      border-radius: var(--radius-btn); font-size: 0.875rem; font-weight: 600;
+      transition: all 0.2s ease; cursor: pointer;
     }
-    .btn-login::before {
-      content: ''; position: absolute; top: 0; left: -80%; width: 55%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(34,197,94,0.28), transparent);
-      pointer-events: none;
-    }
-    .btn-login::after { display: none; }
-    .btn-login:hover {
-      background: rgba(34,197,94,0.15); border-color: var(--accent);
-      box-shadow: 0 0 28px rgba(34,197,94,0.38), inset 0 0 14px rgba(34,197,94,0.07);
-      color: #fff; text-shadow: 0 0 10px rgba(34,197,94,0.6);
-    }
-    .btn-login:hover::before { animation: hud-sweep 0.5s ease forwards; }
+    .btn-login::before { display: none; }
+    .btn-login::after  { display: none; }
+    .btn-login:hover { background: var(--accent-light); }
 
     /* ─── Hero ────────────────────────────────────────────────── */
     .hero {
-      position: relative; min-height: 100vh;
+      position: relative; min-height: 96vh;
       display: flex; align-items: center;
       padding: var(--sp-xl) 0; overflow: hidden;
+      background: var(--bg);
     }
 
-    /* Ambient glow orbs */
-    .orb {
-      position: absolute; border-radius: 50%;
-      pointer-events: none; filter: blur(90px);
-    }
-    .orb-1 {
-      top: 5%; left: -15%; width: 750px; height: 750px;
-      background: radial-gradient(circle, rgba(34,197,94,0.07) 0%, transparent 65%);
-      animation: orb-drift 14s ease-in-out infinite;
-    }
-    .orb-2 {
-      bottom: -10%; right: -18%; width: 680px; height: 680px;
-      background: radial-gradient(circle, rgba(34,197,94,0.055) 0%, transparent 65%);
-      animation: orb-drift 18s ease-in-out infinite reverse;
-    }
-    .orb-3 {
-      top: 55%; left: 38%; width: 460px; height: 460px;
-      background: radial-gradient(circle, rgba(34,197,94,0.04) 0%, transparent 70%);
-      animation: orb-drift 11s ease-in-out infinite 3s;
-    }
     @keyframes lamp-width { from { width: 0; } to { width: 100%; } }
     @keyframes lamp-glow  { from { opacity:0; transform:translateX(-50%) scaleX(0.4); }
                              to   { opacity:1; transform:translateX(-50%) scaleX(1); } }
 
-    @keyframes orb-drift {
-      0%,100% { transform: translate(0,0) scale(1); }
-      33%      { transform: translate(40px,-25px) scale(1.06); }
-      66%      { transform: translate(-25px,18px) scale(0.97); }
-    }
-
-    /* CSS-only floating particles */
-    .particles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-    .particle {
-      position: absolute; border-radius: 50%;
-      background: rgba(34,197,94,0.18);
-      animation: ptcl linear infinite;
-    }
-    @keyframes ptcl {
-      0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
-      8%   { opacity: 1; }
-      92%  { opacity: 1; }
-      100% { transform: translateY(-80px) rotate(720deg); opacity: 0; }
-    }
-
-    .hero-content { position: relative; z-index: 1; max-width: 770px; }
-
     .hero-badge {
       display: inline-flex; align-items: center; gap: 8px;
-      background: var(--accent-dim);
-      border: 1px solid rgba(34,197,94,0.28);
-      border-radius: 2px; padding: 7px 17px;
-      font-size: 0.73rem; font-weight: 700; letter-spacing: 0.09em;
-      text-transform: uppercase; color: var(--accent);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px; padding: 7px 17px;
+      font-size: 0.73rem; font-weight: 600; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--text-muted);
       margin-bottom: var(--sp-md);
       position: relative; overflow: hidden;
+      align-self: center;
     }
-    .hero-badge::before {
-      content: ''; position: absolute; top: 0; left: -120%;
-      width: 60%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(34,197,94,0.22), transparent);
-      animation: badge-sweep 3.5s ease-in-out infinite 1.2s;
-    }
-    @keyframes badge-sweep { 0% { left:-120%; } 100% { left: 200%; } }
+    .hero-badge::before { display: none; }
     .hero-badge i { width: 12px; height: 12px; }
 
     .hero h1 {
-      font-size: clamp(2.9rem, 5.8vw, 5rem);
+      font-size: clamp(2.4rem, 5vw, 4.5rem);
       font-weight: 800; letter-spacing: -0.042em;
       color: var(--text-primary); margin-bottom: var(--sp-sm);
+      max-width: 100%; word-break: break-word; overflow-wrap: break-word;
+      text-align: center;
     }
-    .hero h1 .accent { color: var(--accent); }
+    .hero h1 .accent { color: var(--text-primary); }
 
-    /* ── React Bits — Glitch Text ───────────────────────────── */
-    .glitch-hero {
-      display: flex !important;
-      flex-direction: column;
-      gap: 0.1em;
-      position: relative;
+    /* ── Hero heading ───────────────────────────────────────── */
+    .hero-heading {
+      font-size: clamp(2.4rem, 5vw, 4.5rem);
+      font-weight: 800; letter-spacing: -0.042em;
+      color: var(--text-primary); line-height: 1.08;
+      margin-bottom: var(--sp-sm);
+      text-align: center;
     }
-    .glitch-line {
-      display: flex;
-      align-items: center;
-      flex-wrap: nowrap;
-      gap: 0.04em;
-      line-height: 1;
-    }
-    .gch-cell {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255,255,255,0.045);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 5px;
-      min-width: 0.6em;
-      height: 1em;
-      position: relative;
-      overflow: hidden;
-      padding: 0 0.04em;
-    }
-    .gch-cell::after {
-      content: '';
-      position: absolute;
-      left: 0; right: 0; top: 50%;
-      height: 1px;
-      background: rgba(0,0,0,0.52);
-      z-index: 2;
-      pointer-events: none;
-    }
-    .gch-char {
-      font-family: inherit;
-      font-size: 1em;
-      font-weight: inherit;
-      color: var(--text-primary);
-      position: relative;
-      z-index: 1;
-      display: block;
-      line-height: 1;
-    }
-    .gch-char.accent { color: var(--accent); }
-    .gch-sp { display: inline-block; width: 0.28em; flex-shrink: 0; }
-
-    /* Ghost channel overlays */
-    .glitch-ghost {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.1em;
-      opacity: 0;
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(2.9rem, 5.8vw, 5rem);
-      font-weight: 800;
-      letter-spacing: -0.042em;
-      line-height: 1.12;
-      white-space: nowrap;
-      z-index: 10;
-    }
-    .glitch-ghost-ln { display: block; line-height: 1; }
-
-    /* Glitch keyframes */
-    @keyframes gh-red {
-      0%,100% { opacity:0; transform:none; clip-path:none; }
-      5%  { opacity:1; clip-path:polygon(0 5%,100% 5%,100% 28%,0 28%);  transform:translateX(-5px); }
-      10% { clip-path:polygon(0 55%,100% 55%,100% 72%,0 72%); transform:translateX(4px); }
-      15% { clip-path:polygon(0 80%,100% 80%,100% 96%,0 96%); transform:translateX(-3px); }
-      20% { opacity:0; transform:none; clip-path:none; }
-    }
-    @keyframes gh-cyan {
-      0%,100% { opacity:0; transform:none; clip-path:none; }
-      5%  { opacity:1; clip-path:polygon(0 30%,100% 30%,100% 52%,0 52%); transform:translateX(6px); }
-      10% { clip-path:polygon(0 65%,100% 65%,100% 82%,0 82%); transform:translateX(-5px); }
-      15% { clip-path:polygon(0 10%,100% 10%,100% 26%,0 26%); transform:translateX(3px); }
-      20% { opacity:0; transform:none; clip-path:none; }
-    }
-    @keyframes gh-shake {
-      0%,100% { transform:none; }
-      5%  { transform:translateX(-4px) skewX(1.5deg); }
-      10% { transform:translateX(4px) skewX(-0.8deg); }
-      15% { transform:translateX(-2px); }
-      20% { transform:none; }
-    }
-
-    .glitch-hero.glitching .glitch-ghost.is-red  { animation: gh-red  0.45s steps(1) forwards; color: rgba(255,40,100,0.85); }
-    .glitch-hero.glitching .glitch-ghost.is-cyan { animation: gh-cyan 0.45s steps(1) forwards; color: rgba(0,220,255,0.85); }
-    .glitch-hero.glitching { animation: gh-shake 0.45s steps(1) forwards; }
 
     .hero-sub {
       font-size: 1.06rem; color: var(--text-muted);
       max-width: 500px; line-height: 1.77;
-      margin-bottom: var(--sp-lg); opacity: 0;
+      margin-bottom: var(--sp-lg);
+      text-align: center;
     }
 
-    .hero-actions { display: flex; gap: 13px; flex-wrap: wrap; opacity: 0; }
+    .hero-actions { display: flex; gap: 13px; flex-wrap: wrap; justify-content: center; }
 
-    /* UIVerse shimmer primary button */
     .btn-primary {
       display: inline-flex; align-items: center; gap: 8px;
-      background: var(--accent); color: var(--bg);
+      background: var(--accent); color: #ffffff;
       border: none; padding: 14px 30px;
       border-radius: var(--radius-btn);
-      font-size: 0.95rem; font-weight: 700;
-      transition: var(--transition);
-      position: relative; overflow: hidden; z-index: 0;
+      font-size: 0.95rem; font-weight: 600;
+      transition: var(--transition); cursor: pointer;
     }
-    .btn-primary::before {
-      content: ''; position: absolute; top: 0; left: -120%;
-      width: 60%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.32), transparent);
-      transition: left 0.55s ease;
-    }
-    .btn-primary:hover { background: var(--accent-light); transform: translateY(-2px); box-shadow: 0 14px 36px rgba(34,197,94,0.38); }
-    .btn-primary:hover::before { left: 160%; }
+    .btn-primary::before { display: none; }
+    .btn-primary:hover { background: var(--accent-light); }
     .btn-primary i { width: 17px; height: 17px; }
 
-    /* UIVerse animated border ghost button */
     .btn-ghost {
       display: inline-flex; align-items: center; gap: 8px;
       background: transparent; color: var(--text-primary);
-      border: 1px solid var(--border); padding: 14px 30px;
+      border: 1px solid var(--border-accent); padding: 14px 30px;
       border-radius: var(--radius-btn);
       font-size: 0.95rem; font-weight: 500;
-      transition: var(--transition); position: relative; overflow: hidden;
+      transition: var(--transition);
     }
-    .btn-ghost::before {
-      content: ''; position: absolute; inset: 0;
-      background: rgba(34,197,94,0.05); opacity: 0; transition: opacity 0.3s;
-    }
-    .btn-ghost:hover { border-color: var(--border-accent); transform: translateY(-2px); }
-    .btn-ghost:hover::before { opacity: 1; }
+    .btn-ghost::before { display: none; }
+    .btn-ghost:hover { background: var(--accent-dim); border-color: var(--accent); }
     .btn-ghost i { width: 17px; height: 17px; }
 
-    /* ─── Section Labels (UIVerse line-accent style) ───────────── */
+    /* ─── Section Labels ────────────────────────────────────────── */
     .label {
       display: inline-flex; align-items: center; gap: 8px;
       font-size: 0.72rem; font-weight: 700;
-      letter-spacing: 0.13em; text-transform: uppercase;
-      color: var(--accent); margin-bottom: 12px;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 12px;
     }
-    .label::before { content: ''; width: 22px; height: 1px; background: var(--accent); opacity: 0.65; }
+    .label::before { content: ''; width: 22px; height: 1px; background: var(--text-muted); opacity: 0.5; }
 
     .section-title {
       font-size: clamp(1.9rem, 3.5vw, 2.75rem); font-weight: 800;
@@ -372,8 +215,98 @@
     }
     .section-desc { font-size: 0.975rem; color: var(--text-muted); line-height: 1.78; max-width: 560px; }
 
+    /* ─── Dark mode overrides (index-specific) ───────────────── */
+    [data-theme="dark"] .navbar { background: rgba(0,0,0,0.92); }
+    [data-theme="dark"] .btn-primary { background: #f5f5f7; color: #1d1d1f; }
+    [data-theme="dark"] .btn-primary:hover { background: #e0e0e2; }
+    [data-theme="dark"] .btn-login { background: #f5f5f7; color: #1d1d1f; }
+    [data-theme="dark"] .btn-login:hover { background: #e0e0e2; }
+    [data-theme="dark"] .mq-rv-card { background: var(--surface); border-color: rgba(255,255,255,0.08); }
+    [data-theme="dark"] .mq-rv-text { color: var(--text-muted); }
+    [data-theme="dark"] .mq-rv-who  { color: rgba(255,255,255,0.45); }
+    [data-theme="dark"] .steps-row::before { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.10) 30%, rgba(255,255,255,0.10) 70%, transparent); }
+
+    /* ─── Theme Toggle ────────────────────────────────────────── */
+    .theme-toggle {
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      background: transparent; border: 1px solid var(--border);
+      border-radius: var(--radius-btn); cursor: pointer;
+      color: var(--text-muted); transition: var(--transition); flex-shrink: 0;
+    }
+    .theme-toggle:hover {
+      border-color: var(--border-accent); color: var(--text-primary); background: var(--accent-dim);
+    }
+
+    /* ─── Hero centered layout ───────────────────────────────── */
+    .hero-grid {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+    .hero-content {
+      position: relative; z-index: 1;
+      max-width: 700px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .hero-globe-wrap {
+      position: absolute;
+      right: -60px; top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.18;
+      pointer-events: none;
+    }
+    @media (max-width: 960px) {
+      .hero-globe-wrap { display: none; }
+    }
+
+    /* ─── Word-flip heading animation ────────────────────────── */
+    @keyframes wordFlipIn {
+      from { transform: perspective(400px) rotateX(-90deg); opacity: 0; }
+      to   { transform: perspective(400px) rotateX(0deg);   opacity: 1; }
+    }
+    .flip-word {
+      display: inline-block;
+      transform-origin: center bottom;
+      animation: wordFlipIn 0.55s cubic-bezier(0.23, 1, 0.32, 1) both;
+    }
+    .flip-static { display: inline; }
+    .flip-cycle  { display: inline-block; transform-origin: center bottom; }
+
+    /* ─── Flip Board ──────────────────────────────────────────── */
+    .flip-board-wrap { margin: 24px 0 28px; display: flex; flex-direction: column; align-items: center; }
+    .flip-board-label {
+      font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 10px;
+    }
+    .flip-row { display: flex; gap: 3px; align-items: center; justify-content: center; }
+    .flip-tile {
+      width: 30px; height: 44px;
+      background: var(--text-primary);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Mono', 'Courier New', monospace;
+      font-size: 1.15rem; font-weight: 700;
+      color: var(--bg);
+      position: relative; overflow: hidden; flex-shrink: 0;
+      user-select: none;
+    }
+    .flip-tile::after {
+      content: '';
+      position: absolute; left: 0; right: 0; top: 50%;
+      height: 1px;
+      background: rgba(128,128,128,0.15);
+      pointer-events: none;
+    }
+    .flip-tile .tc { position: relative; z-index: 1; }
+
     /* ─── About ───────────────────────────────────────────────── */
-    #about { background: linear-gradient(180deg, var(--bg) 0%, rgba(14,10,6,0.35) 100%); }
+    #about { background: var(--surface); }
 
     .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
     .about-text .section-desc { max-width: 100%; }
@@ -387,8 +320,8 @@
       font-size: 0.8rem; color: var(--text-muted);
       transition: var(--transition); cursor: default;
     }
-    .pill:hover { border-color: var(--border-accent); color: var(--text-primary); transform: translateY(-1px); }
-    .pill i { color: var(--accent); width: 13px; height: 13px; }
+    .pill:hover { border-color: var(--border-accent); color: var(--text-primary); }
+    .pill i { color: var(--text-muted); width: 13px; height: 13px; }
 
     /* UIVerse glow stat cards */
     .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-sm); }
@@ -398,18 +331,12 @@
       border-radius: var(--radius-card); padding: var(--sp-md) 20px;
       transition: var(--transition); position: relative; overflow: hidden;
     }
-    .stat-card::before {
-      content: ''; position: absolute; top: -50px; left: -50px;
-      width: 140px; height: 140px;
-      background: radial-gradient(circle, rgba(34,197,94,0.14) 0%, transparent 70%);
-      opacity: 0; transition: opacity 0.5s;
-    }
-    .stat-card:hover { border-color: var(--border-accent); transform: translateY(-3px); box-shadow: 0 18px 44px rgba(0,0,0,0.32), var(--glow-sm); }
-    .stat-card:hover::before { opacity: 1; }
+    .stat-card::before { display: none; }
+    .stat-card:hover { border-color: var(--border-accent); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
 
     .stat-number {
       font-family: 'Syne', sans-serif; font-size: 2.5rem; font-weight: 800;
-      color: var(--accent); letter-spacing: -0.045em; margin-bottom: 4px; line-height: 1;
+      color: var(--text-primary); letter-spacing: -0.045em; margin-bottom: 4px; line-height: 1;
     }
     .stat-label { font-size: 0.825rem; color: var(--text-muted); }
 
@@ -418,53 +345,20 @@
 
     .cafe-card {
       background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: var(--radius-card);
       position: relative; overflow: hidden;
-      isolation: isolate;
-      transition: transform 0.35s ease, box-shadow 0.35s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     }
+    .cafe-card::before { display: none; }
+    .cafe-card::after  { display: none; }
+    .cafe-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.09); border-color: var(--border-accent); }
 
-    /* Spinning conic-gradient border (UIVerse technique) */
-    .cafe-card::before {
-      content: '';
-      position: absolute; left: -50%; top: -50%;
-      width: 200%; height: 200%;
-      background: conic-gradient(
-        from 0deg,
-        transparent 0deg, transparent 145deg,
-        rgba(34,197,94,0.85) 195deg, rgba(34,197,94,0.45) 215deg,
-        transparent 248deg, transparent 360deg
-      );
-      animation: card-spin 3.6s linear infinite;
-      animation-play-state: paused;
-      opacity: 0;
-      transition: opacity 0.45s ease;
-      z-index: -2;
-    }
-
-    /* Covers inside, leaving 1px visible as the animated border */
-    .cafe-card::after {
-      content: ''; position: absolute; inset: 1px;
-      background: var(--surface);
-      border-radius: calc(var(--radius-card) - 1px);
-      z-index: -1;
-    }
-
-    .cafe-card:hover { transform: translateY(-7px); box-shadow: 0 28px 70px rgba(0,0,0,0.42), var(--glow); }
-    .cafe-card:hover::before { animation-play-state: running; opacity: 1; }
-
-    @keyframes card-spin { 100% { transform: rotate(1turn); } }
-
-    /* Inner content layer sits above the pseudo-elements */
     .cafe-inner {
-      position: relative; z-index: 1;
-      border: 1px solid var(--border); border-left: 2.5px solid var(--accent);
+      border-left: 3px solid var(--accent);
       border-radius: calc(var(--radius-card) - 1px);
       padding: var(--sp-md); height: 100%;
-      background: var(--surface);
-      transition: border-color 0.3s;
     }
-    .cafe-card:hover .cafe-inner { border-color: rgba(34,197,94,0.15); border-left-color: var(--accent); }
 
     .cafe-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
 
@@ -472,18 +366,18 @@
 
     .rating-chip {
       display: flex; align-items: center; gap: 4px;
-      background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.22);
-      border-radius: 2px; padding: 4px 11px;
-      font-family: 'Syne', sans-serif; font-size: 0.82rem; font-weight: 700; color: var(--accent);
+      background: var(--accent-dim); border: 1px solid var(--border);
+      border-radius: 6px; padding: 4px 11px;
+      font-family: 'Syne', sans-serif; font-size: 0.82rem; font-weight: 700; color: var(--text-primary);
     }
-    .rating-chip i { width: 11px; height: 11px; fill: currentColor; }
+    .rating-chip i { width: 11px; height: 11px; fill: #f59e0b; }
 
     .cafe-stars { display: flex; gap: 3px; margin-bottom: 10px; }
-    .cafe-stars i { width: 13px; height: 13px; color: var(--accent); }
-    .cafe-stars i.dim { color: rgba(34,197,94,0.2); }
+    .cafe-stars i { width: 13px; height: 13px; color: #f59e0b; }
+    .cafe-stars i.dim { color: rgba(0,0,0,0.15); }
 
     .cafe-location { display: flex; align-items: center; gap: 5px; font-size: 0.8rem; color: var(--text-muted); margin-bottom: var(--sp-sm); }
-    .cafe-location i { width: 12px; height: 12px; color: var(--accent); flex-shrink: 0; }
+    .cafe-location i { width: 12px; height: 12px; color: var(--text-muted); flex-shrink: 0; }
 
     .cafe-desc { font-size: 0.865rem; color: var(--text-muted); line-height: 1.73; margin-bottom: var(--sp-md); }
 
@@ -491,27 +385,22 @@
     .review-count { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; color: var(--text-muted); }
     .review-count i { width: 12px; height: 12px; }
 
-    /* HUD ghost button */
     .btn-view {
       display: inline-flex; align-items: center; justify-content: center;
-      background: transparent; color: var(--accent);
-      border: 1px solid rgba(34,197,94,0.3);
-      padding: 7px 16px; border-radius: 2px;
+      background: var(--accent); color: var(--bg);
+      border: none;
+      padding: 7px 16px; border-radius: var(--radius-btn);
       font-size: 0.75rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase;
       transition: all 0.22s ease;
       position: relative; overflow: hidden; z-index: 0; cursor: pointer;
     }
     .btn-view::before { display: none; }
     .btn-view::after  { display: none; }
-    .btn-view:hover {
-      background: rgba(34,197,94,0.08);
-      border-color: rgba(34,197,94,0.6);
-      box-shadow: 0 0 16px rgba(34,197,94,0.22);
-    }
+    .btn-view:hover { background: var(--accent-light); }
     .btn-view span { position: relative; z-index: 1; }
 
     /* ─── How It Works ────────────────────────────────────────── */
-    #how-it-works { background: linear-gradient(180deg, var(--bg) 0%, rgba(12,8,4,0.3) 100%); }
+    #how-it-works { background: var(--bg); }
     .how-header { text-align: center; max-width: 540px; margin: 0 auto; }
     .how-header .section-desc { margin: 0 auto; }
 
@@ -523,7 +412,7 @@
       content: ''; position: absolute; top: 27px;
       left: calc(16.67% + 18px); right: calc(16.67% + 18px);
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(34,197,94,0.38) 30%, rgba(34,197,94,0.38) 70%, transparent);
+      background: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent);
     }
 
     .step-card {
@@ -531,21 +420,21 @@
       border-radius: var(--radius-card); padding: var(--sp-md);
       transition: var(--transition); position: relative;
     }
-    .step-card:hover { border-color: var(--border-accent); transform: translateY(-5px); box-shadow: 0 22px 52px rgba(0,0,0,0.28), var(--glow-sm); }
+    .step-card:hover { border-color: var(--border-accent); transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
 
     .step-number {
       font-family: 'Syne', sans-serif; font-size: 3.6rem; font-weight: 800;
-      color: var(--accent); opacity: 0.16; line-height: 1; letter-spacing: -0.05em; margin-bottom: var(--sp-sm);
+      color: var(--text-primary); opacity: 0.08; line-height: 1; letter-spacing: -0.05em; margin-bottom: var(--sp-sm);
     }
 
     .step-icon {
       width: 46px; height: 46px; background: var(--accent-dim);
-      border: 1px solid rgba(34,197,94,0.2); border-radius: 12px;
+      border: 1px solid var(--border); border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
       margin-bottom: 14px; transition: var(--transition);
     }
-    .step-card:hover .step-icon { background: rgba(34,197,94,0.2); box-shadow: 0 0 22px rgba(34,197,94,0.22); }
-    .step-icon i { width: 20px; height: 20px; color: var(--accent); }
+    .step-card:hover .step-icon { background: var(--surface2); }
+    .step-icon i { width: 20px; height: 20px; color: var(--text-primary); }
 
     .step-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
     .step-desc { font-size: 0.865rem; color: var(--text-muted); line-height: 1.73; }
@@ -560,37 +449,27 @@
       display: flex; align-items: flex-start; gap: 20px;
       transition: var(--transition); position: relative; overflow: hidden;
     }
-    .feature-tile::after {
-      content: ''; position: absolute; bottom: -50px; right: -50px;
-      width: 160px; height: 160px;
-      background: radial-gradient(circle, rgba(34,197,94,0.09) 0%, transparent 70%);
-      opacity: 0; transition: opacity 0.5s;
-    }
-    .feature-tile:hover { border-color: var(--border-accent); transform: translateY(-3px); box-shadow: 0 18px 44px rgba(0,0,0,0.24), var(--glow-sm); }
-    .feature-tile:hover::after { opacity: 1; }
+    .feature-tile::after { display: none; }
+    .feature-tile:hover { border-color: var(--border-accent); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
 
     .feature-icon {
       width: 54px; height: 54px; background: var(--accent-dim);
-      border: 1px solid rgba(34,197,94,0.18); border-radius: 13px;
+      border: 1px solid var(--border); border-radius: 13px;
       display: flex; align-items: center; justify-content: center;
       font-size: 1.5rem; flex-shrink: 0; transition: var(--transition);
     }
-    .feature-tile:hover .feature-icon { background: rgba(34,197,94,0.2); transform: scale(1.1) rotate(4deg); box-shadow: 0 0 24px rgba(34,197,94,0.22); }
+    .feature-tile:hover .feature-icon { background: var(--surface2); }
 
     .feature-body h4 { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; letter-spacing: -0.014em; }
     .feature-body p { font-size: 0.865rem; color: var(--text-muted); line-height: 1.73; }
     .feature-body p strong { color: var(--text-primary); font-weight: 500; }
 
     /* ─── Footer ──────────────────────────────────────────────── */
-    footer { border-top: 1px solid var(--border); padding: 48px 0 44px; position: relative; }
-    footer::before {
-      content: ''; position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
-      width: 220px; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    }
+    footer { border-top: 1px solid var(--border); padding: 48px 0 44px; position: relative; background: var(--surface); }
+    footer::before { display: none; }
     footer .container { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
     .footer-logo { font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 700; letter-spacing: -0.025em; }
-    .footer-logo .accent { color: var(--accent); }
+    .footer-logo .accent { color: var(--text-primary); }
     .footer-tagline { font-size: 0.875rem; color: var(--text-muted); }
     .footer-rule { width: 36px; height: 1px; background: var(--border); }
     .footer-copy { font-size: 0.78rem; color: var(--text-muted); opacity: 0.5; }
@@ -605,48 +484,18 @@
       .spotlight-nav { display: none; }
     }
     @media (max-width: 600px) {
-      .hero h1        { font-size: 2.5rem; }
+      .hero-heading   { font-size: clamp(1.9rem, 8vw, 2.5rem); }
+      .hero h1        { font-size: clamp(1.9rem, 8vw, 2.5rem); }
       .hero-actions   { flex-direction: column; align-items: flex-start; }
       .stats-grid     { grid-template-columns: 1fr 1fr; }
+      .hero-content   { padding: 0 4px; }
     }
 
     /* ─── AOS pointer-events fix ──────────────────────────────── */
     [data-aos] { pointer-events: none; }
     [data-aos].aos-animate { pointer-events: auto; }
 
-    /* ════════════════════════════════════════════════════════════
-       VENGEANCE UI — REVEAL LOADER
-       Two shutter panels split open revealing the brand name
-    ══════════════════════════════════════════════════════════════ */
-    #reveal-loader {
-      position: fixed; inset: 0; z-index: 9999;
-      display: flex; align-items: center; justify-content: center;
-      overflow: hidden;
-    }
-
-    .rl-panel {
-      position: absolute; left: 0; right: 0;
-      background: #030C14;
-    }
-    .rl-top { top: 0; height: 50%; }
-    .rl-bot { bottom: 0; height: 50%; }
-
-    /* Subtle radial glow inside the loader */
-    .rl-top::after {
-      content: ''; position: absolute; bottom: -80px; left: 50%;
-      transform: translateX(-50%);
-      width: 500px; height: 160px;
-      background: radial-gradient(ellipse, rgba(34,197,94,0.12) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .rl-center { position: relative; z-index: 1; text-align: center; }
-
-    /* Brand name row */
-    .rl-name {
-      display: flex; gap: 0.22em; align-items: baseline;
-      justify-content: center; overflow: visible;
-    }
+    /* reveal loader removed */
 
     .rl-word { display: flex; overflow: hidden; }
 
@@ -763,10 +612,10 @@
       transition: transform 0.44s cubic-bezier(0.23, 1, 0.32, 1);
     }
 
-    /* Letter face — resting at 0deg, flips up-and-away on hover */
+    /* Letter face */
     .sfb-front {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.09);
+      background: var(--surface);
+      border: 1px solid var(--border);
       font-family: 'Syne', sans-serif;
       font-size: 1.08rem; font-weight: 700;
       color: var(--text-primary);
@@ -777,163 +626,105 @@
     /* Icon face — starts hidden below, flips in from bottom */
     .sfb-back {
       background: var(--accent-dim);
-      border: 1px solid rgba(34,197,94,0.32);
-      color: var(--accent);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
       transform: rotateX(-90deg);
       transform-origin: center bottom;
     }
     .sfb-back svg { width: 19px; height: 19px; }
-
-    /* Flip: letter goes up, icon comes in */
     .sfb-key:hover .sfb-front { transform: rotateX(90deg); }
     .sfb-key:hover .sfb-back  { transform: rotateX(0deg); }
 
-    /* Key shadow on hover */
-    .sfb-key:hover .sfb-back {
-      box-shadow: 0 0 18px rgba(34,197,94,0.25);
-    }
-
-    /* ════════════════════════════════════════════════════════════
-       VENGEANCE UI — SPOTLIGHT NAVBAR
-       Pill-shaped nav with sliding indicator + mouse-tracked glow
-    ══════════════════════════════════════════════════════════════ */
+    /* ─── Simple navbar links ────────────────────────────── */
     .spotlight-nav {
-      position: relative;
-      display: flex; align-items: center;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.09);
-      border-radius: 2px;
-      padding: 5px;
-      overflow: hidden;
-      z-index: 0;
+      display: flex; align-items: center; gap: 4px;
     }
+    .spotlight-nav::before { display: none; }
+    .spot-indicator { display: none; }
 
-    /* Mouse-tracked radial spotlight */
-    .spotlight-nav::before {
-      content: '';
-      position: absolute;
-      width: 180px; height: 180px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(34,197,94,0.26) 0%, transparent 70%);
-      transform: translate(-50%, -50%);
-      left: var(--sx, 50%);
-      top: var(--sy, 50%);
-      pointer-events: none; z-index: 0;
-      opacity: 0;
-      transition: opacity 0.28s, left 0.06s linear, top 0.06s linear;
-    }
-    .spotlight-nav:hover::before { opacity: 1; }
-
-    /* Sliding indicator pill */
-    .spot-indicator {
-      position: absolute;
-      height: calc(100% - 10px); top: 5px;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 2px;
-      transition: left 0.38s cubic-bezier(0.34, 1.5, 0.64, 1),
-                  width 0.38s cubic-bezier(0.34, 1.5, 0.64, 1);
-      pointer-events: none; z-index: 1;
-    }
-
-    /* Individual nav links */
     .spot-link {
-      position: relative; z-index: 2;
-      display: inline-block;
-      padding: 8px 18px;
+      display: inline-block; padding: 8px 16px;
       font-size: 0.875rem; font-weight: 500;
-      color: var(--text-muted);
-      border-radius: 2px;
-      text-decoration: none;
-      white-space: nowrap;
-      transition: color 0.25s;
-      user-select: none;
+      color: var(--text-muted); text-decoration: none;
+      border-radius: var(--radius-btn); transition: color 0.2s, background 0.2s;
     }
-    .spot-link:hover { color: var(--text-primary); }
+    .spot-link:hover { color: var(--text-primary); background: var(--accent-dim); }
     .spot-link.active { color: var(--text-primary); font-weight: 600; }
-
-    /* ─── Sparkles canvas ─────────────────────────────────── */
-    #sparklesCanvas {
-      position:absolute;inset:0;width:100%;height:100%;
-      pointer-events:none;z-index:0;
-    }
-
-    /* ─── Login button → clean purple pill ───────────────── */
-    .btn-login {
-      background: var(--accent) !important;
-      color: #ffffff !important;
-      border: none !important;
-      border-radius: 100px !important;
-      clip-path: none !important;
-      box-shadow: 0 0 20px rgba(34,197,94,0.35) !important;
-      letter-spacing: 0.04em !important;
-    }
-    .btn-login::before { display:none !important; }
-    .btn-login:hover {
-      background: var(--accent-light) !important;
-      box-shadow: 0 0 30px rgba(34,197,94,0.55) !important;
-      transform: translateY(-1px) !important;
-      text-shadow: none !important;
-      color: #030B04 !important;
-    }
 
     /* ─── 3D Marquee ─────────────────────────────────────── */
     @keyframes mq3d-left  { from{transform:translateX(0)}    to{transform:translateX(-50%)} }
     @keyframes mq3d-right { from{transform:translateX(-50%)} to{transform:translateX(0)}    }
     .mq3d-card {
       flex-shrink:0;display:inline-flex;align-items:center;gap:12px;
-      background:rgba(22,8,36,0.88);
-      border:1px solid rgba(34,197,94,0.18);
+      background:var(--surface);
+      border:1px solid var(--border);
       border-radius:10px;padding:11px 18px;min-width:188px;
-      box-shadow:0 4px 24px rgba(0,0,0,0.35);
-      backdrop-filter:blur(6px);
       transition:border-color 0.2s;cursor:default;
     }
     .mq3d-emoji { font-size:1.4rem;line-height:1;flex-shrink:0; }
-    .mq3d-name  { font-family:'Syne',sans-serif;font-size:0.79rem;font-weight:700;color:#F0EDE6;line-height:1.2; }
-    .mq3d-meta  { font-size:0.65rem;color:rgba(34,197,94,0.9);font-weight:600;margin-top:2px; }
+    .mq3d-name  { font-family:'Syne',sans-serif;font-size:0.79rem;font-weight:700;color:var(--text-primary);line-height:1.2; }
+    .mq3d-meta  { font-size:0.65rem;color:var(--text-muted);font-weight:600;margin-top:2px; }
 
     /* ─── Reviews flat marquee ───────────────────────────── */
     @keyframes mq-rv-left  { from{transform:translateX(0)}    to{transform:translateX(-50%)} }
     @keyframes mq-rv-right { from{transform:translateX(-50%)} to{transform:translateX(0)}    }
     .mq-rv-card {
       flex-shrink:0;display:inline-flex;flex-direction:column;gap:6px;
-      background:rgba(22,8,36,0.75);border:1px solid rgba(34,197,94,0.15);
+      background:#ffffff;border:1px solid rgba(0,0,0,0.1);
       border-radius:12px;padding:14px 20px;min-width:240px;max-width:300px;
-      box-shadow:0 4px 24px rgba(0,0,0,0.3);
+      box-shadow:0 2px 12px rgba(0,0,0,0.06);
     }
-    .mq-rv-stars { font-size:0.72rem;color:#FFB800;letter-spacing:1px; }
-    .mq-rv-text  { font-size:0.78rem;color:rgba(240,237,230,0.88);line-height:1.5;font-style:italic; }
-    .mq-rv-who   { font-size:0.62rem;color:rgba(34,197,94,0.65);font-weight:600;margin-top:2px; }
+    .mq-rv-stars { font-size:0.72rem;color:#f59e0b;letter-spacing:1px; }
+    .mq-rv-text  { font-size:0.78rem;color:rgba(29,29,31,0.78);line-height:1.5;font-style:italic; }
+
+    /* ─── Intro / Splash Screen ──────────────────────────────── */
+    #introScreen {
+      position: fixed; inset: 0; z-index: 10000;
+      background: #06090f;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      overflow: hidden;
+      transition: transform 0.72s cubic-bezier(0.76, 0, 0.24, 1),
+                  opacity 0.4s ease 0.4s;
+    }
+    #introScreen.intro-hide {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    #introText {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      line-height: 1;
+      white-space: nowrap;
+      display: flex;
+      align-items: baseline;
+      color: #ffffff;
+    }
+    #introText .intro-accent { color: #ffffff; }
+    #introBar {
+      width: 28px; height: 2px;
+      background: #ffffff;
+      margin-top: 32px;
+      border-radius: 2px;
+      animation: introBarPulse 0.7s ease-in-out infinite alternate;
+    }
+    @keyframes introBarPulse {
+      from { opacity: 0.3; transform: scaleX(0.5); }
+      to   { opacity: 1;   transform: scaleX(1); }
+    }
+    .mq-rv-who   { font-size:0.62rem;color:rgba(29,29,31,0.45);font-weight:600;margin-top:2px; }
   </style>
 </head>
 <body>
 
-  <!-- ══ REVEAL LOADER (Vengeance UI) ══════════════════════════ -->
-  <div id="reveal-loader" aria-hidden="true">
-    <div class="rl-panel rl-top"></div>
-    <div class="rl-panel rl-bot"></div>
-    <div class="rl-center">
-      <div class="rl-name">
-        <div class="rl-word" id="rlWord1">
-          <span class="rl-letter">C</span><span class="rl-letter">O</span>
-          <span class="rl-letter">N</span><span class="rl-letter">C</span>
-          <span class="rl-letter">O</span><span class="rl-letter">R</span>
-          <span class="rl-letter">D</span><span class="rl-letter">I</span>
-          <span class="rl-letter">A</span>
-        </div>
-        <div class="rl-word" id="rlWord2">
-          <span class="rl-letter gold">E</span><span class="rl-letter gold">A</span>
-          <span class="rl-letter gold">T</span><span class="rl-letter gold">S</span>
-        </div>
-      </div>
-      <div class="rl-bar" id="rlBar"></div>
-      <div class="rl-tagline" id="rlTagline">NUST · Concordia Campus</div>
+  <!-- ══ INTRO SCREEN ════════════════════════════════════════ -->
+  <div id="introScreen" aria-hidden="true">
+    <div id="introText">
+      Concordia&nbsp;<span class="intro-accent">Eats</span>
     </div>
+    <div id="introBar"></div>
   </div>
-
-  <div class="bg-dots" aria-hidden="true"></div>
-  <div class="particles" id="particles" aria-hidden="true"></div>
 
   <!-- ══ NAVBAR ══════════════════════════════════════════════ -->
   <nav class="navbar" id="navbar">
@@ -948,6 +739,7 @@
           <a href="search.html"      class="spot-link">Search</a>
           <a href="leaderboard.html" class="spot-link">Leaderboard</a>
         </nav>
+        <button class="theme-toggle" onclick="toggleTheme()"></button>
         <button class="btn-login" onclick="goToLogin()">Login with NUST</button>
       </div>
     </div>
@@ -956,63 +748,56 @@
 
   <!-- ══ HERO ════════════════════════════════════════════════ -->
   <section class="hero" id="home">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-    <canvas id="sparklesCanvas" aria-hidden="true"></canvas>
     <div class="container">
-      <div class="hero-content">
-        <div class="hero-badge" id="heroBadge">
-          <i data-lucide="map-pin"></i>
-          NUST · Concordia Campus
-        </div>
-        <h1 class="glitch-hero" id="glitchHero">
-          <div class="glitch-ghost is-red" aria-hidden="true">
-            <span class="glitch-ghost-ln">YOUR CAMPUS.</span>
-            <span class="glitch-ghost-ln">YOUR TASTE.</span>
-            <span class="glitch-ghost-ln">YOUR VERDICT.</span>
+      <div class="hero-grid">
+        <div class="hero-content">
+          <div class="hero-badge">
+            <i data-lucide="map-pin"></i>
+            NUST · Concordia Campus
           </div>
-          <div class="glitch-ghost is-cyan" aria-hidden="true">
-            <span class="glitch-ghost-ln">YOUR CAMPUS.</span>
-            <span class="glitch-ghost-ln">YOUR TASTE.</span>
-            <span class="glitch-ghost-ln">YOUR VERDICT.</span>
+          <h1 class="hero-heading">
+            Your campus.<br>Your taste.<br>Your verdict.
+          </h1>
+
+          <!-- Flip Board -->
+          <div class="flip-board-wrap">
+            <div class="flip-board-label">Popular today</div>
+            <div class="flip-row" id="flipRow"></div>
           </div>
-        </h1>
 
-        <!-- FLIP FADE TEXT (Vengeance UI) -->
-        <div class="fft-row" id="fftRow">
-          <span class="fft-tag">Trending now</span>
-          <div class="fft-divider"></div>
-          <div class="fft-display" id="fftDisplay"></div>
+          <p class="hero-sub">
+            Rate NUST's Concordia cafes. Honest reviews by real students —
+            dish by dish, one star at a time.
+          </p>
+          <div class="hero-actions">
+            <button onclick="goToLogin()" class="btn-primary">
+              <i data-lucide="log-in"></i>
+              Get Started
+            </button>
+            <a href="#how-it-works" class="btn-ghost">
+              <i data-lucide="info"></i>
+              How it Works
+            </a>
+          </div>
         </div>
 
-        <p class="hero-sub" id="heroSub">
-          Rate NUST's Concordia cafes. Honest reviews by real students —
-          dish by dish, one star at a time.
-        </p>
-        <div class="hero-actions" id="heroActions">
-          <button onclick="goToLogin()" class="btn-primary">
-            <i data-lucide="log-in"></i>
-            Get Started
-          </button>
-          <a href="#how-it-works" class="btn-ghost">
-            <i data-lucide="info"></i>
-            How it Works
-          </a>
-        </div>
       </div>
+    </div>
+    <!-- Globe — decorative, positioned outside the flow -->
+    <div class="hero-globe-wrap">
+      <canvas id="globeCanvas" style="width:380px;height:380px;cursor:grab;display:block;"></canvas>
     </div>
   </section>
 
 
   <!-- ══ MACBOOK SCROLL ══════════════════════════════════════ -->
-  <section id="macbook-scroll" style="padding: 60px 0 0; overflow: hidden;">
+  <section id="macbook-scroll" style="padding: 60px 0 0; overflow: hidden; background: var(--surface);">
     <div class="container" style="text-align:center;">
-      <span class="label" data-aos="fade-up">Live Preview</span>
-      <h2 class="section-title" data-aos="fade-up" data-aos-delay="60" style="margin-bottom:8px;">
-        Your campus cafe, <span style="color:var(--accent)">at a glance.</span>
+      <span class="label">Live Preview</span>
+      <h2 class="section-title" style="margin-bottom:8px;">
+        Your campus cafe, at a glance.
       </h2>
-      <p class="section-desc" data-aos="fade-up" data-aos-delay="120" style="max-width:480px;margin:0 auto 48px;">
+      <p class="section-desc" style="max-width:480px;margin:0 auto 48px;">
         Real reviews, live crowd levels, full menus — all in one place.
       </p>
     </div>
@@ -1023,173 +808,141 @@
 
         <!-- ── Lid (screen) ── -->
         <div style="
-          background: linear-gradient(145deg,#1a2535 0%,#0d1825 100%);
+          background: linear-gradient(145deg,#d8d8dc 0%,#c8c8cc 100%);
           border-radius: 14px 14px 0 0;
-          border: 2px solid rgba(34,197,94,0.18);
+          border: 1px solid rgba(0,0,0,0.14);
           border-bottom: none;
           padding: 14px 14px 0;
-          box-shadow: 0 -4px 40px rgba(34,197,94,0.08), inset 0 1px 0 rgba(255,255,255,0.06);
           position:relative;
         ">
           <!-- Camera notch -->
-          <div style="width:8px;height:8px;border-radius:50%;background:#0a1520;border:1px solid rgba(34,197,94,0.2);margin:0 auto 10px;"></div>
+          <div style="width:8px;height:8px;border-radius:50%;background:#a0a0a8;margin:0 auto 10px;"></div>
 
           <!-- Screen bezel -->
           <div style="
-            background:#030C14;
+            background:#ffffff;
             border-radius: 8px 8px 0 0;
             overflow: hidden;
             aspect-ratio:16/9.6;
-            border: 1px solid rgba(34,197,94,0.12);
+            border: 1px solid rgba(0,0,0,0.08);
             position: relative;
           ">
-            <!-- HUD grid overlay -->
-            <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(34,197,94,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(34,197,94,0.03) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;z-index:0;"></div>
 
             <!-- Fake navbar -->
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:rgba(7,24,37,0.95);border-bottom:1px solid rgba(34,197,94,0.10);position:relative;z-index:1;">
-              <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:0.75rem;color:#C8E8F5;">Concordia <span style="color:#22C55E;">Eats</span></span>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:#f5f5f7;border-bottom:1px solid rgba(0,0,0,0.08);position:relative;z-index:1;">
+              <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:0.75rem;color:#1d1d1f;">Concordia Eats</span>
               <div style="display:flex;gap:14px;">
-                <span style="font-size:0.58rem;color:rgba(200,232,245,0.46);">Dashboard</span>
-                <span style="font-size:0.58rem;color:rgba(200,232,245,0.46);">Search</span>
-                <span style="font-size:0.58rem;color:rgba(200,232,245,0.46);">Leaderboard</span>
+                <span style="font-size:0.58rem;color:rgba(29,29,31,0.4);">Dashboard</span>
+                <span style="font-size:0.58rem;color:rgba(29,29,31,0.4);">Search</span>
+                <span style="font-size:0.58rem;color:rgba(29,29,31,0.4);">Leaderboard</span>
               </div>
-              <div style="background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);border-radius:3px;padding:2px 8px;font-size:0.55rem;color:#22C55E;font-weight:700;">arafe.seecs</div>
+              <div style="background:rgba(0,0,0,0.06);border:1px solid rgba(0,0,0,0.1);border-radius:6px;padding:2px 8px;font-size:0.55rem;color:#1d1d1f;font-weight:700;">arafe.seecs</div>
             </div>
 
             <!-- Fake content area -->
-            <div style="padding:12px 16px;position:relative;z-index:1;">
+            <div style="padding:12px 16px;position:relative;z-index:1;background:#ffffff;">
               <!-- Hero text mock -->
               <div style="margin-bottom:14px;">
-                <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:#C8E8F5;line-height:1.2;">Rate NUST's <span style="color:#22C55E;">Concordia</span> Cafes</div>
-                <div style="font-size:0.6rem;color:rgba(200,232,245,0.46);margin-top:4px;">Honest reviews by real students — dish by dish, one star at a time.</div>
+                <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:#1d1d1f;line-height:1.2;">Rate NUST's Concordia Cafes</div>
+                <div style="font-size:0.6rem;color:rgba(29,29,31,0.46);margin-top:4px;">Honest reviews by real students — dish by dish, one star at a time.</div>
               </div>
 
               <!-- Cafe cards row -->
               <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
 
                 <!-- C1 -->
-                <div style="background:rgba(7,24,37,0.9);border:1px solid rgba(34,197,94,0.14);border-radius:5px;padding:10px;">
+                <div style="background:#f5f5f7;border:1px solid rgba(0,0,0,0.08);border-radius:8px;padding:10px;">
                   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                    <span style="font-size:0.65rem;font-weight:700;color:#C8E8F5;">Concordia 1</span>
-                    <span style="font-size:0.6rem;color:#22C55E;font-weight:700;">★ 4.2</span>
+                    <span style="font-size:0.65rem;font-weight:700;color:#1d1d1f;">Concordia 1</span>
+                    <span style="font-size:0.6rem;color:#f59e0b;font-weight:700;">★ 4.2</span>
                   </div>
-                  <div style="font-size:0.52rem;color:rgba(200,232,245,0.46);margin-bottom:6px;">Near NBS Ground</div>
+                  <div style="font-size:0.52rem;color:rgba(29,29,31,0.46);margin-bottom:6px;">Near NBS Ground</div>
                   <div style="display:flex;align-items:center;gap:4px;">
-                    <span style="width:6px;height:6px;border-radius:50%;background:#00E87A;display:inline-block;"></span>
-                    <span style="font-size:0.5rem;color:#00E87A;">Quiet now</span>
+                    <span style="width:6px;height:6px;border-radius:50%;background:#1a7f4b;display:inline-block;"></span>
+                    <span style="font-size:0.5rem;color:#1a7f4b;">Quiet now</span>
                   </div>
-                  <div style="margin-top:7px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:3px;padding:4px 8px;font-size:0.52rem;font-weight:700;color:#22C55E;text-align:center;">View Reviews</div>
+                  <div style="margin-top:7px;background:#1d1d1f;border-radius:4px;padding:4px 8px;font-size:0.52rem;font-weight:700;color:#ffffff;text-align:center;">View Reviews</div>
                 </div>
 
                 <!-- C2 -->
-                <div style="background:rgba(7,24,37,0.9);border:1px solid rgba(34,197,94,0.22);border-radius:5px;padding:10px;box-shadow:0 0 14px rgba(34,197,94,0.06);">
+                <div style="background:#f5f5f7;border:1px solid rgba(0,0,0,0.12);border-radius:8px;padding:10px;">
                   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                    <span style="font-size:0.65rem;font-weight:700;color:#C8E8F5;">Concordia 2</span>
-                    <span style="font-size:0.6rem;color:#22C55E;font-weight:700;">★ 4.5</span>
+                    <span style="font-size:0.65rem;font-weight:700;color:#1d1d1f;">Concordia 2</span>
+                    <span style="font-size:0.6rem;color:#f59e0b;font-weight:700;">★ 4.5</span>
                   </div>
-                  <div style="font-size:0.52rem;color:rgba(200,232,245,0.46);margin-bottom:6px;">Near SEECS</div>
+                  <div style="font-size:0.52rem;color:rgba(29,29,31,0.46);margin-bottom:6px;">Near SEECS</div>
                   <div style="display:flex;align-items:center;gap:4px;">
-                    <span style="width:6px;height:6px;border-radius:50%;background:#FF4466;display:inline-block;"></span>
-                    <span style="font-size:0.5rem;color:#FF4466;">Busy now</span>
+                    <span style="width:6px;height:6px;border-radius:50%;background:#cc2233;display:inline-block;"></span>
+                    <span style="font-size:0.5rem;color:#cc2233;">Busy now</span>
                   </div>
-                  <div style="margin-top:7px;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);border-radius:3px;padding:4px 8px;font-size:0.52rem;font-weight:700;color:#22C55E;text-align:center;">View Reviews</div>
+                  <div style="margin-top:7px;background:#1d1d1f;border-radius:4px;padding:4px 8px;font-size:0.52rem;font-weight:700;color:#ffffff;text-align:center;">View Reviews</div>
                 </div>
 
                 <!-- C3 -->
-                <div style="background:rgba(7,24,37,0.9);border:1px solid rgba(34,197,94,0.14);border-radius:5px;padding:10px;">
+                <div style="background:#f5f5f7;border:1px solid rgba(0,0,0,0.08);border-radius:8px;padding:10px;">
                   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                    <span style="font-size:0.65rem;font-weight:700;color:#C8E8F5;">Concordia 3</span>
-                    <span style="font-size:0.6rem;color:#22C55E;font-weight:700;">★ 3.9</span>
+                    <span style="font-size:0.65rem;font-weight:700;color:#1d1d1f;">Concordia 3</span>
+                    <span style="font-size:0.6rem;color:#f59e0b;font-weight:700;">★ 3.9</span>
                   </div>
-                  <div style="font-size:0.52rem;color:rgba(200,232,245,0.46);margin-bottom:6px;">Main Office</div>
+                  <div style="font-size:0.52rem;color:rgba(29,29,31,0.46);margin-bottom:6px;">Main Office</div>
                   <div style="display:flex;align-items:center;gap:4px;">
-                    <span style="width:6px;height:6px;border-radius:50%;background:#FFB800;display:inline-block;"></span>
-                    <span style="font-size:0.5rem;color:#FFB800;">Moderate</span>
+                    <span style="width:6px;height:6px;border-radius:50%;background:#b45309;display:inline-block;"></span>
+                    <span style="font-size:0.5rem;color:#b45309;">Moderate</span>
                   </div>
-                  <div style="margin-top:7px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:3px;padding:4px 8px;font-size:0.52rem;font-weight:700;color:#22C55E;text-align:center;">View Reviews</div>
+                  <div style="margin-top:7px;background:#1d1d1f;border-radius:4px;padding:4px 8px;font-size:0.52rem;font-weight:700;color:#ffffff;text-align:center;">View Reviews</div>
                 </div>
 
               </div>
 
               <!-- Bottom stat bar -->
-              <div style="display:flex;gap:16px;padding-top:8px;border-top:1px solid rgba(34,197,94,0.08);">
-                <div style="font-size:0.55rem;color:rgba(200,232,245,0.46);">☕ <span style="color:#22C55E;font-weight:700;">216</span> C1 items</div>
-                <div style="font-size:0.55rem;color:rgba(200,232,245,0.46);">⚡ <span style="color:#22C55E;font-weight:700;">112</span> C2 items</div>
-                <div style="font-size:0.55rem;color:rgba(200,232,245,0.46);">🏛️ <span style="color:#22C55E;font-weight:700;">129</span> C3 items</div>
-                <div style="margin-left:auto;font-size:0.55rem;color:rgba(200,232,245,0.46);"><span style="color:#22C55E;font-weight:700;">57</span> price comparisons</div>
+              <div style="display:flex;gap:16px;padding-top:8px;border-top:1px solid rgba(0,0,0,0.06);">
+                <div style="font-size:0.55rem;color:rgba(29,29,31,0.46);">☕ <span style="color:#1d1d1f;font-weight:700;">216</span> C1 items</div>
+                <div style="font-size:0.55rem;color:rgba(29,29,31,0.46);">⚡ <span style="color:#1d1d1f;font-weight:700;">112</span> C2 items</div>
+                <div style="font-size:0.55rem;color:rgba(29,29,31,0.46);">🏛️ <span style="color:#1d1d1f;font-weight:700;">129</span> C3 items</div>
+                <div style="margin-left:auto;font-size:0.55rem;color:rgba(29,29,31,0.46);"><span style="color:#1d1d1f;font-weight:700;">57</span> price comparisons</div>
               </div>
             </div>
-
-            <!-- Screen glow effect -->
-            <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 30%, rgba(34,197,94,0.04) 0%, transparent 70%);pointer-events:none;"></div>
           </div>
         </div>
 
         <!-- ── Base / keyboard ── -->
         <div style="
-          background: linear-gradient(180deg,#1c2d3f 0%,#111d2a 50%,#0d1825 100%);
+          background: linear-gradient(180deg,#c8c8cc 0%,#b8b8bc 100%);
           border-radius: 0 0 6px 6px;
-          border: 2px solid rgba(34,197,94,0.14);
-          border-top: 1px solid rgba(34,197,94,0.08);
+          border: 1px solid rgba(0,0,0,0.12);
+          border-top: 1px solid rgba(0,0,0,0.06);
           height: 28px;
           position: relative;
-          box-shadow: 0 12px 60px rgba(0,0,0,0.6), 0 4px 20px rgba(34,197,94,0.06);
+          box-shadow: 0 8px 32px rgba(0,0,0,0.15);
         ">
           <!-- Touchpad -->
-          <div style="width:120px;height:14px;border-radius:3px;border:1px solid rgba(34,197,94,0.12);background:rgba(0,0,0,0.3);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+          <div style="width:120px;height:14px;border-radius:3px;border:1px solid rgba(0,0,0,0.1);background:rgba(0,0,0,0.06);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
         </div>
-
-        <!-- ── Table reflection ── -->
-        <div style="
-          height:30px;
-          background:linear-gradient(180deg, rgba(34,197,94,0.04) 0%, transparent 100%);
-          border-radius:0 0 50% 50% / 0 0 20px 20px;
-          margin-top:1px;
-          filter:blur(4px);
-          transform:scaleY(0.6);
-          transform-origin:top;
-        "></div>
 
       </div><!-- /mbBook -->
     </div><!-- /mbWrap -->
   </section>
 
   <script>
-    // MacBook scroll animation using GSAP ScrollTrigger
-    (function() {
-      function initMacbook() {
-        if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
-        gsap.registerPlugin(ScrollTrigger);
-        gsap.to('#mbBook', {
-          rotateX: 0,
-          scale: 1,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: '#macbook-scroll',
-            start: 'top 80%',
-            end: 'bottom 60%',
-            scrub: 1.2,
-          }
-        });
-      }
-      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initMacbook);
-      else initMacbook();
-    })();
+    // MacBook starts flat — no scroll animation needed
+    document.addEventListener('DOMContentLoaded', function() {
+      var mb = document.getElementById('mbBook');
+      if (mb) mb.style.transform = 'rotateX(16deg) scale(0.92)';
+    });
   </script>
 
   <!-- ══ 3D FOOD MARQUEE ════════════════════════════════════ -->
-  <section id="marquee-showcase" style="padding:0;overflow:hidden;height:580px;position:relative;background:var(--bg);">
+  <section id="marquee-showcase" style="padding:0;overflow:hidden;height:580px;position:relative;background:var(--surface);">
     <!-- edge fades -->
-    <div style="position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(to bottom,var(--bg) 0%,transparent 22%,transparent 72%,var(--bg) 100%);"></div>
-    <div style="position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(to right,var(--bg) 0%,transparent 10%,transparent 90%,var(--bg) 100%);"></div>
+    <div style="position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(to bottom,var(--surface) 0%,transparent 22%,transparent 72%,var(--surface) 100%);"></div>
+    <div style="position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(to right,var(--surface) 0%,transparent 10%,transparent 90%,var(--surface) 100%);"></div>
     <!-- heading -->
     <div style="position:absolute;bottom:60px;left:0;right:0;z-index:5;text-align:center;">
       <span class="label">457 Dishes Across 3 Cafes</span>
       <h2 style="font-family:'Syne',sans-serif;font-size:clamp(1.7rem,4vw,2.9rem);font-weight:800;color:var(--text-primary);letter-spacing:-0.04em;margin-top:10px;line-height:1.18;">
-        Every dish. Every cafe.<br><span style="color:var(--accent);">Find your favourite.</span>
+        Every dish. Every cafe.<br>Find your favourite.
       </h2>
-      <a href="search.html" style="display:inline-flex;align-items:center;gap:8px;margin-top:18px;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.4);color:var(--accent);border-radius:100px;padding:10px 24px;font-size:0.85rem;font-weight:700;letter-spacing:0.03em;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(34,197,94,0.22)'" onmouseout="this.style.background='rgba(34,197,94,0.12)'">Search All Items →</a>
+      <a href="search.html" style="display:inline-flex;align-items:center;gap:8px;margin-top:18px;background:var(--accent);color:var(--bg);border-radius:100px;padding:10px 24px;font-size:0.85rem;font-weight:600;text-decoration:none;transition:background 0.2s;">Search All Items →</a>
     </div>
     <!-- 3D wrapper -->
     <div id="mqWrap3d" style="position:absolute;top:-25%;left:-45%;right:-45%;bottom:-25%;transform:rotateX(22deg) rotateZ(-10deg);transform-style:preserve-3d;display:flex;flex-direction:column;gap:14px;overflow:hidden;"></div>
@@ -1239,46 +992,38 @@
   </script>
 
   <!-- ══ CAMPUS MAP ══════════════════════════════════════════ -->
-  <section id="campus-map" style="padding:80px 0;">
+  <section id="campus-map" style="padding:80px 0; background: var(--bg);">
     <div class="container" style="text-align:center;margin-bottom:48px;">
-      <span class="label" data-aos="fade-up">NUST · H-12 Islamabad</span>
-      <h2 class="section-title" data-aos="fade-up" data-aos-delay="60">
-        Three cafes. One <span style="color:var(--accent)">campus.</span>
+      <span class="label">NUST · H-12 Islamabad</span>
+      <h2 class="section-title">
+        Three cafes. One campus.
       </h2>
-      <p class="section-desc" data-aos="fade-up" data-aos-delay="120" style="max-width:460px;margin:0 auto;">
+      <p class="section-desc" style="max-width:460px;margin:0 auto;">
         All three Concordia cafes are on NUST's main campus. Tap a pin to see its crowd level and rating.
       </p>
     </div>
 
     <!-- Map container -->
-    <div style="position:relative;max-width:960px;margin:0 auto;padding:0 24px;" data-aos="fade-up" data-aos-delay="180">
+    <div style="position:relative;max-width:960px;margin:0 auto;padding:0 24px;">
       <div id="campusMapWrap" style="
         position:relative; border-radius:12px; overflow:hidden;
-        border:1.5px solid rgba(34,197,94,0.18);
-        box-shadow:0 0 60px rgba(34,197,94,0.08), 0 24px 60px rgba(0,0,0,0.5);
-        background:#030C14;
+        border:1px solid rgba(0,0,0,0.10);
+        box-shadow:0 8px 32px rgba(0,0,0,0.08);
+        background:#f5f5f7;
         aspect-ratio:16/9;
       ">
-        <!-- HUD grid overlay -->
-        <div style="position:absolute;inset:0;z-index:1;pointer-events:none;
-          background-image:linear-gradient(rgba(34,197,94,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(34,197,94,0.04) 1px,transparent 1px);
-          background-size:40px 40px;"></div>
-
-        <!-- Scanline overlay -->
-        <div style="position:absolute;inset:0;z-index:1;pointer-events:none;
-          background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(34,197,94,0.012) 3px,rgba(34,197,94,0.012) 4px);"></div>
 
         <!-- ── MAP BACKGROUND IMAGE ── -->
         <!-- Replace the src below with your NUST map image -->
         <img id="campusBg" src="images/nust-map.png" alt="NUST Campus Map"
-          style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;background:#030B04;opacity:0;filter:saturate(0) brightness(0.28) sepia(1) hue-rotate(250deg);transition:opacity 1s ease;"
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;background:#f5f5f7;opacity:0;transition:opacity 1s ease;"
           onerror="this.style.display='none'" onload="this.style.opacity='1'" />
 
         <!-- Placeholder grid campus sketch (shown when no image) -->
         <svg id="campusSvg" viewBox="0 0 960 540" style="position:absolute;inset:0;width:100%;height:100%;z-index:2;" preserveAspectRatio="xMidYMid meet">
 
           <!-- Road network -->
-          <g stroke="rgba(34,197,94,0.12)" stroke-width="1.5" fill="none">
+          <g stroke="rgba(29,29,31,0.12)" stroke-width="1.5" fill="none">
             <!-- Main horizontal road -->
             <line x1="80" y1="270" x2="880" y2="270"/>
             <!-- Vertical roads -->
@@ -1290,7 +1035,7 @@
           </g>
 
           <!-- Building blocks -->
-          <g fill="rgba(34,197,94,0.04)" stroke="rgba(34,197,94,0.10)" stroke-width="1">
+          <g fill="rgba(29,29,31,0.04)" stroke="rgba(29,29,31,0.10)" stroke-width="1">
             <!-- NBS area (C1) -->
             <rect x="140" y="300" width="80" height="55" rx="3"/>
             <rect x="140" y="240" width="55" height="45" rx="3"/>
@@ -1309,15 +1054,15 @@
 
           <!-- ── Animated arcs between cafes (real map coords) ── -->
           <!-- C1 (463,151) → C2 (329,243) -->
-          <path id="arc12" d="M 463 151 Q 396 140 329 243" fill="none" stroke="rgba(34,197,94,0.4)" stroke-width="1.5" stroke-dasharray="6 5">
+          <path id="arc12" d="M 463 151 Q 396 140 329 243" fill="none" stroke="rgba(29,29,31,0.22)" stroke-width="1.5" stroke-dasharray="6 5">
             <animate attributeName="stroke-dashoffset" from="0" to="-88" dur="2.4s" repeatCount="indefinite"/>
           </path>
           <!-- C2 (329,243) → C3 (475,356) -->
-          <path id="arc23" d="M 329 243 Q 400 295 475 356" fill="none" stroke="rgba(34,197,94,0.4)" stroke-width="1.5" stroke-dasharray="6 5">
+          <path id="arc23" d="M 329 243 Q 400 295 475 356" fill="none" stroke="rgba(29,29,31,0.22)" stroke-width="1.5" stroke-dasharray="6 5">
             <animate attributeName="stroke-dashoffset" from="0" to="-88" dur="1.8s" repeatCount="indefinite"/>
           </path>
           <!-- C3 (475,356) → C1 (463,151) -->
-          <path id="arc31" d="M 475 356 Q 469 253 463 151" fill="none" stroke="rgba(34,197,94,0.4)" stroke-width="1.5" stroke-dasharray="6 5">
+          <path id="arc31" d="M 475 356 Q 469 253 463 151" fill="none" stroke="rgba(29,29,31,0.22)" stroke-width="1.5" stroke-dasharray="6 5">
             <animate attributeName="stroke-dashoffset" from="0" to="-88" dur="2.1s" repeatCount="indefinite"/>
           </path>
 
@@ -1325,47 +1070,31 @@
 
           <!-- C1 — Concordia I (463,151) -->
           <g id="pin1" style="cursor:pointer;" onclick="selectCafe(1)" transform="translate(463,151)">
-            <circle r="28" fill="none" stroke="rgba(34,197,94,0.18)" stroke-width="1">
+            <circle r="28" fill="none" stroke="rgba(29,29,31,0.14)" stroke-width="1">
               <animate attributeName="r" values="20;36;20" dur="2.8s" repeatCount="indefinite"/>
               <animate attributeName="opacity" values="0.7;0;0.7" dur="2.8s" repeatCount="indefinite"/>
             </circle>
-            <circle r="18" fill="none" stroke="rgba(34,197,94,0.28)" stroke-width="1">
+            <circle r="18" fill="none" stroke="rgba(29,29,31,0.20)" stroke-width="1">
               <animate attributeName="r" values="13;22;13" dur="2.8s" begin="0.4s" repeatCount="indefinite"/>
               <animate attributeName="opacity" values="0.9;0;0.9" dur="2.8s" begin="0.4s" repeatCount="indefinite"/>
             </circle>
-            <circle r="10" fill="rgba(34,197,94,0.22)" stroke="#22C55E" stroke-width="1.5"/>
-            <circle r="4" fill="#22C55E"/>
-            <text x="0" y="26" text-anchor="middle" font-family="'Syne',sans-serif" font-size="9" font-weight="700" fill="#22C55E">C1</text>
+            <circle r="10" fill="rgba(29,29,31,0.12)" stroke="#1d1d1f" stroke-width="1.5"/>
+            <circle r="4" fill="#1d1d1f"/>
+            <text x="0" y="26" text-anchor="middle" font-family="'Syne',sans-serif" font-size="9" font-weight="700" fill="#1d1d1f">C1</text>
           </g>
 
           <!-- C2 — Concordia II (329,243) -->
           <g id="pin2" style="cursor:pointer;" onclick="selectCafe(2)" transform="translate(329,243)">
-            <circle r="28" fill="none" stroke="rgba(34,197,94,0.18)" stroke-width="1">
-              <animate attributeName="r" values="20;36;20" dur="3.2s" begin="0.6s" repeatCount="indefinite"/>
-              <animate attributeName="opacity" values="0.7;0;0.7" dur="3.2s" begin="0.6s" repeatCount="indefinite"/>
-            </circle>
-            <circle r="18" fill="none" stroke="rgba(34,197,94,0.28)" stroke-width="1">
-              <animate attributeName="r" values="13;22;13" dur="3.2s" begin="1s" repeatCount="indefinite"/>
-              <animate attributeName="opacity" values="0.9;0;0.9" dur="3.2s" begin="1s" repeatCount="indefinite"/>
-            </circle>
-            <circle r="10" fill="rgba(34,197,94,0.22)" stroke="#22C55E" stroke-width="1.5"/>
-            <circle r="4" fill="#22C55E"/>
-            <text x="0" y="26" text-anchor="middle" font-family="'Syne',sans-serif" font-size="9" font-weight="700" fill="#22C55E">C2</text>
+            <circle r="10" fill="rgba(29,29,31,0.12)" stroke="#1d1d1f" stroke-width="1.5"/>
+            <circle r="4" fill="#1d1d1f"/>
+            <text x="0" y="26" text-anchor="middle" font-family="'Syne',sans-serif" font-size="9" font-weight="700" fill="#1d1d1f">C2</text>
           </g>
 
           <!-- C3 — Concordia III (475,356) -->
           <g id="pin3" style="cursor:pointer;" onclick="selectCafe(3)" transform="translate(475,356)">
-            <circle r="28" fill="none" stroke="rgba(34,197,94,0.18)" stroke-width="1">
-              <animate attributeName="r" values="20;36;20" dur="2.5s" begin="1.2s" repeatCount="indefinite"/>
-              <animate attributeName="opacity" values="0.7;0;0.7" dur="2.5s" begin="1.2s" repeatCount="indefinite"/>
-            </circle>
-            <circle r="18" fill="none" stroke="rgba(34,197,94,0.28)" stroke-width="1">
-              <animate attributeName="r" values="13;22;13" dur="2.5s" begin="1.6s" repeatCount="indefinite"/>
-              <animate attributeName="opacity" values="0.9;0;0.9" dur="2.5s" begin="1.6s" repeatCount="indefinite"/>
-            </circle>
-            <circle r="10" fill="rgba(34,197,94,0.22)" stroke="#22C55E" stroke-width="1.5"/>
-            <circle r="4" fill="#22C55E"/>
-            <text x="0" y="26" text-anchor="middle" font-family="'Syne',sans-serif" font-size="9" font-weight="700" fill="#22C55E">C3</text>
+            <circle r="10" fill="rgba(29,29,31,0.12)" stroke="#1d1d1f" stroke-width="1.5"/>
+            <circle r="4" fill="#1d1d1f"/>
+            <text x="0" y="26" text-anchor="middle" font-family="'Syne',sans-serif" font-size="9" font-weight="700" fill="#1d1d1f">C3</text>
           </g>
 
         </svg><!-- /campusSvg -->
@@ -1373,57 +1102,51 @@
         <!-- ── Cafe info card (floats on map) ── -->
         <div id="cafeMapCard" style="
           position:absolute; bottom:18px; left:50%; transform:translateX(-50%);
-          background:rgba(7,24,37,0.96); backdrop-filter:blur(12px);
-          border:1.5px solid rgba(34,197,94,0.28); border-radius:10px;
+          background:#ffffff;
+          border:1px solid rgba(0,0,0,0.12); border-radius:10px;
           padding:14px 20px; min-width:280px; max-width:340px;
-          box-shadow:0 8px 32px rgba(0,0,0,0.5), 0 0 20px rgba(34,197,94,0.08);
-          z-index:10; transition:opacity 0.3s, transform 0.3s;
+          box-shadow:0 8px 24px rgba(0,0,0,0.12);
+          z-index:10;
           display:none;
         ">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;">
             <div>
-              <div id="cardName" style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:#C8E8F5;"></div>
-              <div id="cardLoc"  style="font-size:0.75rem;color:rgba(200,232,245,0.5);margin-top:2px;"></div>
+              <div id="cardName" style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:#1d1d1f;"></div>
+              <div id="cardLoc"  style="font-size:0.75rem;color:rgba(29,29,31,0.5);margin-top:2px;"></div>
             </div>
             <div style="text-align:right;">
-              <div id="cardRating" style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:#22C55E;"></div>
+              <div id="cardRating" style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:#f59e0b;"></div>
               <div id="cardCrowd"  style="margin-top:4px;"></div>
             </div>
           </div>
-          <div id="cardDesc" style="font-size:0.78rem;color:rgba(200,232,245,0.5);margin:10px 0;line-height:1.6;"></div>
+          <div id="cardDesc" style="font-size:0.78rem;color:rgba(29,29,31,0.55);margin:10px 0;line-height:1.6;"></div>
           <div style="display:flex;gap:8px;">
             <button onclick="window.location.href='cafe.html?id='+_selCafe"
-              style="flex:1;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);border-radius:5px;padding:7px;font-size:0.75rem;font-weight:700;color:#22C55E;cursor:pointer;">
+              style="flex:1;background:#1d1d1f;border:none;border-radius:6px;padding:7px;font-size:0.75rem;font-weight:700;color:#ffffff;cursor:pointer;">
               View Menu &amp; Reviews
             </button>
             <button onclick="document.getElementById('cafeMapCard').style.display='none'"
-              style="background:transparent;border:1px solid var(--border);border-radius:5px;padding:7px 10px;font-size:0.75rem;color:rgba(200,232,245,0.4);cursor:pointer;">✕</button>
+              style="background:transparent;border:1px solid rgba(0,0,0,0.12);border-radius:6px;padding:7px 10px;font-size:0.75rem;color:rgba(29,29,31,0.5);cursor:pointer;">✕</button>
           </div>
         </div>
 
-        <!-- Corner HUD brackets -->
-        <div style="position:absolute;top:10px;left:10px;width:22px;height:22px;border-top:2px solid rgba(34,197,94,0.4);border-left:2px solid rgba(34,197,94,0.4);z-index:3;pointer-events:none;"></div>
-        <div style="position:absolute;top:10px;right:10px;width:22px;height:22px;border-top:2px solid rgba(34,197,94,0.4);border-right:2px solid rgba(34,197,94,0.4);z-index:3;pointer-events:none;"></div>
-        <div style="position:absolute;bottom:10px;left:10px;width:22px;height:22px;border-bottom:2px solid rgba(34,197,94,0.4);border-left:2px solid rgba(34,197,94,0.4);z-index:3;pointer-events:none;"></div>
-        <div style="position:absolute;bottom:10px;right:10px;width:22px;height:22px;border-bottom:2px solid rgba(34,197,94,0.4);border-right:2px solid rgba(34,197,94,0.4);z-index:3;pointer-events:none;"></div>
-
-        <!-- HUD label -->
-        <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:3;font-family:'Syne',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:0.16em;color:rgba(34,197,94,0.5);text-transform:uppercase;pointer-events:none;">NUST · H-12 · Concordia Campus</div>
+        <!-- Map label -->
+        <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:3;font-family:'Syne',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:0.12em;color:rgba(29,29,31,0.4);text-transform:uppercase;pointer-events:none;">NUST · H-12 · Concordia Campus</div>
 
       </div><!-- /campusMapWrap -->
 
       <!-- Legend below map -->
       <div style="display:flex;justify-content:center;gap:28px;margin-top:20px;flex-wrap:wrap;">
-        <div onclick="selectCafe(1)" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 14px;border:1px solid var(--border);border-radius:20px;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(34,197,94,0.4)'" onmouseout="this.style.borderColor='var(--border)'">
-          <span style="width:8px;height:8px;border-radius:50%;background:#22C55E;box-shadow:0 0 8px rgba(34,197,94,0.8);"></span>
+        <div onclick="selectCafe(1)" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 14px;border:1px solid var(--border);border-radius:20px;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(0,0,0,0.3)'" onmouseout="this.style.borderColor='rgba(0,0,0,0.1)'">
+          <span style="width:8px;height:8px;border-radius:50%;background:#1d1d1f;display:inline-block;"></span>
           <span style="font-size:0.8rem;font-weight:600;color:var(--text-muted);">C1 · Near NBS Ground</span>
         </div>
-        <div onclick="selectCafe(2)" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 14px;border:1px solid var(--border);border-radius:20px;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(34,197,94,0.4)'" onmouseout="this.style.borderColor='var(--border)'">
-          <span style="width:8px;height:8px;border-radius:50%;background:#22C55E;box-shadow:0 0 8px rgba(34,197,94,0.8);"></span>
+        <div onclick="selectCafe(2)" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 14px;border:1px solid var(--border);border-radius:20px;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(0,0,0,0.3)'" onmouseout="this.style.borderColor='rgba(0,0,0,0.1)'">
+          <span style="width:8px;height:8px;border-radius:50%;background:#1d1d1f;display:inline-block;"></span>
           <span style="font-size:0.8rem;font-weight:600;color:var(--text-muted);">C2 · Near SEECS</span>
         </div>
-        <div onclick="selectCafe(3)" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 14px;border:1px solid var(--border);border-radius:20px;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(34,197,94,0.4)'" onmouseout="this.style.borderColor='var(--border)'">
-          <span style="width:8px;height:8px;border-radius:50%;background:#22C55E;box-shadow:0 0 8px rgba(34,197,94,0.8);"></span>
+        <div onclick="selectCafe(3)" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 14px;border:1px solid var(--border);border-radius:20px;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(0,0,0,0.3)'" onmouseout="this.style.borderColor='rgba(0,0,0,0.1)'">
+          <span style="width:8px;height:8px;border-radius:50%;background:#1d1d1f;display:inline-block;"></span>
           <span style="font-size:0.8rem;font-weight:600;color:var(--text-muted);">C3 · Main Office</span>
         </div>
       </div>
@@ -1462,7 +1185,7 @@
         var pin = document.getElementById('pin'+i);
         if (!pin) return;
         pin.querySelectorAll('circle[r="10"]').forEach(function(c) {
-          c.setAttribute('fill', i===id ? 'rgba(34,197,94,0.35)' : 'rgba(34,197,94,0.18)');
+          c.setAttribute('fill', i===id ? 'rgba(29,29,31,0.30)' : 'rgba(29,29,31,0.12)');
         });
       });
 
@@ -1476,7 +1199,7 @@
     <div class="container">
       <div class="about-grid">
 
-        <div class="about-text" data-aos="fade-right" data-aos-duration="750">
+        <div class="about-text">
           <span class="label">About the App</span>
           <h2 class="section-title">Built for real NUST students.</h2>
           <p class="section-desc">
@@ -1499,7 +1222,7 @@
           </div>
         </div>
 
-        <div class="stats-grid" data-aos="fade-left" data-aos-duration="750" data-aos-delay="100">
+        <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-number" id="stat1">3</div>
             <div class="stat-label">Concordia Cafes on campus</div>
@@ -1524,21 +1247,9 @@
 
 
   <!-- ══ CAFES ════════════════════════════════════════════════ -->
-  <section id="cafes">
-    <!-- Aceternity UI Lamp Section Header -->
-    <div style="display:flex;justify-content:center;align-items:flex-end;height:120px;overflow:hidden;pointer-events:none;margin-bottom:-32px">
-      <div style="position:relative;height:1px;width:0%;max-width:560px;flex-shrink:0;
-        background:linear-gradient(to right,transparent 0%,rgba(34,197,94,0) 5%,rgba(34,197,94,0.9) 35%,rgba(180,240,255,1) 50%,rgba(34,197,94,0.9) 65%,rgba(34,197,94,0) 95%,transparent 100%);
-        animation:lamp-width 1.1s cubic-bezier(0.4,0,0.2,1) 0.1s forwards;
-        box-shadow:0 0 18px 4px rgba(34,197,94,0.5),0 0 48px 10px rgba(34,197,94,0.18);">
-        <div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%) scaleX(0.4);width:520px;height:240px;
-          background:radial-gradient(ellipse 55% 100% at 50% 0%,rgba(34,197,94,0.25) 0%,rgba(34,197,94,0.08) 40%,transparent 72%);
-          animation:lamp-glow 1.2s cubic-bezier(0.4,0,0.2,1) 0.2s forwards;opacity:0;pointer-events:none"></div>
-      </div>
-    </div>
-
+  <section id="cafes" style="background: var(--surface);">
     <div class="container">
-      <div data-aos="fade-up">
+      <div>
         <span class="label">On Campus</span>
         <h2 class="section-title">The Three Concordia Cafes</h2>
         <p class="section-desc">
@@ -1549,12 +1260,12 @@
         <div style="position:relative;max-width:420px;margin-top:20px;">
           <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text-muted);pointer-events:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input id="heroSearch" type="text" placeholder="Search biryani, zinger, chai…"
-            style="width:100%;padding:12px 14px 12px 40px;background:var(--surface);border:1.5px solid var(--border-accent);border-radius:var(--radius-card);color:var(--text-primary);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;transition:var(--transition);"
-            onfocus="this.style.borderColor='var(--accent)'"
-            onblur="this.style.borderColor='var(--border-accent)'"
+            style="width:100%;padding:12px 14px 12px 40px;background:#ffffff;border:1.5px solid rgba(0,0,0,0.15);border-radius:var(--radius-card);color:var(--text-primary);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;transition:var(--transition);"
+            onfocus="this.style.borderColor='rgba(0,0,0,0.4)'"
+            onblur="this.style.borderColor='rgba(0,0,0,0.15)'"
             onkeydown="if(event.key==='Enter'&&this.value.trim())window.location.href='search.html?q='+encodeURIComponent(this.value.trim())" />
           <button onclick="var v=document.getElementById('heroSearch').value.trim();if(v)window.location.href='search.html?q='+encodeURIComponent(v);"
-            style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--accent);border:none;color:#030C14;font-weight:700;font-size:0.75rem;padding:5px 12px;border-radius:4px;cursor:pointer;letter-spacing:0.04em;">
+            style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:#1d1d1f;border:none;color:#ffffff;font-weight:700;font-size:0.75rem;padding:5px 12px;border-radius:6px;cursor:pointer;letter-spacing:0.04em;">
             SEARCH
           </button>
         </div>
@@ -1562,7 +1273,7 @@
 
       <div class="cafes-grid">
 
-        <div class="cafe-card" data-aos="fade-up" data-aos-delay="60" data-aos-duration="620">
+        <div class="cafe-card">
           <div class="cafe-inner">
             <div class="cafe-top">
               <span class="cafe-name">Concordia 1</span>
@@ -1579,14 +1290,14 @@
             <div class="cafe-footer">
               <span class="review-count"><i data-lucide="message-circle"></i>124 reviews</span>
               <div style="display:flex;gap:8px;align-items:center;">
-                <a href="cafe-detail.html?cafe=1" style="font-size:0.75rem;color:var(--accent);font-weight:600;opacity:0.8;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">Explore →</a>
+                <a href="cafe-detail.html?cafe=1" style="font-size:0.75rem;color:var(--text-muted);font-weight:600;transition:color 0.2s;" onmouseover="this.style.color='var(--text-primary)'" onmouseout="this.style.color='var(--text-muted)'">Explore →</a>
                 <button class="btn-view"><span>View Reviews</span></button>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="cafe-card" data-aos="fade-up" data-aos-delay="150" data-aos-duration="620">
+        <div class="cafe-card">
           <div class="cafe-inner">
             <div class="cafe-top">
               <span class="cafe-name">Concordia 2</span>
@@ -1602,14 +1313,14 @@
             <div class="cafe-footer">
               <span class="review-count"><i data-lucide="message-circle"></i>207 reviews</span>
               <div style="display:flex;gap:8px;align-items:center;">
-                <a href="cafe-detail.html?cafe=2" style="font-size:0.75rem;color:var(--accent);font-weight:600;opacity:0.8;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">Explore →</a>
+                <a href="cafe-detail.html?cafe=2" style="font-size:0.75rem;color:var(--text-muted);font-weight:600;transition:color 0.2s;" onmouseover="this.style.color='var(--text-primary)'" onmouseout="this.style.color='var(--text-muted)'">Explore →</a>
                 <button class="btn-view"><span>View Reviews</span></button>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="cafe-card" data-aos="fade-up" data-aos-delay="240" data-aos-duration="620">
+        <div class="cafe-card">
           <div class="cafe-inner">
             <div class="cafe-top">
               <span class="cafe-name">Concordia 3</span>
@@ -1626,7 +1337,7 @@
             <div class="cafe-footer">
               <span class="review-count"><i data-lucide="message-circle"></i>89 reviews</span>
               <div style="display:flex;gap:8px;align-items:center;">
-                <a href="cafe-detail.html?cafe=3" style="font-size:0.75rem;color:var(--accent);font-weight:600;opacity:0.8;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">Explore →</a>
+                <a href="cafe-detail.html?cafe=3" style="font-size:0.75rem;color:var(--text-muted);font-weight:600;transition:color 0.2s;" onmouseover="this.style.color='var(--text-primary)'" onmouseout="this.style.color='var(--text-muted)'">Explore →</a>
                 <button class="btn-view"><span>View Reviews</span></button>
               </div>
             </div>
@@ -1641,26 +1352,26 @@
   <!-- ══ HOW IT WORKS ════════════════════════════════════════ -->
   <section id="how-it-works">
     <div class="container">
-      <div class="how-header" data-aos="fade-up">
+      <div class="how-header">
         <span class="label">Simple Process</span>
         <h2 class="section-title">How it Works</h2>
         <p class="section-desc">Three steps and you're contributing to the most honest food review platform on NUST campus.</p>
       </div>
 
       <div class="steps-row">
-        <div class="step-card" data-aos="fade-up" data-aos-delay="90">
+        <div class="step-card">
           <div class="step-number">01</div>
           <div class="step-icon"><i data-lucide="log-in"></i></div>
           <div class="step-title">Login with NUST</div>
           <p class="step-desc">Use your NUST institutional email (<strong>@seecs.edu.pk</strong>, <strong>@nbs.nust.edu.pk</strong>, <strong>@smme.nust.edu.pk</strong>, <strong>@scme.nust.edu.pk</strong>, <strong>@s3h.nust.edu.pk</strong> &amp; others). No outsiders. Only verified NUST students get in.</p>
         </div>
-        <div class="step-card" data-aos="fade-up" data-aos-delay="190">
+        <div class="step-card">
           <div class="step-number">02</div>
           <div class="step-icon"><i data-lucide="store"></i></div>
           <div class="step-title">Pick a Concordia Cafe</div>
           <p class="step-desc">Browse all three Concordia cafes. See what others are saying, which dishes are trending, and who's winning the weekly leaderboard.</p>
         </div>
-        <div class="step-card" data-aos="fade-up" data-aos-delay="290">
+        <div class="step-card">
           <div class="step-number">03</div>
           <div class="step-icon"><i data-lucide="star"></i></div>
           <div class="step-title">Rate &amp; Review Anonymously</div>
@@ -1674,35 +1385,35 @@
   <!-- ══ FEATURES ════════════════════════════════════════════ -->
   <section id="features">
     <div class="container">
-      <div data-aos="fade-up">
+      <div>
         <span class="label">Platform Features</span>
         <h2 class="section-title">Everything you need.</h2>
         <p class="section-desc">Built to make campus food reviews actually useful — not just a star and a vague one-liner.</p>
       </div>
 
       <div class="features-grid">
-        <div class="feature-tile" data-aos="fade-up" data-aos-delay="80">
+        <div class="feature-tile">
           <div class="feature-icon">⭐</div>
           <div class="feature-body">
             <h4>Dish-Level Ratings</h4>
             <p>Don't just rate the cafe — rate the biryani, the chai, the paratha. Granular ratings mean you actually know what to order before you walk in.</p>
           </div>
         </div>
-        <div class="feature-tile" data-aos="fade-up" data-aos-delay="170">
+        <div class="feature-tile">
           <div class="feature-icon">💬</div>
           <div class="feature-body">
             <h4>Anonymous Comments</h4>
             <p>Say exactly what you think without worrying who's reading. All comments are <strong>100% anonymous</strong> — no names, no handles, no traces.</p>
           </div>
         </div>
-        <div class="feature-tile" data-aos="fade-up" data-aos-delay="80">
+        <div class="feature-tile">
           <div class="feature-icon">🏆</div>
           <div class="feature-body">
             <h4>Weekly Leaderboard</h4>
             <p>See which Concordia cafe is winning this week. Rankings reset every Monday based on fresh student ratings — no stale scores, no old glory.</p>
           </div>
         </div>
-        <div class="feature-tile" data-aos="fade-up" data-aos-delay="170">
+        <div class="feature-tile">
           <div class="feature-icon">🔒</div>
           <div class="feature-body">
             <h4>NUST-Only Access</h4>
@@ -1715,16 +1426,16 @@
 
 
   <!-- ══ REVIEWS MARQUEE ════════════════════════════════════ -->
-  <section id="reviews-marquee" style="padding:80px 0 60px;overflow:hidden;position:relative;background:var(--bg);">
+  <section id="reviews-marquee" style="padding:80px 0 60px;overflow:hidden;position:relative;background:var(--surface);">
     <div class="container" style="text-align:center;margin-bottom:48px;">
-      <span class="label" data-aos="fade-up">Anonymous · Verified NUST Students</span>
-      <h2 class="section-title" data-aos="fade-up" data-aos-delay="60">
-        Students love<br>the <span style="color:var(--accent)">food.</span>
+      <span class="label">Anonymous · Verified NUST Students</span>
+      <h2 class="section-title">
+        Students love the food.
       </h2>
     </div>
     <!-- left/right fades -->
-    <div style="position:absolute;top:0;bottom:0;left:0;width:120px;z-index:2;pointer-events:none;background:linear-gradient(to right,var(--bg),transparent);"></div>
-    <div style="position:absolute;top:0;bottom:0;right:0;width:120px;z-index:2;pointer-events:none;background:linear-gradient(to left,var(--bg),transparent);"></div>
+    <div style="position:absolute;top:0;bottom:0;left:0;width:120px;z-index:2;pointer-events:none;background:linear-gradient(to right,var(--surface),transparent);"></div>
+    <div style="position:absolute;top:0;bottom:0;right:0;width:120px;z-index:2;pointer-events:none;background:linear-gradient(to left,var(--surface),transparent);"></div>
     <!-- Row 1 → left -->
     <div style="overflow:hidden;margin-bottom:14px;">
       <div id="rvRow1" style="display:flex;gap:14px;width:max-content;animation:mq-rv-left 28s linear infinite;"></div>
@@ -1819,191 +1530,159 @@
   </footer>
 
 
-  <!-- AOS -->
-  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-
+  <!-- ══ FLIP BOARD ══════════════════════════════════════════ -->
   <script>
-    // ── Init icons & AOS ──────────────────────────────────────
-    lucide.createIcons();
-    AOS.init({ once: true, offset: 55, easing: 'ease-out-cubic' });
-    gsap.registerPlugin(ScrollTrigger);
+  (function () {
+    const WORDS = ['BIRYANI', 'ZINGER', 'COFFEE', 'PARATHA', 'SHAWARMA', 'HALEEM  '];
+    const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#$%&*?';
+    const MAX   = 8;
+    let wIdx    = 0;
+    const board = document.getElementById('flipRow');
+    if (!board) return;
 
-    // ── Floating particles ────────────────────────────────────
-    (() => {
-      const wrap = document.getElementById('particles');
-      for (let i = 0; i < 20; i++) {
-        const el = document.createElement('div');
-        el.className = 'particle';
-        const s = Math.random() * 4 + 1.5;
-        el.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;` +
-          `animation-duration:${Math.random()*22+14}s;` +
-          `animation-delay:${Math.random()*18}s;opacity:${Math.random()*0.35+0.08};`;
-        wrap.appendChild(el);
-      }
-    })();
+    for (let i = 0; i < MAX; i++) {
+      const t = document.createElement('div');
+      t.className = 'flip-tile';
+      t.innerHTML = '<span class="tc">&nbsp;</span>';
+      board.appendChild(t);
+    }
 
-    /* ════════════════════════════════════════════════════════
-       VENGEANCE UI — REVEAL LOADER
-    ═════════════════════════════════════════════════════════ */
-    document.body.style.overflow = 'hidden';
+    function animTile(tile, target, delay) {
+      const tc = tile.querySelector('.tc');
+      let step = 0;
+      setTimeout(function () {
+        const iv = setInterval(function () {
+          step++;
+          if (step >= 7) { clearInterval(iv); tc.textContent = target === ' ' ? ' ' : target; }
+          else tc.textContent = CHARS[Math.floor(Math.random() * CHARS.length)];
+        }, 40);
+      }, delay);
+    }
 
-    const rlTl = gsap.timeline({
-      onComplete() {
-        document.getElementById('reveal-loader').style.display = 'none';
-        document.body.style.overflow = '';
-        heroEntrance();
-        setTimeout(() => fftNext(), 300);
-      }
-    });
+    function showWord(word) {
+      const padded = word.padEnd(MAX, ' ').slice(0, MAX);
+      const tiles  = board.querySelectorAll('.flip-tile');
+      padded.split('').forEach(function (c, i) { animTile(tiles[i], c, i * 60); });
+    }
 
-    rlTl
-      // Letters stagger up from behind the shutter panels
-      .to('.rl-letter', {
-        y: 0, duration: 0.75, stagger: 0.048, ease: 'power3.out', delay: 0.2
-      })
-      // Bar draws in
-      .to('#rlBar', { width: 56, duration: 0.55, ease: 'power2.out' }, '-=0.15')
-      // Tagline fades in
-      .to('#rlTagline', { opacity: 1, duration: 0.5, ease: 'power2.out' }, '-=0.35')
-      // Hold so user can read
-      .to({}, { duration: 0.65 })
-      // Shutters slide apart — cinematic reveal
-      .to('.rl-top', { y: '-100%', duration: 0.82, ease: 'power2.inOut' })
-      .to('.rl-bot', { y:  '100%', duration: 0.82, ease: 'power2.inOut' }, '<')
-      // Brand text scales + fades as panels leave
-      .to('.rl-center', { opacity: 0, scale: 1.04, duration: 0.45, ease: 'power2.in' }, '<+0.1')
-      // Loader overlay fades away
-      .to('#reveal-loader', { opacity: 0, duration: 0.25 }, '-=0.05');
+    showWord(WORDS[0]);
+    setInterval(function () { wIdx = (wIdx + 1) % WORDS.length; showWord(WORDS[wIdx]); }, 2800);
+  })();
+  </script>
 
-    /* ════════════════════════════════════════════════════════
-       REACT BITS — GLITCH TEXT
-       Tiled block letters + periodic red/cyan channel split
-    ═════════════════════════════════════════════════════════ */
-    const GLITCH_LINES = [
-      { text: 'YOUR CAMPUS.',  accent: [] },
-      { text: 'YOUR TASTE.',   accent: [5,6,7,8,9,10] },
-      { text: 'YOUR VERDICT.', accent: [] },
+  <!-- ══ HERO HEADING WORD FLIP ═══════════════════════════════ -->
+  <script>
+  (function () {
+    var heading = document.querySelector('.hero-heading');
+    if (!heading) return;
+
+    var cycles = [
+      ['campus.', 'cafeteria.', 'hangout.', 'spot.'],
+      ['taste.',  'order.',     'pick.',    'craving.'],
+      ['verdict.','review.',    'rating.',  'voice.']
     ];
 
-    function buildGlitch() {
-      const hero = document.getElementById('glitchHero');
-      hero.querySelectorAll('.glitch-line').forEach(el => el.remove());
-      GLITCH_LINES.forEach(({ text, accent }) => {
-        const line = document.createElement('div');
-        line.className = 'glitch-line';
-        [...text].forEach((ch, i) => {
-          if (ch === ' ') {
-            const sp = document.createElement('span');
-            sp.className = 'gch-sp';
-            line.appendChild(sp);
-          } else {
-            const cell = document.createElement('div');
-            cell.className = 'gch-cell';
-            const charEl = document.createElement('span');
-            charEl.className = 'gch-char' + (accent.includes(i) ? ' accent' : '');
-            charEl.textContent = ch;
-            cell.appendChild(charEl);
-            line.appendChild(cell);
-          }
-        });
-        hero.appendChild(line);
-      });
+    heading.innerHTML =
+      '<span class="flip-static">Your </span><span class="flip-cycle" id="fhLine0"></span><br>' +
+      '<span class="flip-static">Your </span><span class="flip-cycle" id="fhLine1"></span><br>' +
+      '<span class="flip-static">Your </span><span class="flip-cycle" id="fhLine2"></span>';
+
+    var indices = [0, 0, 0];
+
+    function flipLine(n) {
+      var el = document.getElementById('fhLine' + n);
+      if (!el) return;
+      el.style.animation = 'none';
+      el.offsetHeight; /* reflow */
+      indices[n] = (indices[n] + 1) % cycles[n].length;
+      el.textContent = cycles[n][indices[n]];
+      el.style.animation = 'wordFlipIn 0.55s cubic-bezier(0.23,1,0.32,1) both';
     }
 
-    function startGlitch() {
-      const hero = document.getElementById('glitchHero');
-      function fire() {
-        hero.classList.add('glitching');
-        setTimeout(() => hero.classList.remove('glitching'), 450);
-        setTimeout(fire, 2200 + Math.random() * 2800);
-      }
-      setTimeout(fire, 1800);
-    }
-
-    /* ════════════════════════════════════════════════════════
-       HERO ENTRANCE (runs after loader completes)
-    ═════════════════════════════════════════════════════════ */
-    function heroEntrance() {
-      buildGlitch();
-      startGlitch();
-      gsap.timeline()
-        .from('#heroBadge',   { opacity: 0, y: 22, duration: 0.65, ease: 'power3.out' })
-        .from('#glitchHero',  { opacity: 0, y: 36, duration: 0.85, ease: 'power3.out' }, '-=0.35')
-        .to  ('#fftRow',      { opacity: 1, duration: 0.5,  ease: 'power2.out' }, '-=0.25')
-        .to  ('#heroSub',     { opacity: 1, duration: 0.6,  ease: 'power2.out' }, '-=0.2')
-        .to  ('#heroActions', { opacity: 1, duration: 0.55, ease: 'power2.out' }, '-=0.2');
-    }
-
-    /* ════════════════════════════════════════════════════════
-       VENGEANCE UI — FLIP FADE TEXT
-       Letter-by-letter 3D flip cycling through food words
-    ═════════════════════════════════════════════════════════ */
-    const FFT_WORDS = ['BIRYANI', 'CHAI', 'PARATHA', 'ZINGER', 'SAMOSA', 'SANDWICH'];
-    let fftIdx = 0;
-    const fftEl = document.getElementById('fftDisplay');
-
-    function fftNext() {
-      const word = FFT_WORDS[fftIdx];
-      fftEl.innerHTML = '';
-
-      // Create letter spans
-      const letters = [...word].map(ch => {
-        const s = document.createElement('span');
-        s.className = 'fft-letter';
-        s.textContent = ch;
-        fftEl.appendChild(s);
-        return s;
-      });
-
-      // Flip in — rotateX from -90deg (below) to 0
-      gsap.fromTo(letters,
-        { rotateX: -90, opacity: 0, transformOrigin: '50% 100%' },
-        {
-          rotateX: 0, opacity: 1,
-          duration: 0.48, stagger: 0.065, ease: 'back.out(1.3)',
-          onComplete() {
-            // Hold, then flip out
-            gsap.delayedCall(2.2, () => {
-              gsap.to(letters, {
-                rotateX: 90, opacity: 0,
-                transformOrigin: '50% 0%',
-                duration: 0.35, stagger: 0.045, ease: 'power2.in',
-                onComplete() {
-                  fftIdx = (fftIdx + 1) % FFT_WORDS.length;
-                  fftNext();
-                }
-              });
-            });
-          }
-        }
-      );
-    }
-
-    /* ════════════════════════════════════════════════════════
-       STAT COUNTERS (ScrollTrigger)
-    ═════════════════════════════════════════════════════════ */
-    function animateCounter(el, end, suffix) {
-      const obj = { n: 0 };
-      gsap.to(obj, {
-        n: end, duration: 1.6, ease: 'power2.out',
-        onUpdate: () => { el.textContent = Math.round(obj.n) + (suffix || ''); },
-        scrollTrigger: { trigger: el, start: 'top 88%', once: true }
-      });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const s1 = document.getElementById('stat1');
-      const s2 = document.getElementById('stat2');
-      if (s1) animateCounter(s1, 3);
-      if (s2) animateCounter(s2, 100, '%');
+    /* initial set without animation */
+    [0,1,2].forEach(function(n){
+      var el = document.getElementById('fhLine' + n);
+      if (el) el.textContent = cycles[n][0];
     });
 
-    // ── Navbar shadow on scroll ───────────────────────────────
+    /* stagger the cycling so lines don't all flip at once */
+    setInterval(function(){ flipLine(0); }, 2400);
+    setTimeout(function(){ setInterval(function(){ flipLine(1); }, 2400); }, 800);
+    setTimeout(function(){ setInterval(function(){ flipLine(2); }, 2400); }, 1600);
+  })();
+  </script>
+
+  <!-- ══ GLOBE (cobe) ═════════════════════════════════════════ -->
+  <script type="module">
+  import createGlobe from 'https://cdn.jsdelivr.net/npm/cobe@0.6.3/dist/index.js';
+  const canvas = document.getElementById('globeCanvas');
+  if (canvas) {
+    let phi = 1.8, isDrag = false, lastX = 0;
+    const globe = createGlobe(canvas, {
+      devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+      width:  760,
+      height: 760,
+      phi:    1.8,
+      theta:  0.35,
+      dark:   0,
+      diffuse: 1.3,
+      mapSamples: 16000,
+      mapBrightness: 6,
+      baseColor:   [1, 1, 1],
+      markerColor: [0.1, 0.1, 0.1],
+      glowColor:   [0.9, 0.9, 0.9],
+      markers: [{ location: [33.6844, 73.0479], size: 0.08 }],
+      onRender(state) {
+        if (!isDrag) phi += 0.003;
+        state.phi = phi;
+      }
+    });
+
+    canvas.addEventListener('mousedown',  e => { isDrag = true;  lastX = e.clientX; canvas.style.cursor = 'grabbing'; });
+    window.addEventListener('mouseup',    ()  => { isDrag = false; canvas.style.cursor = 'grab'; });
+    window.addEventListener('mousemove',  e  => { if (!isDrag) return; phi += (e.clientX - lastX) * 0.006; lastX = e.clientX; });
+    canvas.addEventListener('touchstart', e  => { isDrag = true;  lastX = e.touches[0].clientX; }, { passive: true });
+    window.addEventListener('touchend',   ()  => { isDrag = false; });
+    window.addEventListener('touchmove',  e  => { if (!isDrag) return; phi += (e.touches[0].clientX - lastX) * 0.006; lastX = e.touches[0].clientX; }, { passive: true });
+  }
+  </script>
+
+  <!-- ══ INTRO SCREEN LOGIC ══════════════════════════════════ -->
+  <script>
+  (function () {
+    var el   = document.getElementById('introText');
+    var screen = document.getElementById('introScreen');
+    if (!el || !screen) return;
+
+    document.body.style.overflow = 'hidden';
+
+    function fitText() {
+      el.style.fontSize = '100px';
+      var ratio = (window.innerWidth * 0.98) / el.scrollWidth;
+      el.style.fontSize = (100 * ratio) + 'px';
+    }
+
+    fitText();
+    window.addEventListener('resize', fitText, { passive: true });
+
+    setTimeout(function () {
+      screen.classList.add('intro-hide');
+      document.body.style.overflow = '';
+      setTimeout(function () { screen.remove(); }, 800);
+    }, 1300);
+  })();
+  </script>
+
+  <script>
+    // ── Init icons ──────────────────────────────────────────
+    lucide.createIcons();
+
+    // ── Navbar shadow on scroll ────────────────────────────
     window.addEventListener('scroll', () => {
       document.getElementById('navbar').classList.toggle('scrolled', scrollY > 20);
     }, { passive: true });
 
-    // ── Auth redirect ─────────────────────────────────────────
+    // ── Auth redirect ──────────────────────────────────────
     function goToLogin() {
       if (typeof Auth !== 'undefined' && Auth.isLoggedIn()) {
         window.location.href = 'dashboard.html';
@@ -2012,61 +1691,20 @@
       }
     }
 
-    // ── View Reviews buttons ──────────────────────────────────
+    // ── View Reviews buttons ───────────────────────────────
     document.querySelectorAll('.btn-view').forEach((btn, i) => {
-      btn.addEventListener('click', () => { window.location.href = `cafe.html?id=${i + 1}`; });
+      btn.addEventListener('click', () => { window.location.href = `cafe-detail.html?cafe=${i + 1}&tab=reviews`; });
     });
 
-    /* ════════════════════════════════════════════════════════
-       VENGEANCE UI — SPOTLIGHT NAVBAR logic
-    ═════════════════════════════════════════════════════════ */
+    // ── Active nav link via IntersectionObserver ──────────
     const spotNav = document.getElementById('spotNav');
-    const spotInd = document.getElementById('spotIndicator');
     const spotLinks = spotNav ? spotNav.querySelectorAll('.spot-link') : [];
-
-    function positionIndicator(link) {
-      if (!link || !spotNav || !spotInd) return;
-      const pRect = spotNav.getBoundingClientRect();
-      const lRect = link.getBoundingClientRect();
-      spotInd.style.left  = (lRect.left - pRect.left) + 'px';
-      spotInd.style.width = lRect.width + 'px';
-    }
-
-    // Init indicator at active link once layout is ready
-    window.addEventListener('load', () => {
-      const active = spotNav && spotNav.querySelector('.spot-link.active');
-      if (active) positionIndicator(active);
-    });
-
-    // Mouse-tracked spotlight glow
-    if (spotNav) {
-      spotNav.addEventListener('mousemove', e => {
-        const r = spotNav.getBoundingClientRect();
-        spotNav.style.setProperty('--sx', (e.clientX - r.left) + 'px');
-        spotNav.style.setProperty('--sy', (e.clientY - r.top)  + 'px');
-      });
-
-      // Slide indicator on hover
-      spotLinks.forEach(link => {
-        link.addEventListener('mouseenter', () => positionIndicator(link));
-      });
-
-      // On mouse-leave: snap back to active
-      spotNav.addEventListener('mouseleave', () => {
-        const active = spotNav.querySelector('.spot-link.active');
-        if (active) positionIndicator(active);
-      });
-    }
-
-    // IntersectionObserver → update active + reposition indicator
     const secObs = new IntersectionObserver(entries => {
       entries.forEach(e => {
         if (!e.isIntersecting) return;
         spotLinks.forEach(link => {
           const sec = link.dataset.section;
-          const isActive = sec && sec === e.target.id;
-          link.classList.toggle('active', isActive);
-          if (isActive) positionIndicator(link);
+          link.classList.toggle('active', sec && sec === e.target.id);
         });
       });
     }, { threshold: 0.45 });
@@ -2085,11 +1723,10 @@
     });
   </script>
 
-  <!-- ── Sparkles hero effect ────────────────────────── -->
   <script>
   (function(){
     var canvas = document.getElementById('sparklesCanvas');
-    if (!canvas) return;
+    if (!canvas) return; // canvas removed, this is a no-op
     var ctx = canvas.getContext('2d');
     var particles = [], raf, dpr = window.devicePixelRatio || 1;
 
@@ -2144,10 +1781,10 @@
   })();
   </script>
 
-  <!-- ── GridScan hero grid (vanilla WebGL) ────────────── -->
   <script>
   (function(){
-    /* Add a grid-scan canvas BEHIND sparkles in the hero */
+    /* GridScan removed for performance */
+    return;
     var hero = document.querySelector('.hero');
     if (!hero) return;
     var cv = document.createElement('canvas');

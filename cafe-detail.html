@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet"/>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="js/theme.js"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -17,13 +18,32 @@
     button { font-family: inherit; cursor: pointer; border: none; background: none; }
 
     :root {
-      --bg:      #030B04;
-      --surface: #091409;
-      --accent:  #22C55E;
-      --accent-light: #4ADE80;
-      --text-primary: #F0EDE6;
-      --text-muted:   rgba(240,237,230,0.46);
-      --border:  rgba(34,197,94,0.14);
+      --bg:           #ffffff;
+      --surface:      #f5f5f7;
+      --surface2:     #e8e8ed;
+      --accent:       #1d1d1f;
+      --accent-light: #424245;
+      --accent-dim:   rgba(0,0,0,0.05);
+      --text-primary: #1d1d1f;
+      --text-muted:   rgba(29,29,31,0.56);
+      --border:       rgba(0,0,0,0.10);
+      --border-accent:rgba(0,0,0,0.22);
+      --red:          #cc2233;
+      --green:        #1a7f4b;
+    }
+    [data-theme="dark"] {
+      --bg:           #1d1d1f;
+      --surface:      #2d2d2f;
+      --surface2:     #3a3a3c;
+      --accent:       #f5f5f7;
+      --accent-light: #e0e0e2;
+      --accent-dim:   rgba(255,255,255,0.07);
+      --text-primary: #f5f5f7;
+      --text-muted:   rgba(245,245,247,0.56);
+      --border:       rgba(255,255,255,0.10);
+      --border-accent:rgba(255,255,255,0.22);
+      --red:          #ff453a;
+      --green:        #30d158;
     }
 
     html { scroll-behavior: smooth; }
@@ -36,39 +56,44 @@
     }
     h1,h2,h3,h4 { font-family: 'Syne', sans-serif; line-height: 1.12; }
 
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      background: transparent; border: 1px solid var(--border);
+      border-radius: 8px; cursor: pointer;
+      color: var(--text-muted); transition: all 0.2s; flex-shrink: 0;
+    }
+    .theme-toggle:hover { border-color: var(--border-accent); color: var(--text-primary); background: var(--accent-dim); }
+
     /* ── Navbar ──────────────────────────── */
     .navbar {
       position: fixed; inset: 0 0 auto 0; z-index: 100;
-      background: rgba(13,3,21,0.88);
+      background: rgba(255,255,255,0.92);
       backdrop-filter: blur(22px);
       border-bottom: 1px solid var(--border);
       padding: 16px 0;
     }
+    [data-theme="dark"] .navbar { background: rgba(29,29,31,0.92); }
     .nav-inner {
       max-width: 1160px; margin: 0 auto; padding: 0 24px;
       display: flex; align-items: center; justify-content: space-between;
     }
-    .logo { font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 700; }
-    .logo span { color: var(--accent); }
+    .logo { font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--text-primary); }
+    .logo span { color: var(--text-primary); }
     .nav-links { display: flex; gap: 28px; }
     .nav-links a {
       font-size: 0.875rem; font-weight: 500; color: var(--text-muted);
-      transition: color 0.2s; position: relative;
-    }
-    .nav-links a::after {
-      content: ''; position: absolute; bottom: -4px; left: 0; right: 100%;
-      height: 1px; background: var(--accent); transition: right 0.3s;
+      transition: color 0.2s;
     }
     .nav-links a:hover { color: var(--text-primary); }
-    .nav-links a:hover::after { right: 0; }
     .nav-cta {
-      background: var(--accent); color: #fff;
-      border-radius: 100px; padding: 9px 22px;
+      background: var(--accent); color: var(--bg);
+      border-radius: 8px; padding: 9px 22px;
       font-size: 0.82rem; font-weight: 700;
-      box-shadow: 0 0 20px rgba(34,197,94,0.35);
       transition: all 0.2s;
     }
-    .nav-cta:hover { background: var(--accent-light); transform: translateY(-1px); }
+    .nav-cta:hover { background: var(--accent-light); }
 
     /* ── Image Slider ─────────────────── */
     .slider-wrap {
@@ -97,7 +122,7 @@
       position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
       font-size: 4rem; letter-spacing: 4px;
-      color: rgba(34,197,94,0.2);
+      color: rgba(29,29,31,0.10);
       font-family: 'Syne', sans-serif; font-weight: 800;
     }
 
@@ -108,11 +133,12 @@
     }
     .slide-text { max-width: 580px; }
     .slide-label {
-      display: inline-block; background: rgba(34,197,94,0.18);
-      border: 1px solid rgba(34,197,94,0.4);
-      color: var(--accent); border-radius: 100px;
+      display: inline-block; background: rgba(0,0,0,0.45);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff; border-radius: 100px;
       padding: 5px 16px; font-size: 0.72rem; font-weight: 700;
       letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px;
+      backdrop-filter: blur(6px);
     }
     .slide-title {
       font-family: 'Syne', sans-serif;
@@ -134,13 +160,13 @@
       position: absolute; top: 50%; z-index: 3;
       transform: translateY(-50%);
       width: 52px; height: 52px; border-radius: 50%;
-      background: rgba(13,3,21,0.6); backdrop-filter: blur(12px);
-      border: 1px solid rgba(34,197,94,0.3);
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(12px);
+      border: 1px solid rgba(29,29,31,0.20);
       color: #fff; font-size: 1.4rem;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; transition: all 0.2s;
     }
-    .arrow-btn:hover { background: rgba(34,197,94,0.25); border-color: var(--accent); }
+    .arrow-btn:hover { background: rgba(29,29,31,0.15); border-color: var(--accent); }
     .arrow-prev { left: 24px; }
     .arrow-next { right: 24px; }
 
@@ -217,7 +243,7 @@
       border-radius: 12px; padding: 18px 20px;
       transition: border-color 0.2s;
     }
-    .menu-card:hover { border-color: rgba(34,197,94,0.4); }
+    .menu-card:hover { border-color: rgba(29,29,31,0.25); }
     .menu-card-emoji { font-size: 2rem; margin-bottom: 10px; }
     .menu-card-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.92rem; margin-bottom: 4px; }
     .menu-card-price { font-size: 0.82rem; color: var(--accent); font-weight: 700; }
@@ -242,7 +268,7 @@
     }
     .btn-primary {
       display: inline-flex; align-items: center; gap: 8px;
-      background: var(--accent); color: #030B04;
+      background: var(--accent); color: #1d1d1f;
       border-radius: 8px; padding: 13px 28px;
       font-size: 0.95rem; font-weight: 700;
       transition: all 0.2s;
@@ -255,7 +281,7 @@
       font-size: 0.95rem; font-weight: 600;
       transition: all 0.2s;
     }
-    .btn-ghost:hover { border-color: rgba(34,197,94,0.4); color: var(--text-primary); }
+    .btn-ghost:hover { border-color: rgba(29,29,31,0.25); color: var(--text-primary); }
 
     /* footer */
     footer { text-align: center; padding: 32px 24px; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid var(--border); }
@@ -274,7 +300,10 @@
         <a href="search.html">Search</a>
         <a href="leaderboard.html">Leaderboard</a>
       </div>
-      <a href="login.html" class="nav-cta">Login with NUST</a>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="theme-toggle" onclick="toggleTheme()"></button>
+        <a href="login.html" class="nav-cta">Login with NUST</a>
+      </div>
     </div>
   </nav>
 
@@ -367,13 +396,26 @@
       <p style="color:var(--text-muted);margin-bottom:32px;font-size:0.9rem;">Anonymous reviews from verified NUST students.</p>
       <div class="review-grid" id="reviewGrid"></div>
       <div style="margin-top:28px;">
-        <a id="rateLink2" href="#" class="btn-primary" style="display:inline-flex;">
+        <button id="writeReviewBtn" class="btn-primary" style="display:inline-flex;align-items:center;gap:8px;">
           <i data-lucide="star" style="width:16px;height:16px;"></i> Write a Review
-        </a>
+        </button>
       </div>
     </div>
 
   </main>
+
+  <!-- ── Review Modal ─────────────────────────────────────── -->
+  <!-- Sign-in prompt shown when guest tries to write a review -->
+  <div id="signInPrompt" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:40px 36px;width:min(420px,92vw);position:relative;text-align:center;">
+      <button onclick="document.getElementById('signInPrompt').style.display='none';document.body.style.overflow='';" style="position:absolute;top:14px;right:16px;background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1.4rem;line-height:1;">×</button>
+      <div style="font-size:2.2rem;margin-bottom:16px;">✍️</div>
+      <h3 style="font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;margin-bottom:10px;">Sign in to Write a Review</h3>
+      <p style="font-size:0.86rem;color:var(--text-muted);line-height:1.6;margin-bottom:28px;">Reviews are anonymous and visible to everyone.<br>You only need a NUST email to post.</p>
+      <a href="login.html" style="display:block;background:var(--accent);color:var(--bg);border-radius:10px;padding:13px 0;font-size:0.9rem;font-weight:700;margin-bottom:12px;text-decoration:none;">Sign in with NUST Email</a>
+      <button onclick="document.getElementById('signInPrompt').style.display='none';document.body.style.overflow='';" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:12px 0;font-size:0.88rem;font-weight:600;color:var(--text-muted);background:none;cursor:pointer;">Maybe Later</button>
+    </div>
+  </div>
 
   <footer>
     <a href="index.html">← Back to Concordia Eats</a> &nbsp;·&nbsp; For campus use only &nbsp;·&nbsp; All reviews are anonymous
@@ -394,9 +436,9 @@
       ratingCount: '247 reviews',
       specialties: ['Special Biryani','Seekh Kabab','Kashmiri Chai','Chicken Roll','Dahi Puri'],
       slides: [
-        { label:'Concordia I · NBS Ground', title:'The Original.', caption:'The most beloved cafe near NBS — open since day one.' },
-        { label:'Popular Dishes', title:'Biryani so good\nit\'s legendary.', caption:'The Special Biryani at C1 has a cult following. Every. Single. Day.' },
-        { label:'Vibes & Atmosphere', title:'Quick bites,\ngreat chai.', caption:'Perfect for a 10-minute break between back-to-back lectures.' },
+        { label:'Concordia I · Night', title:'The Original.', caption:'The most beloved cafe near NBS — open since day one.', photo:'images/c1-night.png' },
+        { label:'Inside C1', title:'Iconic\nrounded hall.', caption:'The warm, circular seating area that every NUST student knows.', photo:'images/c1-interior.png' },
+        { label:'Concordia I · Exterior', title:'Student Centre\nLegacy.', caption:'Standing tall at NBS Ground — a NUST landmark since day one.', photo:'images/c1-exterior.png' },
         { label:'Menu Highlights', title:'457 items.\nChoose wisely.', caption:'From seekh kabab to kashmiri chai — C1 has it all.' },
       ],
       menu: [
@@ -408,10 +450,54 @@
       reviews: [
         {stars:'★★★★★',text:'"Biryani at C1 is absolutely fire. Goes for Rs.220 and worth every rupee."',dish:'Special Biryani'},
         {stars:'★★★★★',text:'"Best kashmiri chai on campus. No debate. Nothing else comes close."',dish:'Kashmiri Chai'},
-        {stars:'★★★★☆',text:'"Seekh kabab is always freshly made. The mint chutney is 👌"',dish:'Seekh Kabab'},
+        {stars:'★★★★☆',text:'"Seekh kabab is always freshly made. The mint chutney is chef\'s kiss."',dish:'Seekh Kabab'},
         {stars:'★★★★★',text:'"C1 is my daily lunch stop. Consistent quality every single time."',dish:'Multiple dishes'},
         {stars:'★★★☆☆',text:'"Gets very crowded at 12–1pm. Food is great but be prepared to wait."',dish:'General'},
         {stars:'★★★★☆',text:'"Dahi puri here is incredible. Much better than C3\'s version."',dish:'Dahi Puri'},
+        {stars:'★★★★★',text:'"The chicken roll is perfectly spiced and filling. My go-to between lectures."',dish:'Chicken Roll'},
+        {stars:'★★★★★',text:'"Achari boti is slept on. Absolutely loaded with flavour for Rs.350."',dish:'Chicken Achari Boti'},
+        {stars:'★★★☆☆',text:'"Noodles are average — nothing special but it fills you up quickly."',dish:'Chicken Noodles'},
+        {stars:'★★★★☆',text:'"Beef burger is juicy and the bun is always fresh. Solid choice."',dish:'Special Beef Burger'},
+        {stars:'★★★★★',text:'"Went at 7am for chai — hot, creamy, perfect. Best way to start the day."',dish:'Kashmiri Chai'},
+        {stars:'★★★★★',text:'"Biryani on Fridays is on another level. I don\'t know what they do differently but please keep doing it."',dish:'Special Biryani'},
+        {stars:'★★☆☆☆',text:'"Queue was 20 minutes long during lunch. They really need more staff."',dish:'General'},
+        {stars:'★★★★☆',text:'"Seekh kabab with naan is a combo I didn\'t know I needed. Highly recommend."',dish:'Seekh Kabab'},
+        {stars:'★★★★★',text:'"Dahi puri is a must every time I visit. Light, tangy, and perfectly assembled."',dish:'Dahi Puri'},
+        {stars:'★★★★☆',text:'"Chicken roll is big enough to keep you full till evening. Great value."',dish:'Chicken Roll'},
+        {stars:'★★★★★',text:'"Staff at C1 are genuinely friendly. Makes the whole experience better."',dish:'General'},
+        {stars:'★★★☆☆',text:'"The beef burger was a bit dry today. Usually better — probably an off day."',dish:'Special Beef Burger'},
+        {stars:'★★★★★',text:'"I study at NBS and C1 is literally a lifesaver. Quick, cheap, and delicious."',dish:'Multiple dishes'},
+        {stars:'★★★★☆',text:'"Achari boti with paratha hits every single time after a 3-hour lecture."',dish:'Chicken Achari Boti'},
+        {stars:'★★★★★',text:'"Kashmiri chai is unmatched. I\'ve tried every cafe on campus and C1 wins."',dish:'Kashmiri Chai'},
+        {stars:'★★★☆☆',text:'"Noodles portion was small today. A bit disappointed for the price."',dish:'Chicken Noodles'},
+        {stars:'★★★★★',text:'"Best biryani I\'ve had in my four years at NUST. Bar none."',dish:'Special Biryani'},
+        {stars:'★★★★☆',text:'"Dahi puri is the perfect snack between classes. Light and tasty."',dish:'Dahi Puri'},
+        {stars:'★★★★★',text:'"C1 never lets me down. Consistent, affordable, and always fresh."',dish:'Multiple dishes'},
+        {stars:'★★★★☆',text:'"Seekh kabab order came out in under 3 minutes. Impressive during rush hour."',dish:'Seekh Kabab'},
+        {stars:'★★★★★',text:'"The chicken roll is my pre-exam ritual. Never failed me yet."',dish:'Chicken Roll'},
+        {stars:'★★★☆☆',text:'"Seating is limited. Had to eat standing up during peak hours."',dish:'General'},
+        {stars:'★★★★★',text:'"Biryani portion is generous and the raita on the side is excellent."',dish:'Special Biryani'},
+        {stars:'★★★★☆',text:'"Chai is always hot and never watery. Exactly what you need at 8am."',dish:'Kashmiri Chai'},
+        {stars:'★★★★★',text:'"Achari boti paratha combo is criminally underrated. Must try."',dish:'Chicken Achari Boti'},
+        {stars:'★★★★☆',text:'"Beef burger with fries is a solid lunch. Could use a bit more sauce."',dish:'Special Beef Burger'},
+        {stars:'★★★★★',text:'"Went with my study group and everyone was happy. Great variety."',dish:'Multiple dishes'},
+        {stars:'★★★☆☆',text:'"Chicken noodles tasted a bit bland. Needs more seasoning."',dish:'Chicken Noodles'},
+        {stars:'★★★★★',text:'"Dahi puri is always made fresh — you can taste the difference."',dish:'Dahi Puri'},
+        {stars:'★★★★☆',text:'"Seekh kabab is perfectly charred and not dry at all. Solid 4 stars."',dish:'Seekh Kabab'},
+        {stars:'★★★★★',text:'"C1 is the GOAT of all three cafes. Biryani alone earns it a 5."',dish:'Special Biryani'},
+        {stars:'★★★★☆',text:'"Chicken roll is filling and the sauce inside is really good."',dish:'Chicken Roll'},
+        {stars:'★★★★★',text:'"Morning chai at C1 is a ritual I refuse to break. Absolute perfection."',dish:'Kashmiri Chai'},
+        {stars:'★★★☆☆',text:'"Service slows down after 12:30pm. Wish they had a faster system."',dish:'General'},
+        {stars:'★★★★★',text:'"Achari boti has a great marinade — smoky, tangy, and not too spicy."',dish:'Chicken Achari Boti'},
+        {stars:'★★★★☆',text:'"Dahi puri portions are consistent every time. Love the reliability."',dish:'Dahi Puri'},
+        {stars:'★★★★★',text:'"Best value per rupee at NUST. Biryani at Rs.220 is genuinely a steal."',dish:'Special Biryani'},
+        {stars:'★★★☆☆',text:'"Beef burger bread was a bit stale today. Not the usual standard."',dish:'Special Beef Burger'},
+        {stars:'★★★★★',text:'"Seekh kabab with mint chutney is one of the best things on this campus."',dish:'Seekh Kabab'},
+        {stars:'★★★★☆',text:'"Chicken roll is fast to prepare and never soggy. Good execution."',dish:'Chicken Roll'},
+        {stars:'★★★★★',text:'"Never had a bad experience at C1 in two years. Consistent excellence."',dish:'Multiple dishes'},
+        {stars:'★★★★☆',text:'"Kashmiri chai in the evening hits differently. Very relaxing."',dish:'Kashmiri Chai'},
+        {stars:'★★★★★',text:'"C1 biryani on a cold morning with chai — this is why I chose NUST."',dish:'Special Biryani'},
+        {stars:'★★★☆☆',text:'"Chicken noodles are okay but I\'d rather get the biryani for the price."',dish:'Chicken Noodles'},
       ]
     },
     '2': {
@@ -424,8 +510,8 @@
       ratingCount: '389 reviews',
       specialties: ['Zinger Burger','Mutton Karahi','Chicken Shawarma','Adrak Chai','Grilled Fish'],
       slides: [
-        { label:'Concordia II · SEECS', title:'Fuel for\nlate-night grind.', caption:'Open till midnight — the lifeline for every SEECS student.' },
-        { label:'Top Dishes', title:'Zinger that hits\nevery time.', caption:'The Zinger Burger at C2 has been a student favourite for years.' },
+        { label:'Concordia II · SEECS', title:'Fuel for\nlate-night grind.', caption:'Open till midnight — the lifeline for every SEECS student.', photo:'images/c2-front.png' },
+        { label:'C2 Plaza', title:'The iconic\nred courtyard.', caption:'The meeting point for every SEECS student between classes.', photo:'images/c2-plaza.png' },
         { label:'Late Night Vibes', title:'Still open at\n11 PM.', caption:'When every other cafe has closed, C2 is still serving.' },
         { label:'After Exams', title:'Celebrate here.', caption:'Post-exam Mutton Karahi is a NUST tradition.' },
       ],
@@ -442,6 +528,66 @@
         {stars:'★★★★★',text:'"The only cafe on campus I trust for late-night food. Quality stays consistent."',dish:'Multiple dishes'},
         {stars:'★★★☆☆',text:'"Always packed. Service slows down a lot after 9pm but the food makes up for it."',dish:'General'},
         {stars:'★★★★★',text:'"Adrak chai at 11pm while debugging code is a whole vibe. Highly recommend."',dish:'Adrak Chai'},
+        {stars:'★★★★★',text:'"C2 is the only reason I survive SEECS lab sessions. Open late and food is always good."',dish:'Multiple dishes'},
+        {stars:'★★★★☆',text:'"Shawarma is packed full and the sauce is genuinely tasty. Better than most spots in Islamabad."',dish:'Chicken Shawarma'},
+        {stars:'★★★★★',text:'"Mutton karahi for Rs.580 is basically highway robbery — in the best way possible."',dish:'Mutton Karahi'},
+        {stars:'★★★☆☆',text:'"French toast is decent but a bit too sweet for my liking. Good for breakfast though."',dish:'French Toast'},
+        {stars:'★★★★★',text:'"Zinger burger is consistently crispy every single time. That\'s rare and impressive."',dish:'Zinger Burger'},
+        {stars:'★★★★☆',text:'"Chicken tikka after 10pm tastes even better somehow. C2 magic."',dish:'Chicken Tikka'},
+        {stars:'★★★★★',text:'"Club sandwich is thick, filling, and perfectly toasted. Great late-night option."',dish:'Club Sandwich'},
+        {stars:'★★★☆☆',text:'"Grilled fish was slightly overcooked today. Usually much better."',dish:'Grilled Fish Fillet'},
+        {stars:'★★★★★',text:'"Adrak chai is the best chai on campus. Strong ginger kick that wakes you right up."',dish:'Adrak Chai'},
+        {stars:'★★★★☆',text:'"C2 is my designated post-deadline meal spot. Never lets me down."',dish:'Multiple dishes'},
+        {stars:'★★★★★',text:'"Mutton karahi with naan at midnight after submitting assignments — peak NUST experience."',dish:'Mutton Karahi'},
+        {stars:'★★★★☆',text:'"Shawarma roll is big enough to share but who would want to."',dish:'Chicken Shawarma'},
+        {stars:'★★★☆☆',text:'"Service is slower when it\'s busy but the food quality doesn\'t drop."',dish:'General'},
+        {stars:'★★★★★',text:'"Zinger burger here beats any fast food place near NUST. Not even close."',dish:'Zinger Burger'},
+        {stars:'★★★★☆',text:'"French toast with tea is a wholesome breakfast combo. Underrated."',dish:'French Toast'},
+        {stars:'★★★★★',text:'"C2 open at 11pm is a blessing I don\'t take for granted anymore."',dish:'General'},
+        {stars:'★★★★★',text:'"Chicken tikka is juicy and well-spiced. The naan that comes with it is fresh."',dish:'Chicken Tikka'},
+        {stars:'★★★☆☆',text:'"Portion size for the club sandwich could be bigger for Rs.200."',dish:'Club Sandwich'},
+        {stars:'★★★★★',text:'"Mutton karahi is legitimately the best food item at any NUST cafe."',dish:'Mutton Karahi'},
+        {stars:'★★★★☆',text:'"Adrak chai at 9am sets the tone for the whole day."',dish:'Adrak Chai'},
+        {stars:'★★★★★',text:'"Grilled fish when it\'s fresh is incredible. Perfect texture and seasoning."',dish:'Grilled Fish Fillet'},
+        {stars:'★★★☆☆',text:'"Sometimes the zinger bun is slightly stale. But the patty always saves it."',dish:'Zinger Burger'},
+        {stars:'★★★★★',text:'"The chicken tikka platter is generous and well-presented. Good for groups."',dish:'Chicken Tikka'},
+        {stars:'★★★★☆',text:'"C2 has the most consistent quality across all meals I\'ve had here."',dish:'Multiple dishes'},
+        {stars:'★★★★★',text:'"Shawarma sauce is housemade and you can taste it. Layers of flavour."',dish:'Chicken Shawarma'},
+        {stars:'★★★☆☆',text:'"French toast needs more butter. A bit dry on its own."',dish:'French Toast'},
+        {stars:'★★★★★',text:'"Adrak chai during exams is basically a performance-enhancing substance."',dish:'Adrak Chai'},
+        {stars:'★★★★☆',text:'"Club sandwich toasted perfectly with good cheese melt. 4 solid stars."',dish:'Club Sandwich'},
+        {stars:'★★★★★',text:'"C2 is the crown jewel of Concordia cafes. Open late, great food, decent prices."',dish:'General'},
+        {stars:'★★★★☆',text:'"Mutton karahi is a shared dish among friends and it always runs out fast."',dish:'Mutton Karahi'},
+        {stars:'★★★★★',text:'"Zinger burger with adrak chai is my go-to combo. Perfect contrast."',dish:'Zinger Burger'},
+        {stars:'★★★☆☆',text:'"Grilled fish is inconsistent — great some days, just okay others."',dish:'Grilled Fish Fillet'},
+        {stars:'★★★★★',text:'"Late night chicken tikka at C2 is a SEECS rite of passage."',dish:'Chicken Tikka'},
+        {stars:'★★★★☆',text:'"Shawarma is well-loaded and the wrap holds together properly."',dish:'Chicken Shawarma'},
+        {stars:'★★★★★',text:'"If you haven\'t had C2 adrak chai, you haven\'t truly lived at NUST."',dish:'Adrak Chai'},
+        {stars:'★★★☆☆',text:'"Needs more seating. Always crowded after 8pm with no place to sit."',dish:'General'},
+        {stars:'★★★★★',text:'"Mutton karahi is so good I\'ve convinced three friends to try SEECS."',dish:'Mutton Karahi'},
+        {stars:'★★★★☆',text:'"Club sandwich is a reliable late-night option. Never disappoints."',dish:'Club Sandwich'},
+        {stars:'★★★★★',text:'"C2 staff keep smiling even at midnight. Absolute legends."',dish:'General'},
+        {stars:'★★★★☆',text:'"French toast was fluffy and warm. Great value for Rs.120."',dish:'French Toast'},
+        {stars:'★★★★★',text:'"Zinger burger patty is always juicy and the chilli sauce is excellent."',dish:'Zinger Burger'},
+        {stars:'★★★☆☆',text:'"The tikka was a bit overdone on my last visit. Still edible but not ideal."',dish:'Chicken Tikka'},
+        {stars:'★★★★★',text:'"I have had mutton karahi at C2 at least 30 times. Zero regrets every time."',dish:'Mutton Karahi'},
+        {stars:'★★★★☆',text:'"Grilled fish with naan is an underrated combination at C2."',dish:'Grilled Fish Fillet'},
+        {stars:'★★★★★',text:'"Best cafe for SEECS students, no contest. Open late, great food, good chai."',dish:'Multiple dishes'},
+        {stars:'★★★★☆',text:'"Adrak chai gets better every time I come back. Consistently strong."',dish:'Adrak Chai'},
+        {stars:'★★★★★',text:'"Shawarma at C2 is hands-down better than the nearby shawarma spots."',dish:'Chicken Shawarma'},
+        {stars:'★★★☆☆',text:'"French toast is a bit plain. Could use powdered sugar or a fruit topping."',dish:'French Toast'},
+        {stars:'★★★★★',text:'"C2 is where I spend 40% of my NUST life. Zero complaints."',dish:'General'},
+        {stars:'★★★★☆',text:'"Zinger with the special C2 sauce is something I dream about during breaks."',dish:'Zinger Burger'},
+        {stars:'★★★★★',text:'"Mutton karahi on a Friday with friends is an unmatched NUST tradition."',dish:'Mutton Karahi'},
+        {stars:'★★★☆☆',text:'"Wished the seating arrangement was better. Hard to find a spot at peak hours."',dish:'General'},
+        {stars:'★★★★★',text:'"Club sandwich is thick, toasted right, and a solid meal on its own."',dish:'Club Sandwich'},
+        {stars:'★★★★☆',text:'"Chicken tikka marinade is really good. Could eat it every day."',dish:'Chicken Tikka'},
+        {stars:'★★★★★',text:'"C2 at 11pm is a completely different energy. Love the late-night crowd."',dish:'General'},
+        {stars:'★★★★★',text:'"Adrak chai is my study fuel. Two cups a night minimum during exams."',dish:'Adrak Chai'},
+        {stars:'★★★★☆',text:'"Grilled fish fillet portion is decent and the seasoning is on point."',dish:'Grilled Fish Fillet'},
+        {stars:'★★★★★',text:'"C2 consistently delivers. Four semesters in and I have zero complaints."',dish:'Multiple dishes'},
+        {stars:'★★★☆☆',text:'"Shawarma could have more veggies in it. Mostly chicken which isn\'t bad, just unbalanced."',dish:'Chicken Shawarma'},
+        {stars:'★★★★★',text:'"Zinger burger is the standard I measure all other burgers against."',dish:'Zinger Burger'},
       ]
     },
     '3': {
@@ -454,8 +600,8 @@
       ratingCount: '198 reviews',
       specialties: ['Haleem (Fridays)','Chicken Tikka','Club Sandwich','Masala Fries','Chicken Pizza'],
       slides: [
-        { label:'Concordia III · Main Campus', title:'Central.\nAlways buzzing.', caption:'Right in the heart of NUST — every student walks past here.' },
-        { label:'Friday Special', title:'Haleem day\nis sacred.', caption:'Every Friday, C3\'s haleem draws students from across the campus.' },
+        { label:'Concordia 3 · Center Point', title:'Rooftop\nvibes only.', caption:'The open-air terrace at C3 — best seat on campus after sunset.', photo:'images/c3-rooftop.png' },
+        { label:'Favourite Campus View', title:'The iconic\nC3 arc.', caption:'NUST\'s most photographed spot — right next to Concordia 3.', photo:'images/c3-view.png' },
         { label:'Seating & Space', title:'Biggest seating\non campus.', caption:'Plenty of room for group study sessions and post-class hangouts.' },
         { label:'Top Picks', title:'Tikka,\nfries & more.', caption:'The chicken tikka and masala fries combo is a student staple.' },
       ],
@@ -472,13 +618,80 @@
         {stars:'★★★★☆',text:'"Masala fries are a solid snack. Perfectly spiced and always fresh."',dish:'Masala Fries'},
         {stars:'★★★★★',text:'"Largest seating of all three cafes. Perfect for group study sessions."',dish:'General'},
         {stars:'★★★☆☆',text:'"Club sandwich is decent but C1 does it better. Still a solid option."',dish:'Club Sandwich'},
+        {stars:'★★★★★',text:'"C3 pizza is surprisingly good for a campus cafe. Thin crust and generous toppings."',dish:'Chicken Pizza'},
+        {stars:'★★★★☆',text:'"Chapli kabab with naan is a perfect lunch. Big and flavourful."',dish:'Beef Chapli Kabab'},
+        {stars:'★★★★★',text:'"Friday haleem is the reason I plan my week around Fridays. Absolutely packed with flavour."',dish:'Haleem'},
+        {stars:'★★★☆☆',text:'"Pasta was overcooked slightly. The sauce is good but execution needs work."',dish:'Pasta'},
+        {stars:'★★★★☆',text:'"Masala fries with raita is the combo nobody told me about. Game changer."',dish:'Masala Fries'},
+        {stars:'★★★★★',text:'"Ice cream at Rs.100 is the best deal on campus. Perfect after a hot afternoon."',dish:'Ice Cream'},
+        {stars:'★★★★☆',text:'"C3 is where I bring parents when they visit. Spacious and the food is reliable."',dish:'General'},
+        {stars:'★★★★★',text:'"Chicken pizza dough is soft and the chicken topping is well seasoned."',dish:'Chicken Pizza'},
+        {stars:'★★★☆☆',text:'"Tikka is hit or miss depending on the time of day. Morning is better."',dish:'Chicken Tikka'},
+        {stars:'★★★★★',text:'"Chapli kabab is thick and juicy. Best kabab on the Concordia campus."',dish:'Beef Chapli Kabab'},
+        {stars:'★★★★☆',text:'"C3\'s central location makes it the default meeting point for every group."',dish:'General'},
+        {stars:'★★★★★',text:'"Masala fries have the perfect level of spice. Not too hot, just enough kick."',dish:'Masala Fries'},
+        {stars:'★★★☆☆',text:'"Club sandwich filling was a bit light today. Expected more for the price."',dish:'Club Sandwich'},
+        {stars:'★★★★★',text:'"Haleem on Fridays draws a crowd for a reason — it\'s genuinely exceptional."',dish:'Haleem'},
+        {stars:'★★★★☆',text:'"Ice cream selection is small but the quality is good. A nice treat."',dish:'Ice Cream'},
+        {stars:'★★★★★',text:'"Pasta with chicken at C3 is creamy and filling. Much better than expected."',dish:'Pasta'},
+        {stars:'★★★☆☆',text:'"Busy all the time due to location. Hard to get a seat at lunch."',dish:'General'},
+        {stars:'★★★★★',text:'"Chicken pizza is the ultimate group order. Everyone always finishes it."',dish:'Chicken Pizza'},
+        {stars:'★★★★☆',text:'"Chapli kabab with mint chutney is a must on any visit to C3."',dish:'Beef Chapli Kabab'},
+        {stars:'★★★★★',text:'"C3 is the social hub of NUST campus. Great food, great vibe, great location."',dish:'General'},
+        {stars:'★★★★☆',text:'"Masala fries are crispy and never soggy. Whoever seasons them deserves a raise."',dish:'Masala Fries'},
+        {stars:'★★★☆☆',text:'"Tikka portion is smaller than C2\'s but it tastes just as good."',dish:'Chicken Tikka'},
+        {stars:'★★★★★',text:'"Ice cream after a heavy lunch is the perfect way to end a meal at C3."',dish:'Ice Cream'},
+        {stars:'★★★★☆',text:'"Club sandwich is well-constructed and holds together even when packed."',dish:'Club Sandwich'},
+        {stars:'★★★★★',text:'"Friday haleem. That\'s it. That\'s the whole review."',dish:'Haleem'},
+        {stars:'★★★★☆',text:'"Pasta carbonara style at C3 is surprisingly authentic for a campus spot."',dish:'Pasta'},
+        {stars:'★★★★★',text:'"Chapli kabab rivals street food in Islamabad. Impressive for a campus cafe."',dish:'Beef Chapli Kabab'},
+        {stars:'★★★☆☆',text:'"Chicken pizza crust can be too thick sometimes. Inconsistent across visits."',dish:'Chicken Pizza'},
+        {stars:'★★★★★',text:'"C3 masala fries are the best fries I\'ve had in Islamabad. Period."',dish:'Masala Fries'},
+        {stars:'★★★★☆',text:'"The seating at C3 is a huge advantage. You can actually relax while eating."',dish:'General'},
+        {stars:'★★★★★',text:'"Haleem in winter hits different. Warm, spiced, and absolutely hearty."',dish:'Haleem'},
+        {stars:'★★★★☆',text:'"Ice cream is a great value and the flavours are consistent."',dish:'Ice Cream'},
+        {stars:'★★★☆☆',text:'"Club sandwich bread went a bit stale on my last visit."',dish:'Club Sandwich'},
+        {stars:'★★★★★',text:'"Chicken tikka on a good day is genuinely excellent. Worth timing your visit."',dish:'Chicken Tikka'},
+        {stars:'★★★★☆',text:'"Chapli kabab is very aromatic. The whole area smells amazing when it\'s cooking."',dish:'Beef Chapli Kabab'},
+        {stars:'★★★★★',text:'"C3 pasta with a side of masala fries is a meal I could have daily."',dish:'Multiple dishes'},
+        {stars:'★★★☆☆',text:'"Pizza portion is a bit small. Two slices isn\'t enough for a full meal."',dish:'Chicken Pizza'},
+        {stars:'★★★★★',text:'"Haleem with naan is arguably the best meal on the entire NUST campus."',dish:'Haleem'},
+        {stars:'★★★★☆',text:'"Masala fries are perfect with a cold drink on a hot day."',dish:'Masala Fries'},
+        {stars:'★★★★★',text:'"C3 always feels lively and welcoming. The biggest social cafe on campus."',dish:'General'},
+        {stars:'★★★★☆',text:'"Chapli kabab has a great char on it. Properly cooked, not rushed."',dish:'Beef Chapli Kabab'},
+        {stars:'★★★☆☆',text:'"Pasta can be watery sometimes. The portion is fine but consistency varies."',dish:'Pasta'},
+        {stars:'★★★★★',text:'"Ice cream at Rs.100 is unbeatable. Simple, cold, and genuinely satisfying."',dish:'Ice Cream'},
+        {stars:'★★★★☆',text:'"Chicken tikka platter is a good group option. Enough for two light eaters."',dish:'Chicken Tikka'},
+        {stars:'★★★★★',text:'"I look forward to C3 Fridays every week. Haleem is always worth the wait."',dish:'Haleem'},
+        {stars:'★★★★☆',text:'"Club sandwich is solid and reliable. Good when you want something quick."',dish:'Club Sandwich'},
+        {stars:'★★★★★',text:'"Chicken pizza with extra chicken topping is how you should always order it."',dish:'Chicken Pizza'},
+        {stars:'★★★☆☆',text:'"Long queues at lunchtime. C3 is great but the volume of students overwhelms it."',dish:'General'},
+        {stars:'★★★★★',text:'"Chapli kabab aroma hits you from 20 metres away. Always a good sign."',dish:'Beef Chapli Kabab'},
+        {stars:'★★★★☆',text:'"Masala fries and ice cream as a meal sounds odd but works perfectly."',dish:'Multiple dishes'},
+        {stars:'★★★★★',text:'"C3 pasta is better than many restaurants I\'ve been to. Well spiced and creamy."',dish:'Pasta'},
+        {stars:'★★★★☆',text:'"Haleem gets sold out fast on Fridays. Arrive before 1pm or you\'ll miss it."',dish:'Haleem'},
+        {stars:'★★★☆☆',text:'"Ice cream flavours are limited. Would love to see more options."',dish:'Ice Cream'},
+        {stars:'★★★★★',text:'"Masala fries are consistently excellent. Top item at C3 for me."',dish:'Masala Fries'},
+        {stars:'★★★★☆',text:'"Chicken tikka on a fresh naan is a proper meal. Highly recommend the combo."',dish:'Chicken Tikka'},
+        {stars:'★★★★★',text:'"C3 is home. Best vibes, best location, best Friday haleem."',dish:'General'},
+        {stars:'★★★☆☆',text:'"Chapli kabab can be greasy sometimes. Good flavour but leaves your hands oily."',dish:'Beef Chapli Kabab'},
+        {stars:'★★★★★',text:'"Chicken pizza crust was perfect today — soft inside, crispy edges."',dish:'Chicken Pizza'},
+        {stars:'★★★★☆',text:'"Pasta portions are good value. A filling meal for under Rs.300."',dish:'Pasta'},
+        {stars:'★★★★★',text:'"Three years at NUST and C3 haleem is still the highlight of my week."',dish:'Haleem'},
+        {stars:'★★★★☆',text:'"C3 club sandwich with fries is a proper sit-down lunch. Comfortable space."',dish:'Club Sandwich'},
+        {stars:'★★★★★',text:'"Ice cream after masala fries is the only way to cool down at C3."',dish:'Ice Cream'},
+        {stars:'★★★☆☆',text:'"Chicken tikka was a bit salty today. Hopefully just an off batch."',dish:'Chicken Tikka'},
+        {stars:'★★★★★',text:'"Masala fries spice blend is unique to C3. You can\'t replicate it at home."',dish:'Masala Fries'},
+        {stars:'★★★★★',text:'"C3 chapli kabab is a must on any campus food tour. Start here."',dish:'Beef Chapli Kabab'},
+        {stars:'★★★☆☆',text:'"Pizza topping distribution is uneven — some slices have barely any chicken."',dish:'Chicken Pizza'},
+        {stars:'★★★★★',text:'"C3 is consistently good and conveniently located. My first choice every time."',dish:'General'},
       ]
     }
   };
 
   /* Slide gradient backgrounds (placeholder until real photos) */
   var SLIDE_BGS = [
-    'linear-gradient(135deg,#1a0533 0%,#3d1080 40%,#6d28d9 70%,#22C55E 100%)',
+    'linear-gradient(135deg,#1a0533 0%,#3d1080 40%,#6d28d9 70%,#1d1d1f 100%)',
     'linear-gradient(135deg,#0a0520 0%,#2d1065 30%,#4c1d95 60%,#7c3aed 100%)',
     'linear-gradient(135deg,#200040 0%,#4a1090 40%,#8b5cf6 70%,#c4b5fd 100%)',
     'linear-gradient(135deg,#0f0030 0%,#1e0a60 40%,#5b21b6 70%,#a78bfa 100%)',
@@ -500,12 +713,17 @@
   cafe.slides.forEach(function(s, i) {
     var el = document.createElement('div');
     el.className = 'slide' + (i === 0 ? ' active' : '');
-    el.style.background = SLIDE_BGS[i % SLIDE_BGS.length];
-    // Placeholder text
-    var ph = document.createElement('div');
-    ph.className = 'slide-placeholder';
-    ph.textContent = 'PHOTO ' + (i+1);
-    el.appendChild(ph);
+    if (s.photo) {
+      el.style.backgroundImage = 'url(' + s.photo + ')';
+      el.style.backgroundSize = 'cover';
+      el.style.backgroundPosition = 'center';
+    } else {
+      el.style.background = SLIDE_BGS[i % SLIDE_BGS.length];
+      var ph = document.createElement('div');
+      ph.className = 'slide-placeholder';
+      ph.textContent = 'PHOTO ' + (i+1);
+      el.appendChild(ph);
+    }
     container.appendChild(el);
 
     var dot = document.createElement('div');
@@ -578,11 +796,14 @@
   cafe.specialties.forEach(function(sp) {
     var chip = document.createElement('span');
     chip.textContent = sp;
-    chip.style.cssText = 'background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:var(--accent);border-radius:100px;padding:4px 14px;font-size:0.75rem;font-weight:600;';
+    chip.style.cssText = 'background:rgba(29,29,31,0.06);border:1px solid rgba(29,29,31,0.15);color:var(--accent);border-radius:100px;padding:4px 14px;font-size:0.75rem;font-weight:600;';
     specWrap.appendChild(chip);
   });
-  document.getElementById('rateLink').href = 'cafe.html?id=' + cafeId;
-  document.getElementById('rateLink2').href = 'cafe.html?id=' + cafeId;
+  document.getElementById('rateLink').onclick = function(e){
+    e.preventDefault();
+    document.getElementById('signInPrompt').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  };
 
   /* ── Populate Menu tab ──────────────── */
   var menuGrid = document.getElementById('menuGrid');
@@ -609,20 +830,41 @@
   });
 
   /* ── Tabs ───────────────────────────── */
+  function activateTab(name) {
+    document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+    var btn = document.querySelector('[data-tab="'+name+'"]');
+    var panel = document.getElementById('tab-'+name);
+    if (btn) btn.classList.add('active');
+    if (panel) panel.classList.add('active');
+  }
+
   document.querySelectorAll('.tab-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
-      document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
-      btn.classList.add('active');
-      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-    });
+    btn.addEventListener('click', function() { activateTab(btn.dataset.tab); });
   });
+
+  /* Auto-open tab from URL param */
+  var tabParam = new URLSearchParams(location.search).get('tab');
+  if (tabParam) activateTab(tabParam);
+
+  /* ── Write-a-Review button — requires sign-in ─────────── */
+  document.getElementById('writeReviewBtn').onclick = function() {
+    document.getElementById('signInPrompt').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  };
 
   /* Lucide icons */
   if (typeof lucide !== 'undefined') lucide.createIcons();
 
   /* Update page title */
   document.title = cafe.name + ' — Concordia Eats';
+  </script>
+
+  <script>
+  /* Close sign-in prompt on backdrop click */
+  document.getElementById('signInPrompt').addEventListener('click', function(e) {
+    if (e.target === this) { this.style.display = 'none'; document.body.style.overflow = ''; }
+  });
   </script>
 </body>
 </html>
