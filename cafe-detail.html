@@ -429,7 +429,7 @@
     '1': {
       name: 'Concordia I',
       location: 'Near NBS Ground, NUST H-12',
-      hours: '7:00 AM – 10:00 PM (Mon–Sat)',
+      hours: '9:00 AM – 10:00 PM (Mon–Sun)',
       bestFor: 'Quick bites between lectures, chai lovers, NBS students',
       desc: 'Concordia I is the go-to spot for NBS and nearby department students. Known for its incredible chai, freshly made parathas, and the legendary Special Biryani. Great for a quick meal between lectures or a relaxed post-class hangout.',
       rating: '4.2',
@@ -451,7 +451,7 @@
     '2': {
       name: 'Concordia II',
       location: 'Near SEECS Building, NUST H-12',
-      hours: '7:00 AM – 12:00 AM (Mon–Sat)',
+      hours: '9:00 AM – 10:00 PM (Mon–Sun)',
       bestFor: 'Late-night study sessions, SEECS & CS students, group hangouts',
       desc: 'Concordia II is the powerhouse cafe for SEECS and EE students. Open the latest of all three cafes, it\'s the go-to for late-night lab sessions, midnight chai runs, and post-deadline celebration meals. The Zinger Burger and Mutton Karahi are crowd favourites.',
       rating: '4.5',
@@ -472,7 +472,7 @@
     '3': {
       name: 'Concordia III',
       location: 'Near Main Office / Admin Block, NUST H-12',
-      hours: '7:00 AM – 9:00 PM (Mon–Sat)',
+      hours: '9:00 AM – 10:00 PM (Mon–Sun)',
       bestFor: 'All departments, central campus location, larger group meals',
       desc: 'Concordia III sits right at the heart of the NUST campus, making it accessible to students from every department. Known for its haleem on Fridays, chicken tikka, and pizza. The largest seating area of all three cafes — perfect for group meals.',
       rating: '3.9',
@@ -591,10 +591,9 @@
   document.getElementById('abtLoc').textContent = cafe.location;
   document.getElementById('abtHours').textContent = cafe.hours;
   document.getElementById('abtFor').textContent = cafe.bestFor;
-  document.getElementById('abtRating').textContent = cafe.rating;
-  document.getElementById('abtCount').textContent = cafe.ratingCount;
-  var starsVal = Math.round(parseFloat(cafe.rating));
-  document.getElementById('abtStars').textContent = '★'.repeat(starsVal) + '☆'.repeat(5 - starsVal);
+  document.getElementById('abtRating').textContent = '—';
+  document.getElementById('abtCount').textContent = '0 reviews';
+  document.getElementById('abtStars').textContent = '☆☆☆☆☆';
   var specWrap = document.getElementById('abtSpecialties');
   cafe.specialties.forEach(function(sp) {
     var chip = document.createElement('span');

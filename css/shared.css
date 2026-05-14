@@ -358,5 +358,19 @@ h1, h2, h3, h4 { font-family: 'Syne', sans-serif; line-height: 1.15; }
   .hide-mobile { display: none !important; }
   .nav-links   { display: none; }
   .nav-hamburger { display: flex; }
-  .btn-login   { padding: 8px 14px; font-size: 0.78rem; }
+  .btn-login   { padding: 8px 12px; font-size: 0.76rem; white-space: nowrap; }
+
+  /* Scrollable navbar — user can swipe right to reach login & theme buttons */
+  .navbar .container {
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap;
+    gap: 12px;
+    padding-right: 16px;
+  }
+  .navbar .container::-webkit-scrollbar { display: none; }
+  .nav-right { flex-shrink: 0; gap: 8px; }
+  .logo { flex-shrink: 0; }
 }
