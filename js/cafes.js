@@ -644,9 +644,9 @@ function renderStars(rating, size = 14) {
   const s = `width:${size}px;height:${size}px;flex-shrink:0;`;
   const starPath = 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z';
   let h = '';
-  for (let i = 0; i < full; i++)  h += `<svg style="${s}fill:#00C8F0;filter:drop-shadow(0 0 4px rgba(0,200,240,0.5));" viewBox="0 0 24 24"><path d="${starPath}"/></svg>`;
-  if (half)                        h += `<svg style="${s}fill:none;stroke:#00C8F0;stroke-width:1.5" viewBox="0 0 24 24"><path d="${starPath}"/></svg>`;
-  for (let i = 0; i < empty; i++) h += `<svg style="${s}fill:none;stroke:rgba(0,200,240,0.2);stroke-width:1.5" viewBox="0 0 24 24"><path d="${starPath}"/></svg>`;
+  for (let i = 0; i < full; i++)  h += `<svg style="${s}fill:#f59e0b;" viewBox="0 0 24 24"><path d="${starPath}"/></svg>`;
+  if (half)                        h += `<svg style="${s}fill:none;stroke:#f59e0b;stroke-width:1.5" viewBox="0 0 24 24"><path d="${starPath}"/></svg>`;
+  for (let i = 0; i < empty; i++) h += `<svg style="${s}fill:none;stroke:rgba(245,158,11,0.3);stroke-width:1.5" viewBox="0 0 24 24"><path d="${starPath}"/></svg>`;
   return h;
 }
 

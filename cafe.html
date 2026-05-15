@@ -62,7 +62,7 @@
     .rating-label { font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 10px; display: block; }
     .star-picker { display: flex; gap: 8px; margin-bottom: 18px; }
     .star-picker svg {
-      width: 34px; height: 34px; cursor: pointer; color: rgba(0,0,0,0.12);
+      width: 34px; height: 34px; cursor: pointer; color: rgba(245,158,11,0.25);
       transition: color 0.15s, transform 0.15s;
     }
     .star-picker svg:hover, .star-picker svg.hov { color: #f59e0b; transform: scale(1.12); }
@@ -240,8 +240,8 @@
       width: 28px; height: 28px; cursor: pointer; color: rgba(0,0,0,0.10);
       transition: color 0.12s, transform 0.12s;
     }
-    .star-popover-stars svg:hover, .star-popover-stars svg.hov { color: rgba(0,0,0,0.5); transform: scale(1.15); }
-    .star-popover-stars svg.sel { color: var(--accent); }
+    .star-popover-stars svg:hover, .star-popover-stars svg.hov { color: #f59e0b; transform: scale(1.15); }
+    .star-popover-stars svg.sel { color: #f59e0b; }
 
     /* ── Cafe nav ── */
     .cafe-nav { display: flex; gap: 10px; margin-bottom: 40px; }
@@ -579,12 +579,7 @@
           await Auth.restoreSession();
           await SbReviews.submit(cafe.id, user.id, user.department, selectedRating, comment);
         } else {
-          const existingLocal = DB.where('reviews', 'cafeId', cafe.id).find(rv => rv.userId === user.id);
-          if (existingLocal) {
-            DB.update('reviews', existingLocal.id, { rating: selectedRating, comment });
-          } else {
-            DB.insert('reviews', { cafeId: cafe.id, userId: user.id, department: user.department, rating: selectedRating, comment });
-          }
+          DB.insert('reviews', { cafeId: cafe.id, userId: user.id, department: user.department, rating: selectedRating, comment });
         }
         showToast('Review saved! Thank you.', 'success');
         _existingReview = null;
@@ -914,17 +909,14 @@
 
         const myReview = reviews.find(r => String(r.user_id) === String(user.id))
                       || myRevs.find(r => String(r.cafe_id) === String(cafe.id));
-        if (myReview) showAlreadyReviewed(myReview);
-        else buildStarPicker();
+        buildStarPicker();
       } else {
         const r = getCafeRating(cafe.id);
         renderHero(r.avg, r.count);
         const reviews = DB.where('reviews', 'cafeId', cafe.id)
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         renderReviews(reviews, r.avg, r.count);
-        const existing = reviews.find(rv => rv.userId === user.id);
-        if (existing) showAlreadyReviewed(existing);
-        else buildStarPicker();
+        buildStarPicker();
       }
 
       renderMenu();
