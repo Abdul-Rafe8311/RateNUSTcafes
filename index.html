@@ -1318,12 +1318,12 @@
         <div style="position:relative;max-width:420px;margin-top:20px;">
           <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text-muted);pointer-events:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input id="heroSearch" type="text" placeholder="Search biryani, zinger, chai…"
-            style="width:100%;padding:12px 14px 12px 40px;background:#ffffff;border:1.5px solid rgba(0,0,0,0.15);border-radius:var(--radius-card);color:var(--text-primary);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;transition:var(--transition);"
-            onfocus="this.style.borderColor='rgba(0,0,0,0.4)'"
-            onblur="this.style.borderColor='rgba(0,0,0,0.15)'"
+            style="width:100%;padding:12px 14px 12px 40px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-card);color:var(--text-primary);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;transition:var(--transition);"
+            onfocus="this.style.borderColor='var(--border-accent)'"
+            onblur="this.style.borderColor='var(--border)'"
             onkeydown="if(event.key==='Enter'&&this.value.trim())window.location.href='search.html?q='+encodeURIComponent(this.value.trim())" />
           <button onclick="var v=document.getElementById('heroSearch').value.trim();if(v)window.location.href='search.html?q='+encodeURIComponent(v);"
-            style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:#1d1d1f;border:none;color:#ffffff;font-weight:700;font-size:0.75rem;padding:5px 12px;border-radius:6px;cursor:pointer;letter-spacing:0.04em;">
+            style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--accent);border:none;color:var(--bg);font-weight:700;font-size:0.75rem;padding:5px 12px;border-radius:6px;cursor:pointer;letter-spacing:0.04em;">
             SEARCH
           </button>
         </div>
