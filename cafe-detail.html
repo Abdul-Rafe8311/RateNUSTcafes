@@ -10,6 +10,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet"/>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="js/theme.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/db.js"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -619,17 +622,60 @@
     menuGrid.appendChild(card);
   });
 
-  /* ── Populate Reviews tab ───────────── */
+  /* ── Populate Reviews tab (live from Supabase / localStorage) ── */
   var reviewGrid = document.getElementById('reviewGrid');
-  cafe.reviews.forEach(function(r) {
-    var card = document.createElement('div');
-    card.className = 'review-card';
-    card.innerHTML = '<div class="review-stars">'+r.stars+'</div>'
-      +'<div class="review-text">'+r.text+'</div>'
-      +'<div class="review-dish">'+r.dish+'</div>'
-      +'<div class="review-anon">Anonymous · NUST Student</div>';
-    reviewGrid.appendChild(card);
-  });
+
+  function renderStarText(rating) {
+    var stars = '';
+    for (var i = 1; i <= 5; i++) {
+      stars += i <= Math.round(rating) ? '★' : '☆';
+    }
+    return '<span style="color:#f59e0b;font-size:1.1rem;">'+stars+'</span>';
+  }
+
+  function renderReviews(reviews, avg, count) {
+    // Update About tab numbers
+    if (count > 0) {
+      document.getElementById('abtRating').textContent = parseFloat(avg).toFixed(1);
+      document.getElementById('abtCount').textContent = count + (count === 1 ? ' review' : ' reviews');
+      document.getElementById('abtStars').innerHTML = renderStarText(avg);
+    }
+    // Render review cards
+    reviewGrid.innerHTML = '';
+    if (!reviews || reviews.length === 0) {
+      reviewGrid.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem;">No reviews yet — be the first!</p>';
+      return;
+    }
+    reviews.forEach(function(r) {
+      var rating  = r.rating || r.stars || 0;
+      var comment = r.comment || r.text || '';
+      var dept    = r.department || 'NUST Student';
+      var date    = r.createdAt || r.created_at ? new Date(r.createdAt || r.created_at).toLocaleDateString('en-PK',{month:'short',day:'numeric',year:'numeric'}) : '';
+      var card = document.createElement('div');
+      card.className = 'review-card';
+      card.innerHTML = renderStarText(rating)
+        + (comment ? '<div class="review-text" style="margin:8px 0;">'+comment+'</div>' : '')
+        + '<div class="review-anon" style="font-size:0.75rem;color:var(--text-muted);">Anonymous · '+dept+(date?' · '+date:'')+'</div>';
+      reviewGrid.appendChild(card);
+    });
+  }
+
+  async function loadReviews() {
+    reviewGrid.innerHTML = '<p style="color:var(--text-muted);font-size:0.88rem;">Loading reviews…</p>';
+    try {
+      if (typeof SbReviews !== 'undefined') {
+        var result = await SbReviews.forCafe(cafeId);
+        renderReviews(result.reviews, result.avg, result.count);
+        return;
+      }
+    } catch(e) {}
+    // localStorage fallback
+    var all = DB.where('reviews', 'cafeId', cafeId);
+    var avg = all.length ? (all.reduce(function(s,r){return s+r.rating;},0)/all.length) : 0;
+    renderReviews(all, avg, all.length);
+  }
+
+  loadReviews();
 
   /* ── Tabs ───────────────────────────── */
   function activateTab(name) {
