@@ -520,7 +520,7 @@
       selectedRating = n;
       document.querySelectorAll('#starPicker svg').forEach((s, i) => {
         s.classList.toggle('sel', i < n);
-        if (i < n) { s.setAttribute('fill', '#1d1d1f'); s.removeAttribute('stroke'); }
+        if (i < n) { s.setAttribute('fill', '#f59e0b'); s.setAttribute('stroke', 'none'); }
         else { s.setAttribute('fill', 'none'); s.setAttribute('stroke', 'currentColor'); }
       });
     }
@@ -815,7 +815,7 @@
       const starPath = 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z';
       stars.innerHTML = [1,2,3,4,5].map(n => `
         <svg data-n="${n}" viewBox="0 0 24 24"
-          fill="${n <= myR ? '#1d1d1f' : 'none'}"
+          fill="${n <= myR ? '#f59e0b' : 'none'}"
           stroke="${n <= myR ? 'none' : 'currentColor'}"
           stroke-width="1.5"
           class="${n <= myR ? 'sel' : ''}"

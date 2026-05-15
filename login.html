@@ -291,8 +291,57 @@
     .back-link:hover { color: var(--text-primary); }
     .back-link a { text-decoration: none; color: inherit; }
 
-    #loginForm, #signupForm { display: none; }
-    #loginForm.active, #signupForm.active { display: block; }
+    #stepEmail, #stepOtp { display: none; }
+    #stepEmail.active, #stepOtp.active { display: block; }
+
+    /* OTP input row */
+    .otp-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1.5px solid var(--border-accent);
+      border-radius: 10px;
+      padding: 16px;
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.35em;
+      color: var(--text-primary);
+      text-align: center;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .otp-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.07);
+    }
+    [data-theme="dark"] .otp-input:focus {
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.09);
+    }
+    .otp-hint {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 10px;
+    }
+    .otp-hint a {
+      color: var(--text-primary);
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .otp-hint a:hover { text-decoration: underline; }
+    .sent-to {
+      background: rgba(26,127,75,0.06);
+      border: 1px solid rgba(26,127,75,0.15);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      color: var(--green);
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
     .spinner {
       width: 18px; height: 18px;
@@ -417,55 +466,52 @@
     <div class="auth-wrap" id="authWrap">
 
       <div class="auth-header">
-        <h2 id="formTitle">Welcome back</h2>
-        <p id="formSub">Sign in with your NUST institutional email</p>
+        <h2 id="formTitle">Sign in</h2>
+        <p id="formSub">Use your NUST email — we'll send a 6-digit code</p>
       </div>
 
-      <div class="auth-tabs">
-        <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Login</button>
-        <button class="auth-tab" id="tabSignup" onclick="switchTab('signup')">Sign Up</button>
-      </div>
-
-      <!-- Login Form -->
-      <div id="loginForm" class="active">
-        <div class="err-msg" id="loginErr"></div>
+      <!-- Step 1: Email -->
+      <div id="stepEmail" class="active">
+        <div class="err-msg" id="emailErr"></div>
         <div class="form-group">
           <label>NUST Email</label>
-          <input type="email" id="loginEmail" placeholder="you@seecs.edu.pk" oninput="checkDomain(this,'loginDomainHint')" autocomplete="email" />
-          <div class="domain-hint" id="loginDomainHint"></div>
+          <input type="email" id="otpEmail" placeholder="you@seecs.edu.pk"
+            oninput="checkDomain(this,'emailDomainHint')" autocomplete="email"
+            onkeydown="if(event.key==='Enter')doSendOtp()" />
+          <div class="domain-hint" id="emailDomainHint"></div>
         </div>
         <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()" />
+          <label>Your Name <span style="font-weight:400;text-transform:none;letter-spacing:0;">(first-time only)</span></label>
+          <input type="text" id="otpName" placeholder="e.g. Abdul Rafe" autocomplete="name" />
         </div>
-        <button class="btn-submit" onclick="doLogin()" id="loginBtn">
-          <span>Sign In</span>
+        <button class="btn-submit" onclick="doSendOtp()" id="sendOtpBtn">
+          <span>Send Code</span>
         </button>
       </div>
 
-      <!-- Signup Form -->
-      <div id="signupForm">
-        <div class="err-msg" id="signupErr"></div>
-        <div class="form-group">
-          <label>Full Name</label>
-          <input type="text" id="signupName" placeholder="Your name" autocomplete="name" />
+      <!-- Step 2: OTP -->
+      <div id="stepOtp">
+        <div class="sent-to" id="sentToMsg">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+          Code sent to <strong id="sentToEmail"></strong>
         </div>
+        <div class="err-msg" id="otpErr"></div>
         <div class="form-group">
-          <label>NUST Email</label>
-          <input type="email" id="signupEmail" placeholder="you@seecs.edu.pk" oninput="checkDomain(this,'signupDomainHint')" autocomplete="email" />
-          <div class="domain-hint" id="signupDomainHint"></div>
+          <label>6-Digit Code</label>
+          <input type="text" class="otp-input" id="otpCode" inputmode="numeric"
+            pattern="[0-9]{6}" maxlength="6" placeholder="——————"
+            autocomplete="one-time-code"
+            onkeydown="if(event.key==='Enter')doVerifyOtp()" />
         </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="signupPassword" placeholder="Min 6 characters" autocomplete="new-password" />
-        </div>
-        <div class="form-group">
-          <label>Confirm Password</label>
-          <input type="password" id="signupConfirm" placeholder="Repeat password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doSignup()" />
-        </div>
-        <button class="btn-submit" onclick="doSignup()" id="signupBtn">
-          <span>Create Account</span>
+        <button class="btn-submit" onclick="doVerifyOtp()" id="verifyOtpBtn">
+          <span>Verify &amp; Sign In</span>
         </button>
+        <p class="otp-hint" style="margin-top:16px;">
+          Didn't get it? Check spam, or
+          <a onclick="doResendOtp()" id="resendLink">resend code</a>.
+          &nbsp;·&nbsp;
+          <a onclick="goBackToEmail()">change email</a>
+        </p>
       </div>
 
       <div class="back-link"><a href="index.html">← Back to home</a></div>
@@ -481,29 +527,13 @@
   <script>
     if (Auth.isLoggedIn()) window.location.href = 'dashboard.html';
 
-    // Simple entrance animation
     gsap.timeline({ delay: 0.05 })
       .to('.auth-panel .panel-content', { opacity: 1, x: 0, duration: 0.65, ease: 'power3.out' })
       .to('#authWrap',                  { opacity: 1, y: 0,  duration: 0.55, ease: 'power3.out' }, '-=0.4');
+    gsap.from('.panel-feat', { opacity: 0, x: -14, stagger: 0.08, duration: 0.5, ease: 'power2.out', delay: 0.4 });
 
-    gsap.from('.panel-feat', {
-      opacity: 0, x: -14, stagger: 0.08, duration: 0.5, ease: 'power2.out', delay: 0.4
-    });
-
-    // Tab logic
-    const titles = {
-      login:  ['Welcome back',    'Sign in with your NUST institutional email'],
-      signup: ['Create account',  'Join with your NUST institutional email']
-    };
-
-    function switchTab(tab) {
-      document.getElementById('tabLogin').classList.toggle('active',  tab === 'login');
-      document.getElementById('tabSignup').classList.toggle('active', tab === 'signup');
-      document.getElementById('loginForm').classList.toggle('active',  tab === 'login');
-      document.getElementById('signupForm').classList.toggle('active', tab === 'signup');
-      document.getElementById('formTitle').textContent = titles[tab][0];
-      document.getElementById('formSub').textContent   = titles[tab][1];
-    }
+    var _otpEmail = '';
+    var _otpName  = '';
 
     function checkDomain(input, hintId) {
       const hint  = document.getElementById(hintId);
@@ -527,51 +557,78 @@
       btn.disabled = loading;
       btn.innerHTML = loading ? '<div class="spinner"></div>' : `<span>${text}</span>`;
     }
-
     function showErr(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.classList.add('visible'); }
     function hideErr(id)      { document.getElementById(id).classList.remove('visible'); }
 
-    async function doLogin() {
-      hideErr('loginErr');
-      const email    = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value;
-      if (!email || !password) { showErr('loginErr', 'Please fill in all fields.'); return; }
-      setLoading('loginBtn', true, 'Sign In');
+    async function doSendOtp() {
+      hideErr('emailErr');
+      const email = document.getElementById('otpEmail').value.trim().toLowerCase();
+      const name  = document.getElementById('otpName').value.trim();
+      if (!email) { showErr('emailErr', 'Please enter your NUST email.'); return; }
+      if (!Auth.validateNUST(email)) { showErr('emailErr', 'Only NUST institutional emails are allowed.'); return; }
+      setLoading('sendOtpBtn', true, 'Send Code');
       try {
-        await Auth.login(email, password);
-        document.getElementById('loginBtn').innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Welcome!';
-        setTimeout(() => { window.location.href = 'dashboard.html'; }, 500);
+        const { error } = await _sb.auth.signInWithOtp({
+          email,
+          options: { shouldCreateUser: true }
+        });
+        if (error) throw new Error(error.message);
+        _otpEmail = email;
+        _otpName  = name || email.split('@')[0];
+        document.getElementById('sentToEmail').textContent = email;
+        document.getElementById('stepEmail').classList.remove('active');
+        document.getElementById('stepOtp').classList.add('active');
+        document.getElementById('otpCode').focus();
       } catch (e) {
-        setLoading('loginBtn', false, 'Sign In');
-        showErr('loginErr', e.message);
+        showErr('emailErr', e.message);
+      } finally {
+        setLoading('sendOtpBtn', false, 'Send Code');
       }
     }
 
-    async function doSignup() {
-      hideErr('signupErr');
-      const name     = document.getElementById('signupName').value.trim();
-      const email    = document.getElementById('signupEmail').value.trim();
-      const password = document.getElementById('signupPassword').value;
-      const confirm  = document.getElementById('signupConfirm').value;
-      if (!name || !email || !password || !confirm) { showErr('signupErr', 'Please fill in all fields.'); return; }
-      if (name.length < 2)        { showErr('signupErr', 'Please enter your full name.'); return; }
-      if (password.length < 6)    { showErr('signupErr', 'Password must be at least 6 characters.'); return; }
-      if (password !== confirm)   { showErr('signupErr', 'Passwords do not match.'); return; }
-      setLoading('signupBtn', true, 'Create Account');
+    async function doVerifyOtp() {
+      hideErr('otpErr');
+      const token = document.getElementById('otpCode').value.trim();
+      if (!token || token.length !== 6) { showErr('otpErr', 'Please enter the full 6-digit code.'); return; }
+      setLoading('verifyOtpBtn', true, 'Verify & Sign In');
       try {
-        await Auth.signup(name, email, password);
-        document.getElementById('signupBtn').innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Account created!';
-        setTimeout(() => { window.location.href = 'dashboard.html'; }, 500);
+        const { data, error } = await _sb.auth.verifyOtp({ email: _otpEmail, token, type: 'email' });
+        if (error) throw new Error(error.message);
+        const user = data.user;
+        const department = Auth.getDept(_otpEmail);
+        // Create or fetch profile
+        await SbAuth.ensureProfile(user.id, _otpName, department);
+        Auth._saveSession({
+          id: user.id, name: _otpName, email: _otpEmail, department,
+          _at: data.session.access_token, _rt: data.session.refresh_token
+        });
+        document.getElementById('verifyOtpBtn').innerHTML =
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Verified!';
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 600);
       } catch (e) {
-        setLoading('signupBtn', false, 'Create Account');
-        if (e.message && e.message.toLowerCase().includes('already registered')) {
-          document.getElementById('loginEmail').value = email;
-          switchTab('login');
-          showErr('loginErr', 'You already have an account — please sign in.');
-        } else {
-          showErr('signupErr', e.message);
-        }
+        setLoading('verifyOtpBtn', false, 'Verify & Sign In');
+        showErr('otpErr', 'Invalid or expired code. Please try again.');
       }
+    }
+
+    async function doResendOtp() {
+      const link = document.getElementById('resendLink');
+      link.textContent = 'Sending…';
+      try {
+        const { error } = await _sb.auth.signInWithOtp({ email: _otpEmail, options: { shouldCreateUser: true } });
+        if (error) throw error;
+        link.textContent = 'Sent!';
+      } catch (_) {
+        link.textContent = 'Try again';
+      }
+      setTimeout(() => { link.textContent = 'resend code'; }, 3000);
+    }
+
+    function goBackToEmail() {
+      hideErr('otpErr');
+      document.getElementById('otpCode').value = '';
+      document.getElementById('stepOtp').classList.remove('active');
+      document.getElementById('stepEmail').classList.add('active');
     }
   </script>
 </body>
