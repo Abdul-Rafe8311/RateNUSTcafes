@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="js/theme.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -51,13 +51,13 @@
 
     html { scroll-behavior: smooth; }
     body {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Lexend', sans-serif;
       background: var(--bg);
       color: var(--text-primary);
       line-height: 1.65;
       overflow-x: hidden;
     }
-    h1,h2,h3,h4 { font-family: 'Syne', sans-serif; line-height: 1.12; }
+    h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.12; }
 
     /* ── Theme Toggle ── */
     .theme-toggle {
@@ -82,7 +82,7 @@
       max-width: 1160px; margin: 0 auto; padding: 0 24px;
       display: flex; align-items: center; justify-content: space-between;
     }
-    .logo { font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--text-primary); }
+    .logo { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--text-primary); }
     .logo span { color: var(--text-primary); }
     .nav-links { display: flex; gap: 28px; }
     .nav-links a {
@@ -126,7 +126,7 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 4rem; letter-spacing: 4px;
       color: rgba(29,29,31,0.10);
-      font-family: 'Syne', sans-serif; font-weight: 800;
+      font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800;
     }
 
     .slide-content {
@@ -144,7 +144,7 @@
       backdrop-filter: blur(6px);
     }
     .slide-title {
-      font-family: 'Syne', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: clamp(2rem, 5vw, 4rem);
       font-weight: 800; line-height: 1.08;
       color: #fff; margin-bottom: 10px;
@@ -153,7 +153,7 @@
 
     /* Counter */
     .slide-counter {
-      font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700;
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.1rem; font-weight: 700;
       color: rgba(255,255,255,0.5); white-space: nowrap;
     }
     .slide-counter span { color: #fff; }
@@ -202,7 +202,7 @@
       margin-bottom: 48px;
     }
     .tab-btn {
-      padding: 12px 28px; font-family: 'Syne', sans-serif;
+      padding: 12px 28px; font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: 0.875rem; font-weight: 600;
       color: var(--text-muted); border-bottom: 2px solid transparent;
       transition: all 0.2s; cursor: pointer; position: relative; top: 1px;
@@ -231,7 +231,7 @@
       border-radius: 14px; padding: 28px;
     }
     .rating-num {
-      font-family: 'Syne', sans-serif; font-size: 4rem; font-weight: 800;
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: 4rem; font-weight: 800;
       color: var(--accent); line-height: 1;
     }
     .rating-stars { font-size: 1.2rem; color: #FFB800; margin: 8px 0; letter-spacing: 3px; }
@@ -248,7 +248,7 @@
     }
     .menu-card:hover { border-color: rgba(29,29,31,0.25); }
     .menu-card-emoji { font-size: 2rem; margin-bottom: 10px; }
-    .menu-card-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.92rem; margin-bottom: 4px; }
+    .menu-card-name { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 0.92rem; margin-bottom: 4px; }
     .menu-card-price { font-size: 0.82rem; color: var(--accent); font-weight: 700; }
     .menu-card-cat { font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; }
 
@@ -388,14 +388,14 @@
 
     <!-- MENU tab -->
     <div class="tab-panel" id="tab-menu">
-      <h2 style="font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;margin-bottom:8px;">Menu Highlights</h2>
+      <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.6rem;font-weight:800;margin-bottom:8px;">Menu Highlights</h2>
       <p style="color:var(--text-muted);margin-bottom:32px;font-size:0.9rem;">Top-rated dishes by students. <a href="search.html" style="color:var(--accent);">Search the full menu →</a></p>
       <div class="menu-grid" id="menuGrid"></div>
     </div>
 
     <!-- REVIEWS tab -->
     <div class="tab-panel" id="tab-reviews">
-      <h2 style="font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;margin-bottom:8px;">Recent Reviews</h2>
+      <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.6rem;font-weight:800;margin-bottom:8px;">Recent Reviews</h2>
       <p style="color:var(--text-muted);margin-bottom:32px;font-size:0.9rem;">Anonymous reviews from verified NUST students.</p>
       <div class="review-grid" id="reviewGrid"></div>
       <div style="margin-top:28px;">
@@ -413,7 +413,7 @@
     <div style="background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:40px 36px;width:min(420px,92vw);position:relative;text-align:center;">
       <button onclick="document.getElementById('signInPrompt').style.display='none';document.body.style.overflow='';" style="position:absolute;top:14px;right:16px;background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1.4rem;line-height:1;">×</button>
       <div style="font-size:2.2rem;margin-bottom:16px;">✍️</div>
-      <h3 style="font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;margin-bottom:10px;">Sign in to Write a Review</h3>
+      <h3 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.25rem;font-weight:800;margin-bottom:10px;">Sign in to Write a Review</h3>
       <p style="font-size:0.86rem;color:var(--text-muted);line-height:1.6;margin-bottom:28px;">Reviews are anonymous and visible to everyone.<br>You only need a NUST email to post.</p>
       <a href="login.html" style="display:block;background:var(--accent);color:var(--bg);border-radius:10px;padding:13px 0;font-size:0.9rem;font-weight:700;margin-bottom:12px;text-decoration:none;">Sign in with NUST Email</a>
       <button onclick="document.getElementById('signInPrompt').style.display='none';document.body.style.overflow='';" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:12px 0;font-size:0.88rem;font-weight:600;color:var(--text-muted);background:none;cursor:pointer;">Maybe Later</button>
