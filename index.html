@@ -1746,22 +1746,32 @@
   </script>
 
   <script>
-    // Update review counts from localStorage
-    document.addEventListener('DOMContentLoaded', function() {
-      function updateReviewCounts() {
-        ['1','2','3'].forEach(function(id) {
-          var span = document.getElementById('rc-' + id);
-          if (!span) return;
-          var count = 0;
+    // Update review counts — Supabase first, localStorage fallback
+    document.addEventListener('DOMContentLoaded', async function() {
+      async function getCount(id) {
+        if (typeof SbReviews !== 'undefined') {
           try {
-            var raw = localStorage.getItem('ce_reviews');
-            var all = raw ? JSON.parse(raw) : [];
-            count = all.filter(function(r){ return String(r.cafeId) === id; }).length;
+            var result = await SbReviews.forCafe(id);
+            return result.count;
           } catch(e) {}
+        }
+        try {
+          var raw = localStorage.getItem('ce_reviews');
+          var all = raw ? JSON.parse(raw) : [];
+          return all.filter(function(r){ return String(r.cafeId) === id; }).length;
+        } catch(e) { return 0; }
+      }
+
+      async function updateReviewCounts() {
+        for (var id of ['1','2','3']) {
+          var span = document.getElementById('rc-' + id);
+          if (!span) continue;
+          var count = await getCount(id);
           span.innerHTML = '<i data-lucide="message-circle"></i>' + count + (count === 1 ? ' review' : ' reviews');
-        });
+        }
         if (window.lucide) lucide.createIcons();
       }
+
       updateReviewCounts();
       window.addEventListener('storage', updateReviewCounts);
     });
