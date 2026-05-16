@@ -3,6 +3,7 @@ const NUST_DOMAINS = [
     's3h.nust.edu.pk', 'nust.edu.pk', 'pnec.edu.pk', 'mcs.edu.pk',
     'iese.edu.pk', 'asab.nust.edu.pk', 'igis.nust.edu.pk', 'rimms.nust.edu.pk',
     'sns.nust.edu.pk', 'nice.nust.edu.pk', 'camp.nust.edu.pk', 'cae.nust.edu.pk',
+    'student.nust.edu.pk',
 ];
 
 const DEPT_NAMES = {
@@ -11,7 +12,7 @@ const DEPT_NAMES = {
     'pnec.edu.pk': 'PNEC', 'mcs.edu.pk': 'MCS', 'iese.edu.pk': 'IESE',
     'asab.nust.edu.pk': 'ASAB', 'igis.nust.edu.pk': 'IGIS', 'rimms.nust.edu.pk': 'RIMMS',
     'sns.nust.edu.pk': 'SNS', 'nice.nust.edu.pk': 'NICE', 'camp.nust.edu.pk': 'CAMP',
-    'cae.nust.edu.pk': 'CAE',
+    'cae.nust.edu.pk': 'CAE', 'student.nust.edu.pk': 'NUST',
 };
 
 const Auth = {
