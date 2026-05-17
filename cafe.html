@@ -524,21 +524,6 @@
       document.querySelector('.review-form-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    async function loadExistingReview() {
-      if (!Auth._supabaseReady()) return;
-      try {
-        const existing = await SbReviews.findExisting(cafe.id, user.id);
-        if (existing) {
-          editingReviewId = existing.id;
-          selectStar(parseInt(existing.rating) || 0);
-          const ta = document.getElementById('reviewComment');
-          if (ta) ta.value = existing.comment || '';
-          document.getElementById('submitBtn').textContent = 'Update Review';
-          document.getElementById('reviewNote').style.display = '';
-        }
-      } catch (_) {}
-    }
-
     async function reloadReviews() {
       if (!Auth._supabaseReady()) return;
       const { reviews, avg, count } = await SbReviews.forCafe(cafe.id);
@@ -577,7 +562,7 @@
         await reloadReviews();
       } catch (e) {
         const msg = (e.message || '').toLowerCase();
-        if (msg.includes('row-level security') || msg.includes('unique') || msg.includes('duplicate')) {
+        if (msg.includes('row-level') || msg.includes('unique') || msg.includes('duplicate') || msg.includes('already') || msg.includes('violates') || msg.includes('23505') || msg.includes('42501')) {
           showToast("You've already reviewed this cafe.", 'warn');
         } else {
           showToast('Something went wrong. Please try again.', 'error');
@@ -911,7 +896,16 @@
         renderHero(avg, count);
         renderReviews(reviews, avg, count);
         buildStarPicker();
-        await loadExistingReview();
+        // Pre-fill form if user already has a review — use data we already fetched
+        const myReview = reviews.find(r => String(r.user_id) === String(user.id));
+        if (myReview) {
+          editingReviewId = myReview.id;
+          selectStar(parseInt(myReview.rating) || 0);
+          const ta = document.getElementById('reviewComment');
+          if (ta) ta.value = myReview.comment || '';
+          document.getElementById('submitBtn').textContent = 'Update Review';
+          document.getElementById('reviewNote').style.display = '';
+        }
       } else {
         const r = getCafeRating(cafe.id);
         renderHero(r.avg, r.count);
