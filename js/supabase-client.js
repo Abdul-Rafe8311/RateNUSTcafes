@@ -95,6 +95,14 @@ const SbReviews = {
         return data;
     },
 
+    async findExisting(cafeId, userId) {
+        const { data, error } = await _sb.from('reviews')
+            .select('*').eq('cafe_id', cafeId).eq('user_id', userId)
+            .maybeSingle();
+        if (error) throw new Error(error.message);
+        return data;
+    },
+
     async mine(userId) {
         const { data, error } = await _sb.from('reviews').select('*').eq('user_id', userId);
         if (error) throw new Error(error.message);

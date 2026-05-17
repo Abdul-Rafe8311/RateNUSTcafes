@@ -389,17 +389,16 @@
           <div class="review-form-card">
             <div class="review-form-title">Leave a Review</div>
             <div id="formArea">
+              <div id="reviewNote" style="display:none;font-size:0.8rem;color:var(--text-muted);margin-bottom:14px;padding:10px 12px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--accent);">
+                You've already reviewed this cafe — you can update it below.
+              </div>
               <span class="rating-label">Your Rating *</span>
               <div class="star-picker" id="starPicker"></div>
-
               <div class="form-group">
                 <label>Comment (optional)</label>
                 <textarea id="reviewComment" placeholder="Share your honest opinion…" maxlength="400"></textarea>
               </div>
-              <div style="display:flex;gap:10px;align-items:center;">
-                <button class="submit-review-btn" id="submitBtn" onclick="submitReview()">Submit Review</button>
-                <button class="btn-ghost btn-sm" id="cancelBtn" style="display:none;" onclick="cancelEdit()">Cancel</button>
-              </div>
+              <button class="submit-review-btn" id="submitBtn" onclick="submitReview()">Submit Review</button>
             </div>
           </div>
         </div>
@@ -521,24 +520,30 @@
     let _useApi = false;
     let editingReviewId = null;
 
-    function startEdit(reviewId, rating, comment) {
-      editingReviewId = reviewId;
-      selectStar(rating);
-      const ta = document.getElementById('reviewComment');
-      if (ta) ta.value = comment || '';
-      document.getElementById('submitBtn').textContent = 'Update Review';
-      document.getElementById('cancelBtn').style.display = '';
+    function startEdit() {
       document.querySelector('.review-form-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    function cancelEdit() {
-      editingReviewId = null;
-      selectedRating = 0;
-      buildStarPicker();
-      const ta = document.getElementById('reviewComment');
-      if (ta) ta.value = '';
-      document.getElementById('submitBtn').textContent = 'Submit Review';
-      document.getElementById('cancelBtn').style.display = 'none';
+    async function loadExistingReview() {
+      if (!Auth._supabaseReady()) return;
+      try {
+        const existing = await SbReviews.findExisting(cafe.id, user.id);
+        if (existing) {
+          editingReviewId = existing.id;
+          selectStar(parseInt(existing.rating) || 0);
+          const ta = document.getElementById('reviewComment');
+          if (ta) ta.value = existing.comment || '';
+          document.getElementById('submitBtn').textContent = 'Update Review';
+          document.getElementById('reviewNote').style.display = '';
+        }
+      } catch (_) {}
+    }
+
+    async function reloadReviews() {
+      if (!Auth._supabaseReady()) return;
+      const { reviews, avg, count } = await SbReviews.forCafe(cafe.id);
+      renderHero(avg, count);
+      renderReviews(reviews, avg, count);
     }
 
     // ── Submit review ──
@@ -556,17 +561,27 @@
           await Auth.restoreSession();
           if (isEditing) {
             await SbReviews.update(editingReviewId, selectedRating, comment);
+            showToast('Review updated!', 'success');
           } else {
-            await SbReviews.submit(cafe.id, user.id, user.department, selectedRating, comment);
+            const newReview = await SbReviews.submit(cafe.id, user.id, user.department, selectedRating, comment);
+            editingReviewId = newReview.id;
+            document.getElementById('reviewNote').style.display = '';
+            showToast('Review submitted!', 'success');
           }
         } else {
           DB.insert('reviews', { cafeId: cafe.id, userId: user.id, department: user.department, rating: selectedRating, comment });
+          showToast('Review submitted!', 'success');
         }
-        showToast(isEditing ? 'Review updated!' : 'Review submitted!', 'success');
-        cancelEdit();
-        await loadCafe();
+        btn.disabled = false;
+        btn.textContent = 'Update Review';
+        await reloadReviews();
       } catch (e) {
-        showToast('Something went wrong. Please try again.', 'error');
+        const msg = (e.message || '').toLowerCase();
+        if (msg.includes('row-level security') || msg.includes('unique') || msg.includes('duplicate')) {
+          showToast("You've already reviewed this cafe.", 'warn');
+        } else {
+          showToast('Something went wrong. Please try again.', 'error');
+        }
         btn.disabled = false;
         btn.textContent = isEditing ? 'Update Review' : 'Submit Review';
       }
@@ -624,8 +639,7 @@
         const isOwn = String(r.user_id) === String(user.id);
         const safeComment = (r.comment || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         const editBtn = isOwn
-          ? `<button class="btn-ghost btn-sm" style="font-size:0.72rem;padding:3px 10px;"
-               onclick="startEdit('${r.id}', ${parseInt(r.rating)}, '${safeComment}')">Edit</button>`
+          ? `<button class="btn-ghost btn-sm" style="font-size:0.72rem;padding:3px 10px;" onclick="startEdit()">Edit</button>`
           : '';
         return `
           <div class="review-card">
@@ -897,6 +911,7 @@
         renderHero(avg, count);
         renderReviews(reviews, avg, count);
         buildStarPicker();
+        await loadExistingReview();
       } else {
         const r = getCafeRating(cafe.id);
         renderHero(r.avg, r.count);

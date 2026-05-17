@@ -173,6 +173,7 @@ h1, h2, h3, h4 { font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.15
 .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 .toast.success { background: var(--green); }
 .toast.error   { background: var(--red); }
+.toast.warn    { background: #f59e0b; color: #1a1a1a; }
 
 /* ─── Page wrapper ────────────────────────────────────────── */
 .page { padding-top: 72px; min-height: 100vh; }
