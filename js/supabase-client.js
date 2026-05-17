@@ -74,15 +74,24 @@ const SbReviews = {
     },
 
     async submit(cafeId, userId, department, rating, comment) {
-        const { data, error } = await _sb.from('reviews').upsert({
+        const { data, error } = await _sb.from('reviews').insert({
             cafe_id: cafeId, user_id: userId, department,
             rating, comment: comment || '',
-        }, { onConflict: 'cafe_id,user_id' }).select().single();
+        }).select().single();
 
         if (error) {
             if (error.code === '23503') throw new Error('Session expired — please log out and log back in.');
             throw new Error(error.message);
         }
+        return data;
+    },
+
+    async update(reviewId, rating, comment) {
+        const { data, error } = await _sb.from('reviews')
+            .update({ rating, comment: comment || '' })
+            .eq('id', reviewId)
+            .select().single();
+        if (error) throw new Error(error.message);
         return data;
     },
 
