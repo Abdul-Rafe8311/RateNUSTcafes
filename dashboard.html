@@ -353,7 +353,7 @@
               <div class="review-stars">${renderStars(r.rating, 12)}</div>
             </div>
             ${r.comment ? `<div class="review-text">"${r.comment}"</div>` : ''}
-            <div class="review-time">${r.department} · ${timeAgo(r.createdAt)}</div>
+            <div class="review-time">${r.department} · ${timeAgo(r.created_at || r.createdAt)}</div>
           </div>
         `;
       }).join('');
@@ -420,7 +420,7 @@
           <div class="mq-text">"${comment}"</div>
           <div class="mq-footer">
             <span class="mq-cafe-tag">${cafe ? cafe.name : 'Concordia'}</span>
-            <span class="mq-time">${timeAgo(r.createdAt)}</span>
+            <span class="mq-time">${timeAgo(r.created_at || r.createdAt)}</span>
           </div>
         </div>`;
     }
@@ -472,7 +472,7 @@
             ratings[c.id] = { avg: null, count: 0 };
           }
         });
-        const allRevs = DB.getAll('reviews').sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        const allRevs = DB.getAll('reviews').sort((a, b) => new Date(b.created_at || b.createdAt) - new Date(a.created_at || a.createdAt));
         const myRevs = DB.where('reviews', 'userId', user.id);
         renderLeaderboard(ratings);
         renderCafes(ratings);
