@@ -520,10 +520,6 @@
     let _useApi = false;
     let editingReviewId = null;
 
-    function startEdit() {
-      document.querySelector('.review-form-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-
     async function reloadReviews() {
       if (!Auth._supabaseReady()) return;
       const { reviews, avg, count } = await SbReviews.forCafe(cafe.id);
@@ -622,9 +618,8 @@
 
       container.innerHTML = reviews.map(r => {
         const isOwn = String(r.user_id) === String(user.id);
-        const safeComment = (r.comment || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-        const editBtn = isOwn
-          ? `<button class="btn-ghost btn-sm" style="font-size:0.72rem;padding:3px 10px;" onclick="startEdit()">Edit</button>`
+        const ownBadge = isOwn
+          ? `<span style="font-size:0.68rem;color:var(--text-muted);opacity:0.7;">Your review</span>`
           : '';
         return `
           <div class="review-card">
@@ -638,7 +633,7 @@
               </div>
               <div style="display:flex;align-items:center;gap:8px;">
                 <div class="review-stars">${renderStars(r.rating, 13)}</div>
-                ${editBtn}
+                ${ownBadge}
               </div>
             </div>
             ${r.comment ? `<div class="review-text">"${r.comment}"</div>` : ''}
