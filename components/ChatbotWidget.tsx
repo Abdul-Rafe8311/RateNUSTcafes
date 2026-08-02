@@ -39,8 +39,8 @@ interface ChatbotWidgetProps {
 }
 
 const WELCOME_TEXT =
-  "Hi! I'm Concordia Helper. Ask me about menus, prices or which cafe to hit — " +
-  'I know Concordia 1, 2, 3 and Ratro Cafe.';
+  "Hi! 👋 I'm Concordia Helper. Ask me anything about our 4 cafes — menus, prices, " +
+  'locations or what to order.';
 
 function formatTime(date: Date): string {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
