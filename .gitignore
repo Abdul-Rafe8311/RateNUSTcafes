@@ -1,5 +1,12 @@
 node_modules/
 backend/.env
 .env
+# every local env file, at any depth — these hold live secrets
+.env.local
+.env.*.local
+**/.env.local
+**/.env
+!.env.local.template
+!backend/.env.example
 .DS_Store
 .claude/
