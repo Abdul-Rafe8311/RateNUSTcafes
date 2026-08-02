@@ -38,6 +38,8 @@ interface ChatbotWidgetProps {
   userId?: string;
 }
 
+const REQUEST_TIMEOUT_MS = 30_000; // give up rather than spin forever
+
 const WELCOME_TEXT =
   "Hi! 👋 I'm Concordia Helper. Ask me anything about our 4 cafes — menus, prices, " +
   'locations or what to order.';
@@ -100,38 +102,78 @@ export default function ChatbotWidget({ userId }: ChatbotWidgetProps) {
     setInput('');
     setIsLoading(true);
 
+    const addBotMessage = (botText: string) =>
+      setMessages((prev) => [
+        ...prev,
+        { id: newId(), role: 'bot', text: botText, timestamp: new Date() },
+      ]);
+
+    // Client-side timeout, so a hung request can't spin forever
+    const controller = new AbortController();
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, REQUEST_TIMEOUT_MS);
+
     try {
+      // userId is always sent — null when nobody is signed in, so the server
+      // sees an explicit value rather than a missing key.
+      const payload = { message: text, userId: userId ?? null };
+      console.log('[chatbot] POST /api/chatbot', payload);
+
       const response = await fetch('/api/chatbot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, userId }),
+        body: JSON.stringify(payload),
+        signal: controller.signal,
       });
 
-      const data: { success?: boolean; message?: string; error?: string } = await response
-        .json()
-        .catch(() => ({}));
+      console.log('[chatbot] HTTP', response.status, response.statusText);
 
-      const replyText =
-        data.success && data.message
-          ? data.message
-          : data.error ?? "Sorry — I couldn't reach the kitchen. Please try again.";
+      // Read the body once as text — an error page may not be JSON at all
+      const raw = await response.text();
+      let data: { success?: boolean; message?: string; error?: string } | null = null;
+      try {
+        data = raw ? JSON.parse(raw) : null;
+      } catch {
+        console.error('[chatbot] response was not JSON:', raw.slice(0, 300));
+      }
 
-      setMessages((prev) => [
-        ...prev,
-        { id: newId(), role: 'bot', text: replyText, timestamp: new Date() },
-      ]);
-    } catch {
-      // Network failure — the fetch never completed
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: newId(),
-          role: 'bot',
-          text: "I'm having trouble connecting right now. Check your internet and try again.",
-          timestamp: new Date(),
-        },
-      ]);
+      // Validate the status code before trusting the payload
+      if (!response.ok) {
+        const serverMsg = data?.error ?? data?.message;
+        console.error('[chatbot] server error', response.status, serverMsg ?? raw.slice(0, 300));
+        throw new Error(
+          serverMsg ??
+            `Server returned HTTP ${response.status} (${response.statusText || 'error'}).`,
+        );
+      }
+      if (!data) throw new Error(`Server sent a response I could not read (HTTP ${response.status}).`);
+      if (!data.success || !data.message) {
+        throw new Error(data.error ?? 'Server replied without a message.');
+      }
+
+      addBotMessage(data.message);
+    } catch (err) {
+      console.error('[chatbot] request failed:', err);
+
+      if (timedOut || (err instanceof Error && err.name === 'AbortError')) {
+        addBotMessage(
+          `That took longer than ${REQUEST_TIMEOUT_MS / 1000} seconds, so I stopped waiting. Please try again.`,
+        );
+      } else if (err instanceof TypeError || (err instanceof Error && err.name === 'TypeError')) {
+        // fetch rejects with TypeError when the request never reached a server
+        // (server down, wrong URL, DNS, CORS rejection). The name check also
+        // catches errors thrown in another realm, where instanceof fails.
+        addBotMessage(
+          "I can't reach the chatbot API. Check that the dev server is running, then try again.",
+        );
+      } else {
+        addBotMessage(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      }
     } finally {
+      clearTimeout(timer);
       setIsLoading(false);
       inputRef.current?.focus();
     }

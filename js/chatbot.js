@@ -17,6 +17,7 @@
   // ── Config ────────────────────────────────────────────────────────
   var API_URL = window.CHATBOT_API_URL || 'http://localhost:5002/api/chatbot';
   var MAX_LENGTH = 500;
+  var REQUEST_TIMEOUT_MS = 30000; // give up rather than spin forever
 
   // Concordia Eats palette
   var C = {
@@ -271,8 +272,19 @@
     syncSendButton();
     showLoading();
 
-    var payload = { message: text };
-    if (window.CHATBOT_USER_ID) payload.userId = window.CHATBOT_USER_ID;
+    // userId is always present in the payload — null when nobody is signed in,
+    // so the server sees an explicit value rather than a missing key.
+    var payload = { message: text, userId: window.CHATBOT_USER_ID || null };
+
+    // Client-side timeout, so a hung request can't leave "Thinking..." forever.
+    var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var timedOut = false;
+    var timer = setTimeout(function () {
+      timedOut = true;
+      if (controller) controller.abort();
+    }, REQUEST_TIMEOUT_MS);
+
+    console.log('[chatbot] POST', API_URL, payload);
 
     // Wrapped so a synchronous throw (no fetch, blocked by CSP, bad URL) still
     // clears the loading state instead of leaving "Thinking..." on screen.
@@ -281,25 +293,61 @@
       request = fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        signal: controller ? controller.signal : undefined
       });
     } catch (err) {
       request = Promise.reject(err);
     }
 
     request
-      .then(function (res) { return res.json().catch(function () { return {}; }); })
-      .then(function (data) {
-        hideLoading();
-        addMessage('bot', (data && data.success && data.message)
-          ? data.message
-          : (data && data.error) || "Sorry — I couldn't reach the kitchen. Please try again.");
+      .then(function (res) {
+        console.log('[chatbot] HTTP', res.status, res.statusText);
+        // Read the body once as text — an error page may not be JSON at all.
+        return res.text().then(function (raw) {
+          var data = null;
+          try { data = raw ? JSON.parse(raw) : null; } catch (e) {
+            console.error('[chatbot] response was not JSON:', raw.slice(0, 300));
+          }
+
+          // Validate the status code before trusting the payload
+          if (!res.ok) {
+            var serverMsg = data && (data.error || data.message);
+            console.error('[chatbot] server error', res.status, serverMsg || raw.slice(0, 300));
+            throw new Error(serverMsg || ('Server returned HTTP ' + res.status + ' (' + (res.statusText || 'error') + ').'));
+          }
+          if (!data) throw new Error('Server sent a response I could not read (HTTP ' + res.status + ').');
+          if (!data.success || !data.message) {
+            throw new Error(data.error || 'Server replied without a message.');
+          }
+          return data.message;
+        });
       })
-      .catch(function () {
+      .then(function (reply) {
         hideLoading();
-        addMessage('bot', "I'm having trouble connecting right now. Make sure the backend is running, then try again.");
+        addMessage('bot', reply);
+      })
+      .catch(function (err) {
+        hideLoading();
+        console.error('[chatbot] request failed:', err);
+
+        var msg;
+        if (timedOut || err.name === 'AbortError') {
+          msg = 'That took longer than ' + (REQUEST_TIMEOUT_MS / 1000) +
+            ' seconds, so I stopped waiting. Please try again.';
+        } else if (err instanceof TypeError || err.name === 'TypeError') {
+          // fetch rejects with TypeError when the request never reached a server
+          // (server down, wrong port, DNS, CORS rejection). The name check also
+          // catches errors thrown in another realm, where instanceof fails.
+          msg = "I can't reach the server at " + API_URL + '. ' +
+            'Check that the backend is running (cd backend && npm run dev), then try again.';
+        } else {
+          msg = err.message || 'Something went wrong. Please try again.';
+        }
+        addMessage('bot', msg);
       })
       .finally(function () {
+        clearTimeout(timer);
         isLoading = false;
         els.input.disabled = false;
         syncSendButton();
