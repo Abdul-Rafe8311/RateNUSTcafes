@@ -129,9 +129,17 @@ exports.chat = async (req, res) => {
         ? req.body.userId.trim()
         : null;
 
-    if (!message) return fail(400, 'Please include a "message" string in the request body.');
-    if (message.length > MAX_MESSAGE_LENGTH)
+    console.log('[chatbot] POST /api/chatbot called');
+
+    if (!message) {
+        console.warn('[chatbot] rejected: empty message');
+        return fail(400, 'Please include a "message" string in the request body.');
+    }
+    if (message.length > MAX_MESSAGE_LENGTH) {
+        console.warn('[chatbot] rejected: message too long (%d chars)', message.length);
         return fail(400, `Message is too long (max ${MAX_MESSAGE_LENGTH} characters).`);
+    }
+    console.log('[chatbot] message received:', message);
 
     // 2. Check configuration before doing any work
     if (!process.env.GROQ_API_KEY) {
@@ -142,7 +150,12 @@ exports.chat = async (req, res) => {
     // 3. Load the menu context
     let menuContext;
     try {
+        const cached = menuCache && menuCache.expiresAt > Date.now();
+        console.log(cached
+            ? '[chatbot] using cached menu data'
+            : '[chatbot] fetching menu data from Supabase...');
         menuContext = await buildMenuContext();
+        console.log('[chatbot] menu context ready (%d chars)', menuContext.length);
     } catch (err) {
         console.error('[chatbot] menu load failed:', err.message);
         return fail(503, "Couldn't load the cafe menus right now. Check the Supabase keys and that SUPABASE_SETUP.sql has been run.");
@@ -153,6 +166,8 @@ exports.chat = async (req, res) => {
     const timer = setTimeout(() => controller.abort(), GROQ_TIMEOUT_MS);
 
     try {
+        console.log('[chatbot] calling Groq (%s)...', GROQ_MODEL);
+        const startedAt = Date.now();
         const groqRes = await fetch(GROQ_URL, {
             method: 'POST',
             headers: {
@@ -185,6 +200,8 @@ exports.chat = async (req, res) => {
             console.error('[chatbot] Groq returned no content');
             return fail(502, 'The AI service returned an empty response. Please try again.');
         }
+
+        console.log('[chatbot] Groq replied in %dms (%d chars)', Date.now() - startedAt, reply.length);
 
         // 5. Log the exchange when we know who asked (never blocks the reply)
         if (userId) logChat(userId, message, reply);

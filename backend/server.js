@@ -19,9 +19,14 @@ const allowedOrigins = [
     process.env.FRONTEND_URL
 ].filter(Boolean);
 
+// In development any localhost port is fine (Live Server picks 5500, 5501, …);
+// production stays restricted to the explicit list above.
+const isLocalhost = origin => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+
 app.use(cors({
     origin(origin, cb) {
         if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+        if (process.env.NODE_ENV !== 'production' && isLocalhost(origin)) return cb(null, true);
         console.log('CORS blocked:', origin);
         cb(new Error('Not allowed by CORS'));
     },
@@ -47,4 +52,12 @@ const PORT = process.env.PORT || 5002;
 app.listen(PORT, () => {
     console.log(`🚀 Concordia Eats API running on port ${PORT}`);
     console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+
+    // Chatbot config check — a missing key here is the usual cause of
+    // "I'm having trouble connecting right now" in the widget.
+    const missing = ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'GROQ_API_KEY']
+        .filter(k => !process.env[k]);
+    console.log(missing.length
+        ? `🤖 Chatbot: DISABLED — missing ${missing.join(', ')} (expected in project-root .env.local)`
+        : '🤖 Chatbot: ready at POST /api/chatbot');
 });
