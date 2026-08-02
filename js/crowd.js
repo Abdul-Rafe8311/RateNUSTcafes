@@ -21,6 +21,13 @@ const CROWD_SCHEDULE = {
     { start:14,  end:17,  level:'moderate' },
     { start:17,  end:19,  level:'quiet'    },
   ],
+  '4': [ // Ratro – Near Liaquat Hostel, hostel crowd peaks at night
+    { start:9,   end:12,  level:'quiet'    },
+    { start:12,  end:14,  level:'moderate' },
+    { start:14,  end:18,  level:'quiet'    },
+    { start:18,  end:21,  level:'busy'     },
+    { start:21,  end:24,  level:'moderate' },
+  ],
 };
 
 const CROWD_EXPIRY_MS = 45 * 60 * 1000; // 45 minutes

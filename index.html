@@ -1159,6 +1159,13 @@
             <text x="0" y="26" text-anchor="middle" font-family="'Plus Jakarta Sans',sans-serif" font-size="9" font-weight="700" fill="#1d1d1f">C3</text>
           </g>
 
+          <!-- RC — Ratro Cafe, near Liaquat Hostel (700,398) -->
+          <g id="pin4" style="cursor:pointer;" onclick="selectCafe(4)" transform="translate(700,398)">
+            <circle r="10" fill="rgba(29,29,31,0.12)" stroke="#1d1d1f" stroke-width="1.5"/>
+            <circle r="4" fill="#1d1d1f"/>
+            <text x="0" y="26" text-anchor="middle" font-family="'Plus Jakarta Sans',sans-serif" font-size="9" font-weight="700" fill="#1d1d1f">RC</text>
+          </g>
+
         </svg><!-- /campusSvg -->
 
         <!-- ── Cafe info card (floats on map) ── -->
@@ -1211,6 +1218,10 @@
           <span style="width:8px;height:8px;border-radius:50%;background:#1d1d1f;display:inline-block;"></span>
           <span style="font-size:0.8rem;font-weight:600;color:var(--text-muted);">C3 · Main Office</span>
         </div>
+        <div onclick="selectCafe(4)" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 14px;border:1px solid var(--border);border-radius:20px;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(0,0,0,0.3)'" onmouseout="this.style.borderColor='rgba(0,0,0,0.1)'">
+          <span style="width:8px;height:8px;border-radius:50%;background:#1d1d1f;display:inline-block;"></span>
+          <span style="font-size:0.8rem;font-weight:600;color:var(--text-muted);">RC · Near Liaquat Hostel</span>
+        </div>
       </div>
     </div>
   </section>
@@ -1221,7 +1232,8 @@
     var _mapCafes = {
       1: { name:'Concordia 1', loc:'Near NBS Ground', rating:'4.2', desc:'Quick bites, great chai, and a chill vibe between classes. The go-to spot when you have 10 minutes between lectures.', crowd:'quiet' },
       2: { name:'Concordia 2', loc:'Near SEECS',      rating:'4.5', desc:'Fuel for late-night lab sessions. Favorite of CS and EE students — always packed after 8 pm.', crowd:'busy' },
-      3: { name:'Concordia 3', loc:'Main Office',     rating:'3.9', desc:'The most central cafe on campus. Always buzzing with students from every department.', crowd:'moderate' }
+      3: { name:'Concordia 3', loc:'Main Office',     rating:'3.9', desc:'The most central cafe on campus. Always buzzing with students from every department.', crowd:'moderate' },
+      4: { name:'Ratro Cafe',  loc:'Near Liaquat Hostel', rating:'4.3', desc:'Hostel-side favourite for BBQ, jumbo rolls and pizza. Big portions and late hours.', crowd:'busy' }
     };
     var _crowdLabel = { busy:'Busy now', moderate:'Moderate', quiet:'Quiet now' };
     var _crowdColor = { busy:'#FF4466', moderate:'#FFB800', quiet:'#00E87A' };
@@ -1243,7 +1255,7 @@
         _crowdLabel[level] + '</span>';
 
       // Highlight selected pin
-      [1,2,3].forEach(function(i) {
+      [1,2,3,4].forEach(function(i) {
         var pin = document.getElementById('pin'+i);
         if (!pin) return;
         pin.querySelectorAll('circle[r="10"]').forEach(function(c) {
@@ -1265,8 +1277,8 @@
           <span class="label">About the App</span>
           <h2 class="section-title">Built for real NUST students.</h2>
           <p class="section-desc">
-            Concordia Eats is a verified student review platform for the three
-            Concordia cafes on NUST campus. Sign in with your NUST institutional email —
+            Concordia Eats is a verified student review platform for the
+            cafes on NUST campus. Sign in with your NUST institutional email —
             <strong style="color:var(--text-primary);font-weight:600;">@seecs.edu.pk</strong>,
             <strong style="color:var(--text-primary);font-weight:600;">@nbs.nust.edu.pk</strong>,
             <strong style="color:var(--text-primary);font-weight:600;">@smme.nust.edu.pk</strong> and more —
@@ -1315,7 +1327,7 @@
         <span class="label">On Campus</span>
         <h2 class="section-title">The Three Concordia Cafes</h2>
         <p class="section-desc">
-          All three cafes live on NUST's main campus. Each has its own crowd, vibe, and menu.
+          All four cafes live on NUST's main campus. Each has its own crowd, vibe, and menu.
           Find out which one your fellow students swear by.
         </p>
         <!-- Quick search bar -->
@@ -1389,6 +1401,24 @@
           </div>
         </div>
 
+        <div class="cafe-card">
+          <div class="cafe-inner">
+            <div class="cafe-top">
+              <span class="cafe-name">Ratro Cafe</span>
+            </div>
+            <div class="cafe-location"><i data-lucide="map-pin"></i>Near Liaquat Hostel</div>
+            <div id="crowd-4" style="margin:8px 0 4px;"></div>
+            <p class="cafe-desc">Hostel-side favourite for BBQ, jumbo rolls and pizza. Big portions, late hours, and the shakes menu everyone ends up ordering from.</p>
+            <div class="cafe-footer">
+              <span id="rc-4" class="review-count"><i data-lucide="message-circle"></i>0 reviews</span>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <a href="cafe-detail.html?cafe=4" style="font-size:0.75rem;color:var(--text-muted);font-weight:600;transition:color 0.2s;" onmouseover="this.style.color='var(--text-primary)'" onmouseout="this.style.color='var(--text-muted)'">Explore →</a>
+                <button class="btn-view"><span>View Reviews</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
@@ -1414,7 +1444,7 @@
           <div class="step-number">02</div>
           <div class="step-icon"><i data-lucide="store"></i></div>
           <div class="step-title">Pick a Concordia Cafe</div>
-          <p class="step-desc">Browse all three Concordia cafes. See what others are saying, which dishes are trending, and who's winning the weekly leaderboard.</p>
+          <p class="step-desc">Browse every cafe on campus. See what others are saying, which dishes are trending, and who's winning the weekly leaderboard.</p>
         </div>
         <div class="step-card">
           <div class="step-number">03</div>
@@ -1749,7 +1779,7 @@
   <script src="js/crowd.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      ['1','2','3'].forEach(id => {
+      ['1','2','3','4'].forEach(id => {
         const el = document.getElementById('crowd-' + id);
         if (el) el.innerHTML = crowdBadgeHtml(id);
       });
@@ -1774,7 +1804,7 @@
       }
 
       async function updateReviewCounts() {
-        for (var id of ['1','2','3']) {
+        for (var id of ['1','2','3','4']) {
           var span = document.getElementById('rc-' + id);
           if (!span) continue;
           var count = await getCount(id);

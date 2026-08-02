@@ -1,6 +1,6 @@
 const Review = require('../models/Review');
 
-const CAFE_IDS = ['1', '2', '3'];
+const CAFE_IDS = ['1', '2', '3', '4'];
 
 exports.getReviews = async (req, res, next) => {
     try {

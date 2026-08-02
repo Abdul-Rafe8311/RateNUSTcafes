@@ -14,7 +14,7 @@ create table if not exists public.profiles (
 -- 2. Cafe reviews (one per user per cafe)
 create table if not exists public.reviews (
   id         uuid primary key default gen_random_uuid(),
-  cafe_id    text not null check (cafe_id in ('1','2','3')),
+  cafe_id    text not null check (cafe_id in ('1','2','3','4')),
   user_id    uuid not null references auth.users on delete cascade,
   department text not null,
   rating     integer not null check (rating >= 1 and rating <= 5),
@@ -26,7 +26,7 @@ create table if not exists public.reviews (
 -- 3. Per-item ratings (upsert — user can update their own rating)
 create table if not exists public.item_reviews (
   id         uuid primary key default gen_random_uuid(),
-  cafe_id    text not null check (cafe_id in ('1','2','3')),
+  cafe_id    text not null check (cafe_id in ('1','2','3','4')),
   item_id    text not null,
   user_id    uuid not null references auth.users on delete cascade,
   department text not null,
@@ -71,3 +71,13 @@ $$ language plpgsql security definer;
 create or replace trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+
+-- ─────────────────────────────────────────────────────────────────
+-- 6. Migration: allow cafe_id '4' (Ratro Cafe) on existing databases
+--    The create-table checks above only apply to fresh installs, so run
+--    this once against a database that was created before Ratro was added.
+-- ─────────────────────────────────────────────────────────────────
+alter table public.reviews      drop constraint if exists reviews_cafe_id_check;
+alter table public.reviews      add  constraint reviews_cafe_id_check      check (cafe_id in ('1','2','3','4'));
+alter table public.item_reviews drop constraint if exists item_reviews_cafe_id_check;
+alter table public.item_reviews add  constraint item_reviews_cafe_id_check check (cafe_id in ('1','2','3','4'));

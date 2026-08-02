@@ -452,21 +452,21 @@
     // ── Load dashboard data ──
     async function loadDashboard() {
       if (Auth._supabaseReady()) {
-        const [r1, r2, r3, recent, myRevs] = await Promise.all([
-          SbReviews.forCafe('1'), SbReviews.forCafe('2'), SbReviews.forCafe('3'),
+        const [cafeStats, recent, myRevs] = await Promise.all([
+          Promise.all(CAFES.map(c => SbReviews.forCafe(c.id))),
           SbReviews.recent(10), SbReviews.mine(user.id),
         ]);
         // Only real counts — no fallbacks
-        const ratings = {
-          '1': { avg: r1.avg, count: r1.count },
-          '2': { avg: r2.avg, count: r2.count },
-          '3': { avg: r3.avg, count: r3.count },
-        };
+        const ratings = {};
+        CAFES.forEach((c, i) => {
+          ratings[c.id] = { avg: cafeStats[i].avg, count: cafeStats[i].count };
+        });
+        const totalReviews = cafeStats.reduce((s, r) => s + r.count, 0);
         renderLeaderboard(ratings);
         renderCafes(ratings);
         renderRecentReviews(recent);
         renderMarquee(recent);
-        renderUserStats(myRevs.length, r1.count + r2.count + r3.count);
+        renderUserStats(myRevs.length, totalReviews);
       } else {
         // localStorage fallback — also only real data
         const ratings = {};

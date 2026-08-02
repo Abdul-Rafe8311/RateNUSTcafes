@@ -181,7 +181,7 @@
     <div class="search-hero">
       <div class="container">
         <div class="search-hero-title">Find Food Across <span style="color:var(--accent)">All Cafes</span></div>
-        <div class="search-hero-sub">Search any dish · Compare prices · See ratings from all 3 Concordia cafes</div>
+        <div class="search-hero-sub">Search any dish · Compare prices · See ratings from every campus cafe</div>
         <div class="search-wrap">
           <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -203,9 +203,7 @@
       <div class="tab-panel active" id="tab-search">
         <div class="filter-row">
           <button class="filter-chip active" onclick="setFilter('all',this)">All Cafes</button>
-          <button class="filter-chip" onclick="setFilter('1',this)">Concordia 1</button>
-          <button class="filter-chip" onclick="setFilter('2',this)">Concordia 2</button>
-          <button class="filter-chip" onclick="setFilter('3',this)">Concordia 3</button>
+          <span id="cafeChips"></span>
         </div>
         <div class="results-count" id="resultsCount"></div>
         <div class="results-grid" id="resultsGrid"></div>
@@ -232,11 +230,8 @@
         <div class="compare-table-wrap">
           <table class="compare-table" id="compareTable">
             <thead>
-              <tr>
+              <tr id="compareHead">
                 <th>Item</th>
-                <th>Concordia 1</th>
-                <th>Concordia 2</th>
-                <th>Concordia 3</th>
               </tr>
             </thead>
             <tbody id="compareBody"></tbody>
@@ -259,7 +254,16 @@
     let _filter    = 'all';
     let _sortMode  = 'name';
     let _allItems  = []; // { name, cafeId, cafeName, price, itemId }
-    let _compareItems = []; // { name, c1, c2, c3 } — items in 2+ cafes
+    let _compareItems = []; // { name, prices: { [cafeId]: price } } — items in 2+ cafes
+
+    /* ── Cafe filter chips + comparison table header ── */
+    function buildCafeUI() {
+      document.getElementById('cafeChips').innerHTML = CAFES.map(c =>
+        `<button class="filter-chip" onclick="setFilter('${c.id}',this)">${c.name}</button>`
+      ).join('');
+      document.getElementById('compareHead').innerHTML =
+        '<th>Item</th>' + CAFES.map(c => `<th>${c.name}</th>`).join('');
+    }
 
     /* ── Build flat item index ── */
     function buildIndex() {
@@ -286,12 +290,10 @@
       const map = {};
       _allItems.forEach(item => {
         const key = item.nameLow;
-        if (!map[key]) map[key] = { name: item.name, c1: null, c2: null, c3: null };
-        map[key]['c' + item.cafeId] = item.price;
+        if (!map[key]) map[key] = { name: item.name, prices: {} };
+        map[key].prices[item.cafeId] = item.price;
       });
-      _compareItems = Object.values(map).filter(r =>
-        [r.c1, r.c2, r.c3].filter(p => p != null).length >= 2
-      );
+      _compareItems = Object.values(map).filter(r => cafeCount(r) >= 2);
     }
 
     /* ── Search rendering ── */
@@ -359,19 +361,15 @@
       empty.style.display = 'none';
 
       tbody.innerHTML = rows.map(r => {
-        const prices = [r.c1, r.c2, r.c3];
-        const validPrices = prices.filter(p => p != null);
-        const best = Math.min(...validPrices);
-        const count = validPrices.length;
-        const badge = count === 3
-          ? '<span class="multi-badge">All 3</span>'
-          : count === 2 ? '<span class="multi-badge">2 cafes</span>' : '';
+        const best  = minPrice(r);
+        const count = cafeCount(r);
+        const badge = count === CAFES.length
+          ? `<span class="multi-badge">All ${CAFES.length}</span>`
+          : `<span class="multi-badge">${count} cafes</span>`;
 
         return `<tr>
           <td class="item-name">${r.name}${badge}</td>
-          ${priceCell(r.c1, best)}
-          ${priceCell(r.c2, best)}
-          ${priceCell(r.c3, best)}
+          ${CAFES.map(c => priceCell(r.prices[c.id], best)).join('')}
         </tr>`;
       }).join('');
     }
@@ -382,8 +380,9 @@
       return `<td class="price-cell ${cls}">Rs. ${price}</td>`;
     }
 
-    function minPrice(r)  { return Math.min(...[r.c1,r.c2,r.c3].filter(p=>p!=null)); }
-    function cafeCount(r) { return [r.c1,r.c2,r.c3].filter(p=>p!=null).length; }
+    function priceList(r) { return CAFES.map(c => r.prices[c.id]).filter(p => p != null); }
+    function minPrice(r)  { return Math.min(...priceList(r)); }
+    function cafeCount(r) { return priceList(r).length; }
 
     function highlight(text, q) {
       if (!q) return escHtml(text);
@@ -451,6 +450,7 @@
 
     /* ── Boot ── */
     document.addEventListener('DOMContentLoaded', () => {
+      buildCafeUI();
       buildIndex();
       renderSearch();
       renderCompare();
