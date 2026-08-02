@@ -13,8 +13,11 @@ const connectDB = async () => {
             process.exit(0);
         });
     } catch (err) {
+        // Don't kill the process: routes that need Mongo (auth, reviews) will
+        // fail individually, but the chatbot — which only talks to Supabase and
+        // Groq — keeps working.
         console.error('❌ MongoDB connection failed:', err.message);
-        process.exit(1);
+        console.error('⚠️  Auth and review endpoints are unavailable until Mongo is reachable.');
     }
 };
 

@@ -1,4 +1,7 @@
 require('dotenv').config();
+// Chatbot keys (Supabase + Groq) live in the project-root .env.local so they
+// are shared with the rest of the app. Loaded second so backend/.env wins.
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env.local') });
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/database');
@@ -35,6 +38,7 @@ app.get('/health', (_req, res) => res.json({ success: true, message: 'Concordia 
 
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/reviews', require('./routes/reviews'));
+app.use('/api/chatbot', require('./routes/chatbot'));
 
 app.use((_req, res) => res.status(404).json({ success: false, message: 'Route not found' }));
 app.use(errorHandler);
